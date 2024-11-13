@@ -42,6 +42,7 @@ def getUser(request):
     token = AccessToken(token_string)
 
     user_id = token['user_id']
+    # logger.info("MON ID USER ---> %s", user_id)
     myUser = User.objects.get(id=user_id)
 
     # logger.info("OBJET DB myUser ---> %s", myUser)

@@ -23,8 +23,8 @@ section{
     background-color: rgba(106, 11, 129, 0.356);
     box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.877);
     backdrop-filter: blur(10px);
-    height: 80vh;
-    width: 70%;
+    height: 65vh;
+    width: 50%;
 }
 
 .pp{
