@@ -17,7 +17,6 @@ section{
 }
 
 .content-profil{
-    display: flex;
     color: white;
     border: 4px solid rgba(137, 18, 153, 0.795);
     border-radius: 100px;
@@ -31,5 +30,11 @@ section{
 .pp{
     border-radius: 100000000px;
     height: 150px;
-    margin: 50px 50px;
+    margin: 30px 50px;
+}
+
+h1 {
+    display: flex;
+    justify-content: center;
+    color: white;
 }

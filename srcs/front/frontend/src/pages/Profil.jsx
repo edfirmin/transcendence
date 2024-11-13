@@ -18,6 +18,7 @@ function Profil() {
     return (
         <section className="bg-profil">
             <div className="content-profil">
+                <h1>{user.username}</h1>
                 <img className="pp" src={user.profil_pic}/>
             </div>
         </section>

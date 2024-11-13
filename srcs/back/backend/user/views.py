@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from .models import User
 from rest_framework import generics
-from rest_framework.views import APIView
 from .serializers import UserSerializer, CreatUserSerializer
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from django.http import JsonResponse
 import logging
+from rest_framework_simplejwt.tokens import AccessToken
 logger = logging.getLogger(__name__)
 # Create your views here.
 
@@ -37,10 +37,12 @@ class CreatUserView(generics.CreateAPIView):
 
 def getUser(request):
     myPath = request.build_absolute_uri()
-    myUsernameId = myPath.split("?")[1]
 
-    # logger.info("MON ID EST ---> %s", myUsernameId)
-    myUser = User.objects.get(id=myUsernameId)
+    token_string = myPath.split("?")[1]
+    token = AccessToken(token_string)
+
+    user_id = token['user_id']
+    myUser = User.objects.get(id=user_id)
 
     # logger.info("OBJET DB myUser ---> %s", myUser)
     myUserSer = UserSerializer(myUser)

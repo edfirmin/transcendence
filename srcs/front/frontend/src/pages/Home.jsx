@@ -17,10 +17,7 @@ function Home() {
 
 	return (
 		<div>
-			<div>
-				<h2>Home Page</h2>
-			</div>
-			<h2>Transcendence</h2>
+			<h2>Transcendence</h2>{/*replacer par le logo*/}
 			<button className="logout-button" onClick={() => handleLogout()}>Logout</button>
 			<br/>
 			<button onClick={() => handleProfil()}>Profil</button>
