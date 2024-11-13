@@ -7,4 +7,4 @@ class User(AbstractUser):
     first_name = None
     last_name = None
     profil_pic = models.URLField(default="https://wallpapers-clan.com/wp-content/uploads/2022/08/default-pfp-16.jpg")
-    sec_id = models.CharField(default="")
+    

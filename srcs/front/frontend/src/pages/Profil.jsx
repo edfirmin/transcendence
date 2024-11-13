@@ -3,16 +3,16 @@ import { useState, useEffect } from "react";
 import { getUser } from "../api"
 
 function Profil() {
-    // const [user, setUser] = useState([])
+    const [user, setUser] = useState([])
     
-    // const inituser = async () => {
-    //     const TMPuser = await getUser()
-    //     setUser(TMPuser);
-    // }
+    const inituser = async () => {
+        const TMPuser = await getUser()
+        setUser(TMPuser);
+    }
 
-    // useEffect(() => {
-    //     inituser()
-    // }, []);
+    useEffect(() => {
+        inituser()
+    }, []);
 
 
     return (

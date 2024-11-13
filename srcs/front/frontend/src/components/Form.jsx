@@ -22,8 +22,6 @@ function From({route, method}) {
             if (method === "login") {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access)
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
-                const spl = res.data.refresh.split('.')
-                const sec_id = spl[2]
                 //await axios.post("/api/user/set_secID/", {username, sec_id})
                 navigate("/")
             }

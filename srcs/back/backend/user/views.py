@@ -37,19 +37,19 @@ class CreatUserView(generics.CreateAPIView):
 
 def getUser(request):
     myPath = request.build_absolute_uri()
-    idd = myPath.split("?")[1]
+    myUsernameId = myPath.split("?")[1]
 
-    myUser = User.objects.get(sec_id=idd)
-    #myUser = User.objects.get(sec_id=myUsername)
+    # logger.info("MON ID EST ---> %s", myUsernameId)
+    myUser = User.objects.get(id=myUsernameId)
 
-    logger.info("OBJET DB myUser ---> %s", myUser)
+    # logger.info("OBJET DB myUser ---> %s", myUser)
     myUserSer = UserSerializer(myUser)
 
-    logger.info("myUserSer ---> %s", myUserSer)
+    # logger.info("myUserSer ---> %s", myUserSer
 
     myUserFinal = myUserSer.data
 
-    logger.info("myUserFinal ---> %s", myUserFinal)
+    # logger.info("myUserFinal ---> %s", myUserFinal)
 
     return JsonResponse(myUserFinal, safe=False)
 
