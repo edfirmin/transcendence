@@ -43,12 +43,12 @@ class GlobalConsumer(AsyncWebsocketConsumer):
 class PongConsumer(AsyncWebsocketConsumer):
     ball_pos = [500, 500]
     ball_velocity = [2, 2]
-    left_paddle_pos = [0, 500]
-    right_paddle_pos = [0, 500]
+    left_paddle_pos = [0, 250]
+    right_paddle_pos = [0, 250]
     score = [0, 0]
     game_task = None
-    up_limit = 120
-    down_limit = 800
+    up_limit = 60
+    down_limit = 440
 
     async def connect(self):
         await self.accept()
@@ -71,7 +71,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if self.left_paddle_pos[1] > self.down_limit:
                 return
 
-            self.left_paddle_pos[1] += 1
+            self.left_paddle_pos[1] += 5
             await self.send(text_data=json.dumps({
                 'type':'left_paddle_down',
                 'message': self.left_paddle_pos[1]
@@ -81,32 +81,32 @@ class PongConsumer(AsyncWebsocketConsumer):
             if self.left_paddle_pos[1] < self.up_limit:
                 return
 
-            self.left_paddle_pos[1] -= 1
+            self.left_paddle_pos[1] -= 5
             await self.send(text_data=json.dumps({
                 'type':'left_paddle_up',
                 'message': self.left_paddle_pos[1]
             }))
         if (message == "right_paddle_up"):
-            if self.right_paddle_pos[1] > self.up_limit:
+            if self.right_paddle_pos[1] < self.up_limit:
                 return
             
-            self.right_paddle_pos[1] -= 1
+            self.right_paddle_pos[1] -= 5
             await self.send(text_data=json.dumps({
                 'type':'right_paddle_up',
                 'message': self.right_paddle_pos[1]
             }))
         if (message == "right_paddle_down"):
-            if self.right_paddle_pos[1] < self.down_limit:
+            if self.right_paddle_pos[1] > self.down_limit:
                 return
 
-            self.right_paddle_pos[1] += 1
+            self.right_paddle_pos[1] += 5
             await self.send(text_data=json.dumps({
                 'type':'right_paddle_down',
                 'message': self.right_paddle_pos[1]
             }))
 
-        if self.game_task == None:
-            self.game_task = asyncio.create_task(self.main_loop())
+        #if self.game_task == None:
+            #self.game_task = asyncio.create_task(self.main_loop())
 
 
     async def disconnect(self, close_code):

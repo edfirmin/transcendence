@@ -14,7 +14,7 @@ function Pong() {
 	const RPaddle = useRef({ x: 750, y: 250});
 	const [score, setScore] = useState({left: 0, right: 0});
 	const gameStarted = useRef(false);
-    const pos = useRef({ x: 400, y: 250 });
+    const ball = useRef({ x: 400, y: 250 });
     const obj = useRef({ x: 400, y: 250 });
     const dir = useRef(1);
     const vec = useRef(0.005);
@@ -28,14 +28,11 @@ function Pong() {
         let data = JSON.parse(event.data);
         console.log('Data:', data);
     
-        if (data.type == "left_paddle_down") {
-            LPaddle.current.y += 5
-        }
-		if (data.type == "left_paddle_up") {
-            LPaddle.current.y -= 5
+        if (data.type == "left_paddle_down" || data.type == "left_paddle_up") {
+            LPaddle.current.y = data.message
         }
         if (data.type == "right_paddle_down" || data.type == "right_paddle_up") {
-            setTopRightPaddle(data.message);
+            RPaddle.current.y = data.message
         }
         if (data.type == "ball_pos") {
             setBallPos(data.message);
@@ -118,9 +115,13 @@ function Pong() {
 				'message':'left_paddle_down'
 			}))
 		if (keys.current.ru)
-			RPaddle.current.y += (RPaddle.current.y <= 60 ? 0 : -5);
+			ws.send(JSON.stringify({
+				'message':'right_paddle_up'
+			}))
 		if (keys.current.rd)
-			RPaddle.current.y += (RPaddle.current.y >= 440 ? 0 : 5);
+			ws.send(JSON.stringify({
+				'message':'right_paddle_down'
+			}))
 	}
 
     const handleFaster = () => {
@@ -134,14 +135,14 @@ function Pong() {
 	const playAgain = () => {
 
 		// Adding score depending on the position of the ball, x=791.1 would be the right side, x=9 for left
-		if (pos.current.x == 791.1)
+		if (ball.current.x == 791.1)
 			setScore((s) => s = {...s, left: s.left + 1});
 		else
 			setScore((s) => s = {...s, right: s.right + 1});
 
 		// Resets the gamestate to keep playing (except scores)
 		speed.current = 2;
-		pos.current = ({ x: 400, y: 250 });
+		ball.current = ({ x: 400, y: 250 });
 		obj.current = ({ x: 400, y: 250 });
 		LPaddle.current = ({ x: 50, y: 250});
 		RPaddle.current = ({ x: 750, y: 250});
@@ -153,7 +154,7 @@ function Pong() {
 
 		// Resets completely the gamestate
 		gameStarted.current = false;
-		pos.current = ({ x: 400, y: 250 });
+		ball.current = ({ x: 400, y: 250 });
 		obj.current = ({ x: 400, y: 250 });
 		LPaddle.current = ({ x: 50, y: 250});
 		RPaddle.current = ({ x: 750, y: 250});
@@ -171,7 +172,7 @@ function Pong() {
 		setScore({ left: 0, right: 0 });
 		vec.current = 0.005;
 		speed.current = 2;
-		pos.current = ({ x: 400, y: 250 });
+		ball.current = ({ x: 400, y: 250 });
 		obj.current = ({ x: 400, y: 250 });
 	}
 
@@ -208,7 +209,7 @@ function Pong() {
 		// Drawing non-static game elements
 		drawPaddle(ctx, LPaddle.current.x - 10, LPaddle.current.y);
 		drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y);
-		drawBall(ctx, pos.current.x, pos.current.y);
+		drawBall(ctx, ball.current.x, ball.current.y);
 	}
 
 	function isPaddleAtLevel(side, y) {
@@ -239,7 +240,7 @@ function Pong() {
 		let newX = dir.current * ((newY - obj.current.y) / vec.current) + obj.current.x;
 
 		// Checking if the ball is going past a paddle, setting the next position no further than paddle level
-		if (((newX > 750 && dir.current == 1) || (newX < 50 && dir.current == -1)) && pos.current.x < 750 && pos.current.x > 50)
+		if (((newX > 750 && dir.current == 1) || (newX < 50 && dir.current == -1)) && ball.current.x < 750 && ball.current.x > 50)
 		{
 			newX = newX > 750 ? 750 : 50;
 			newY = dir.current * (newX - obj.current.x) * vec.current + obj.current.y;
@@ -248,15 +249,15 @@ function Pong() {
 		else if (obj.current.x == 750 || obj.current.x == 50)
 		{
 			// And if this side's paddle is in range, the ball bounces off
-			if (isPaddleAtLevel(dir.current, pos.current.y) == true)
+			if (isPaddleAtLevel(dir.current, ball.current.y) == true)
 			{
-				vec.current = getNewVector(dir.current, pos.current.y);
+				vec.current = getNewVector(dir.current, ball.current.y);
 				dir.current *= -1;
 				newY = vec.current > 0 ? 491.1 : 9.1;
 				newX = dir.current * ((newY - obj.current.y) / vec.current) + obj.current.x;
 				if (newX >= 750 || newX <= 50) {
 					newX = (newX >= 750 ? 750 : 50);
-					newY = dir.current * (newX - pos.current.x) * vec.current + pos.current.y;
+					newY = dir.current * (newX - ball.current.x) * vec.current + ball.current.y;
 				}
 				handleFaster();
 			}
@@ -264,7 +265,7 @@ function Pong() {
 			{
 				if (newX >= 791 || newX <= 9) {
 					newX = (newX >= 791 ? 791.1 : 9);
-					newY = dir.current * (newX - pos.current.x) * vec.current + pos.current.y;
+					newY = dir.current * (newX - ball.current.x) * vec.current + ball.current.y;
 					dir.current *= -1;
 				}
 				else
@@ -276,18 +277,18 @@ function Pong() {
 			console.log("no specific");
 			if (newX >= 750 || newX <= 50) {
 				// if (pos.current.x >= 750 || pos.current.x <= 50)
-				if (pos.current.x > 750 || pos.current.x < 50)
+				if (ball.current.x > 750 || ball.current.x < 50)
 					newX = (newX >= 750 ? 791.1 : 9);
 				else
 					newX = (newX >= 750 ? 750 : 50);
-				newY = dir.current * (newX - pos.current.x) * vec.current + pos.current.y;
+				newY = dir.current * (newX - ball.current.x) * vec.current + ball.current.y;
 				dir.current *= -1;
 			}
 			else
 				vec.current *= -1;
 		}
 
-		pos.current = obj.current;
+		ball.current = obj.current;
 		obj.current = {x: newX, y: newY};
     };
 
@@ -299,29 +300,29 @@ function Pong() {
 		{
 			if (time - lastUpdateTimeRef.current > 1000 / 61) {
 				// Calculating the distance from the current position to the target position
-				const dx = obj.current.x - pos.current.x;
-				const dy = obj.current.y - pos.current.y;
+				const dx = obj.current.x - ball.current.x;
+				const dy = obj.current.y - ball.current.y;
 				const distance = Math.sqrt(dx * dx + dy * dy);
 
 				// The game is more fun when you can move the paddles
 				handlePaddlesMovement();
 
 				if (distance <= speed.current) { // Snap to target if close enough, not going further than target
-					pos.current.x = obj.current.x;
-					pos.current.y = obj.current.y;
+					ball.current.x = obj.current.x;
+					ball.current.y = obj.current.y;
 					drawGame(context);
 					// Checking if the ball has scored a point yet
-					if (pos.current.x == 791.1 || pos.current.x == 9)
+					if (ball.current.x == 791.1 || ball.current.x == 9)
 						playAgain();
 					else if (gameStarted.current == true)
 						nextHit();
 				}
 				else { // Determine the step's length towards the target, depending on speed
 					const angle = Math.atan2(dy, dx);
-					const newX = pos.current.x + Math.cos(angle) * speed.current;
-					const newY = pos.current.y + Math.sin(angle) * speed.current;
+					const newX = ball.current.x + Math.cos(angle) * speed.current;
+					const newY = ball.current.y + Math.sin(angle) * speed.current;
 					drawGame(context);
-					pos.current = {x: newX, y: newY};
+					ball.current = {x: newX, y: newY};
 					lastUpdateTimeRef.current = time;
 				}	
 			}
