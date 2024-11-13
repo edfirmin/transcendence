@@ -7,6 +7,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
 
 function Pong() {
 
+	var ws = useMemo(() => {return new WebSocket("ws://localhost:8000/ws/pong/")}, [ws]);
     const canvasRef = useRef(null);
 	const keys = useRef({ lu: false, ld: false, ru: false, rd: false});
 	const LPaddle = useRef({ x: 50, y: 250});
@@ -20,6 +21,26 @@ function Pong() {
     const speed = useRef(2);
     const lastUpdateTimeRef = useRef(0);
     const [count, setCount] = useState(0);
+
+
+    // When receiving a message from the back
+    ws.onmessage = function(event) {
+        let data = JSON.parse(event.data);
+        console.log('Data:', data);
+    
+        if (data.type == "left_paddle_down") {
+            LPaddle.current.y += 5
+        }
+		if (data.type == "left_paddle_up") {
+            LPaddle.current.y -= 5
+        }
+        if (data.type == "right_paddle_down" || data.type == "right_paddle_up") {
+            setTopRightPaddle(data.message);
+        }
+        if (data.type == "ball_pos") {
+            setBallPos(data.message);
+        }
+	}
 
 	// Setting the tab on mount
 	useEffect(() => {
@@ -89,9 +110,13 @@ function Pong() {
 		// Moves the paddles in the corresponding direction depending on pressed keys
 		// See handleKeyUp() and handleKeyDown() above
 		if (keys.current.lu)
-			LPaddle.current.y += (LPaddle.current.y <= 60 ? 0 : -5);
+			ws.send(JSON.stringify({
+				'message':'left_paddle_up'
+			}))
 		if (keys.current.ld)
-			LPaddle.current.y += (LPaddle.current.y >= 440 ? 0 : 5);
+			ws.send(JSON.stringify({
+				'message':'left_paddle_down'
+			}))
 		if (keys.current.ru)
 			RPaddle.current.y += (RPaddle.current.y <= 60 ? 0 : -5);
 		if (keys.current.rd)

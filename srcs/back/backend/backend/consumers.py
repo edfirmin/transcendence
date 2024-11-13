@@ -8,6 +8,7 @@ logging.basicConfig(level=logging.DEBUG)  # Définir le niveau des logs
 logger = logging.getLogger(__name__)     # Créer un logger avec un nom unique
 
 class GlobalConsumer(AsyncWebsocketConsumer):
+    
 
     async def connect(self):
         await self.accept()
