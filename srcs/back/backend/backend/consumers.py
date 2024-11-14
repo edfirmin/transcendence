@@ -64,7 +64,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         data_json = json.loads(text_data)
         message = data_json['message']
 
-        logger.info(self.ball_pos)
+        #logger.info(self.ball_pos)
 
         if (message == "left_paddle_down"):
             if self.left_paddle_pos[1] > self.down_limit:
@@ -119,7 +119,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.ball_pos[0] += self.ball_velocity[0]
             self.ball_pos[1] += self.ball_velocity[1]
 
-            logger.info(f"{self.ball_pos}")
+            #logger.info(f"{self.ball_pos}")
 
             await self.send(text_data=json.dumps({
                 'type':'ball_pos',

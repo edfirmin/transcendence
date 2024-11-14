@@ -60,7 +60,8 @@ INSTALLED_APPS = [
 
     'api',
 	'user',
-    'pong'
+    'pong',
+    'user_auth',
 ]
 
 ASGI_APPLICATION = 'backend.asgi.application'

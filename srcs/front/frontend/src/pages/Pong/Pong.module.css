@@ -1,5 +1,7 @@
 body {
 	background-image: url(../../assets/background_pong.png);
+	background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .MovingBall {

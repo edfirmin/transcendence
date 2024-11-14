@@ -8,11 +8,12 @@ import Pong from "./pages/Pong/Pong"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import RedirectHome from './pages/RedirectHome';
+import CheckUser from './pages/CheckUser';
 
 
 
 function App() {
-	var ws = useMemo(() => {return new WebSocket("ws://localhost:8000/ws/global")}, [ws]);
+	//var ws = useMemo(() => {return new WebSocket("ws://localhost:8000/ws/global")}, [ws]);
 	return (
     <BrowserRouter>
       <Routes>
@@ -23,6 +24,7 @@ function App() {
         <Route path="/register" element={<Register/>}></Route>
         <Route path="*" element={<NotFound/>}></Route>
         <Route path="/pong" element={<ProtectedRoute> <Pong/> </ProtectedRoute>}/>
+        <Route path="/check42user" element={<CheckUser/>}></Route>
       </Routes>
     </BrowserRouter>
 	)
