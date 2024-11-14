@@ -26,6 +26,11 @@ function Home() {
         navigate("/profil")
     }
 
+
+    const handlePong = () => {
+        navigate("/pong")
+    }
+
 	return (
 		<>
 		  <div id="root">
@@ -46,7 +51,7 @@ function Home() {
 			  <div id='bottom'>
 				<Chat />
 				<table id='button_div'>
-				<Button name={"Play"} />
+				<Button name={"Play"} callback={handlePong} />
 				<Button name={"Settings"}/>
 				</table>
 				<div></div>
@@ -56,11 +61,11 @@ function Home() {
 	);
 }
 
-function Button({name}) {
+function Button({name, callback}) {
 	return (
 	  <tr>
 		<td>
-		  <button className='button' >{name} </button>
+		  <button className='button' onClick={() => callback()}>{name} </button>
 		</td>
 	  </tr>
 	)

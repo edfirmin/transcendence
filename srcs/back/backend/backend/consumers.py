@@ -41,14 +41,16 @@ class GlobalConsumer(AsyncWebsocketConsumer):
 
 
 class PongConsumer(AsyncWebsocketConsumer):
-    ball_pos = [500, 500]
-    ball_velocity = [2, 2]
+    ball_pos = [400, 250]
+    ball_direction = [1, 1]
+    ball_speed = 3
     left_paddle_pos = [0, 250]
     right_paddle_pos = [0, 250]
     score = [0, 0]
     game_task = None
     up_limit = 60
     down_limit = 440
+    score_to_win = 5
 
     async def connect(self):
         await self.accept()
@@ -57,9 +59,6 @@ class PongConsumer(AsyncWebsocketConsumer):
             'type':'connection_established',
             'message':'You are now connected!'
         }))
-
-        self.ball_pos = [500, 500]
-
 
     async def receive(self, text_data):
         data_json = json.loads(text_data)
@@ -105,26 +104,80 @@ class PongConsumer(AsyncWebsocketConsumer):
                 'message': self.right_paddle_pos[1]
             }))
 
-        #if self.game_task == None:
-            #self.game_task = asyncio.create_task(self.main_loop())
+        if self.game_task == None:
+            self.game_task = asyncio.create_task(self.main_loop())
 
 
     async def disconnect(self, close_code):
         logger.info("salut mon pote")
-    
+
+
     async def main_loop(self):
         while True:
-            if (self.ball_pos[1] > self.up_limit or self.ball_pos[1] < self.down_limit):
-                self.ball_velocity[1] *= -1
+            if (self.ball_pos[1] + self.ball_direction[1] > 490 or self.ball_pos[1] + self.ball_direction[1] < 10):
+                self.ball_direction[1] *= -1
+                await self.send(text_data=json.dumps({
+                    'type':'hit'
+                }))
 
-            self.ball_pos[0] += self.ball_velocity[0]
-            self.ball_pos[1] += self.ball_velocity[1]
+            # right side
+            if (self.ball_pos[0] + self.ball_direction[0] > 750):
+                if (self.ball_pos[1] < self.right_paddle_pos[1] + 60 and self.ball_pos[1] > self.right_paddle_pos[1] - 60):
+                    self.ball_direction[0] *= -1
+                    self.ball_speed += 1
+                else:
+                    self.score[0] += 1
+                    # check winner
+                    if (self.score[0] >= self.score_to_win):
+                        await self.send(text_data=json.dumps({
+                            'type':'winner',
+                            'message': "LEFT"
+                        }))
+                    self.ball_pos = [400, 250]
+                    await self.send(text_data=json.dumps({
+                        'type':'score',
+                        'left': self.score[0],
+                        'right': self.score[1]
+                    }))
+                    self.ball_speed = 3
+
+            
+
+            # left side
+            if (self.ball_pos[0] + self.ball_direction[0] < 50):
+                if (self.ball_pos[1] < self.left_paddle_pos[1] + 60 and self.ball_pos[1] > self.left_paddle_pos[1] - 60):
+                    self.ball_direction[0] *= -1
+                    self.ball_speed += 1
+                else:
+                    self.score[1] += 1
+
+                    # check winner
+                    if (self.score[1] >= self.score_to_win):
+                        await self.send(text_data=json.dumps({
+                            'type':'winner',
+                            'message': "RIGHT"
+                        }))
+                    
+                    await self.send(text_data=json.dumps({
+                        'type':'score',
+                        'left': self.score[0],
+                        'right': self.score[1]
+                    }))
+
+                    # re-init ball
+                    self.ball_pos = [400, 250]
+                    self.ball_speed = 3
+
+
+            self.ball_pos[0] += self.ball_direction[0] * self.ball_speed
+            self.ball_pos[1] += self.ball_direction[1] * self.ball_speed
 
             logger.info(f"{self.ball_pos}")
 
             await self.send(text_data=json.dumps({
                 'type':'ball_pos',
-                'message': self.ball_pos
+                'x': self.ball_pos[0],
+                'y': self.ball_pos[1]
             }))
             await asyncio.sleep(1 / 30)
         
