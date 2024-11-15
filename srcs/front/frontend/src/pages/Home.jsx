@@ -28,7 +28,7 @@ function Home() {
 
 
     const handlePong = () => {
-        navigate("/pong")
+        navigate("/selection")
     }
 
 	return (

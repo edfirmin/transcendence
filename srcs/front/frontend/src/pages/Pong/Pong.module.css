@@ -30,9 +30,13 @@ body {
 	background-color: white;
 }
 
-#ball {
-	color: white;
-	border: 3px solid white;
-	border-radius: 6px;
+
+#winPanel {
 	position: absolute;
+	top: 50%;
+	left: 50%;
+
+	background-color: rgb(10, 81, 143);
+	padding: 30px;
+	color: black;
 }

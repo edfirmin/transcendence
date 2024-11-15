@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './Pong.module.css';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
 
 
@@ -23,6 +23,9 @@ function Pong() {
     const [count, setCount] = useState(0);
 	const trails = [];
 	const [winner, setWinner] = useState("");
+
+	const data = useLocation();
+	const isAI = data.state.isAI;
 
     // When receiving a message from the back
     ws.onmessage = function(event) {
@@ -205,15 +208,24 @@ function Pong() {
 	
 
     return (
+		<>
+		<WinPanel winner={'Oui'} />
+		<h1>Oui {isAI}</h1>
         <div className={styles.MovingBall}>
-			<h1>{winner}</h1>
 			<h2>{score.left}:{score.right}</h2>
             <canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white' }}></canvas>
 			<div id='ball' style={{left: {ball}+"px"}}></div>
 			<div>
 			</div>
         </div>
-    );
+		</>
+	);
+}
+
+function WinPanel({winner}) {
+	return (
+		<h1 id='winPanel'>{winner}</h1>
+	)
 }
 
 export default Pong;

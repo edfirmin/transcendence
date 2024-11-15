@@ -5,6 +5,7 @@ import Register from "./pages/Register"
 import Home from "./pages/Home"
 import Profil from "./pages/Profil"
 import Pong from "./pages/Pong/Pong"
+import PongSelection from "./pages/PongSelection"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import RedirectHome from './pages/RedirectHome';
@@ -23,6 +24,7 @@ function App() {
         <Route path="/register" element={<Register/>}></Route>
         <Route path="*" element={<NotFound/>}></Route>
         <Route path="/pong" element={<ProtectedRoute> <Pong/> </ProtectedRoute>}/>
+        <Route path="/selection" element={<ProtectedRoute> <PongSelection/> </ProtectedRoute>}/>
       </Routes>
     </BrowserRouter>
 	)

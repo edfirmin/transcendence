@@ -133,6 +133,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                             'type':'winner',
                             'message': "LEFT"
                         }))
+                        self.game_task.cancel()
+
                     self.ball_pos = [400, 250]
                     await self.send(text_data=json.dumps({
                         'type':'score',
@@ -140,8 +142,6 @@ class PongConsumer(AsyncWebsocketConsumer):
                         'right': self.score[1]
                     }))
                     self.ball_speed = 3
-
-            
 
             # left side
             if (self.ball_pos[0] + self.ball_direction[0] < 50):
@@ -157,6 +157,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                             'type':'winner',
                             'message': "RIGHT"
                         }))
+                        self.game_task.cancel()
+
                     
                     await self.send(text_data=json.dumps({
                         'type':'score',
