@@ -5,7 +5,6 @@ from .serializers import UserSerializer, CreatUserSerializer
 from rest_framework.response import Response
 from django.http import JsonResponse
 import logging
-from rest_framework_simplejwt.tokens import AccessToken
 logger = logging.getLogger(__name__)
 import jwt, datetime
 # Create your views here.

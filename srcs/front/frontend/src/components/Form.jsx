@@ -20,7 +20,7 @@ function From({route, method}) {
         try {
             const res = await axios.post(route, {username, password})
             if (method === "login") {
-                console.log(res.data.jwt)
+                // console.log(res.data.jwt)
                 localStorage.setItem(ACCESS_TOKEN, res.data.jwt)
                 navigate("/")
             }
