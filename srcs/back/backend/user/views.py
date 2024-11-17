@@ -3,6 +3,7 @@ from .models import User
 from rest_framework.views import APIView
 from .serializers import UserSerializer, CreatUserSerializer
 from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
 from django.http import JsonResponse
 import logging
 logger = logging.getLogger(__name__)
@@ -14,10 +15,10 @@ class CreatUserView(APIView):
         myData = request.data
         myUserToSave = CreatUserSerializer(data=myData)
 
-        if myUserToSave.is_valid():
+        if myUserToSave.is_valid(raise_exception=True):
             myUserToSave.save()
         
-        logger.info("LE USER EST CREEE")
+        logger.info("LE USER EST CREEE ->>>>>>>>>> %s", myData['username'])
         return Response(myUserToSave.data)
 
 
@@ -30,16 +31,12 @@ class LoginView(APIView):
 
         if user is None:
             logging.info("PAS BON 1")
-            return Response({
-                'message' : 'pas bon user'
-            })
+            raise AuthenticationFailed('pas bon user')
         
         if (user.is42stud==False):
             if not user.check_password(password):
                 logging.info("PAS BON 2")
-                return Response({
-                   'message' : 'pas bon mdp'
-                })
+                raise AuthenticationFailed('pas bon mdp')
         
         payload = {
             'id' : user.id,
