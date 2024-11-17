@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './Pong.module.css';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
+import { ACCESS_TOKEN } from "../../constants";
 
 
 function Pong() {

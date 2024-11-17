@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { ACCESS_TOKEN } from "../constants";
 import "../styles/Form.css"
 import LoadingIndicator from "./LoadingIndicator";
 import axios from "axios";
@@ -20,8 +20,8 @@ function From({route, method}) {
         try {
             const res = await axios.post(route, {username, password})
             if (method === "login") {
-                localStorage.setItem(ACCESS_TOKEN, res.data.access)
-                localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
+                console.log(res.data.jwt)
+                localStorage.setItem(ACCESS_TOKEN, res.data.jwt)
                 navigate("/")
             }
             else {

@@ -1,47 +1,73 @@
 from django.shortcuts import render
 from .models import User
-from rest_framework import generics
+from rest_framework.views import APIView
 from .serializers import UserSerializer, CreatUserSerializer
-from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from django.http import JsonResponse
 import logging
 from rest_framework_simplejwt.tokens import AccessToken
 logger = logging.getLogger(__name__)
+import jwt, datetime
 # Create your views here.
 
-class CreatUserView(generics.CreateAPIView):
-    queryset = User.objects.all()#pour regarder tout les objets de ma classe pour ne pas cree un user qui existe deja
-    serializer_class = CreatUserSerializer#dire a la "view" quel genre de donne on a besooin pour faire un nouveau user
-    permission_classes = [AllowAny]#determine qui a le droit d'avoir accee a cette "view"
+class CreatUserView(APIView):
+    def post(self, request):
+        myData = request.data
+        myUserToSave = CreatUserSerializer(data=myData)
 
-    # def post(self, request, *args, **kwargs):
-    #     logger.info(request.data)
-    #     myData = request.data
-
-    #     myUsername = myData.get("username")
-    #     myPassword = myData.get("password")
-
-    #     myUserData = {
-    #         "username": myUsername,
-    #         "password": myPassword
-    #     }
-
-    #     myUserToSave = UserSerializer(data=myUserData)
-
-    #     if myUserToSave.is_valid():
-    #         myUserToSave.save()
+        if myUserToSave.is_valid():
+            myUserToSave.save()
         
-    #     logger.info("LE USER EST CREEE")
-    #     return JsonResponse({"mabite": "0"}, safe=False)
+        logger.info("LE USER EST CREEE")
+        return Response(myUserToSave.data)
+
+
+class LoginView(APIView):
+    def post(self, request):
+        username = request.data['username']
+        password = request.data['password']
+
+        user = User.objects.filter(username=username).first()
+
+        if user is None:
+            logging.info("PAS BON 1")
+            return Response({
+                'message' : 'pas bon user'
+            })
+        
+        if (user.is42stud==False):
+            if not user.check_password(password):
+                logging.info("PAS BON 2")
+                return Response({
+                   'message' : 'pas bon mdp'
+                })
+        
+        payload = {
+            'id' : user.id,
+            'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=1000000000),
+            'iat' : datetime.datetime.utcnow()
+        }
+
+        token = jwt.encode(payload, 'secret', algorithm='HS256')
+
+        response = Response()
+
+        response.data = {
+            'jwt' : token
+        }
+        # decode = jwt.decode(token, 'secret', algorithms=['HS256'])
+        # logging.info("MON TOKEN C'EST ->>>>>>>> %s", decode.get('id'))
+
+        return response
 
 
 def getUser(request):
     myPath = request.build_absolute_uri()
 
     token_string = myPath.split("?")[1]
-    token = AccessToken(token_string)
+    token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
 
-    user_id = token['user_id']
+    user_id = token.get('id')
     # logger.info("MON ID USER ---> %s", user_id)
     myUser = User.objects.get(id=user_id)
 
