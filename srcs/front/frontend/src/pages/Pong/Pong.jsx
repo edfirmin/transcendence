@@ -20,18 +20,33 @@ function Pong() {
     const vec = useRef(0.005);
     const speed = useRef(2);
     const lastUpdateTimeRef = useRef(0);
-    const [count, setCount] = useState(0);
+    const [count, setCount]  = useState(0);
 	const trails = [];
 	const [winner, setWinner] = useState("");
 
 	const data = useLocation();
 	const isAI = data.state.isAI;
+	const difficulty = data.state.difficult;
 
     // When receiving a message from the back
     ws.onmessage = function(event) {
         let data = JSON.parse(event.data);
         console.log('Data:', data);
     
+		if (data.type == "connection_established") {
+			ws.send(JSON.stringify({
+				'message':'isAi',
+				'value': isAI
+			}));
+			if (isAI){
+				ws.send(JSON.stringify({
+					'message':'difficulty',
+					'value': difficulty
+				}));
+			}
+
+		}
+
         if (data.type == "left_paddle_down" || data.type == "left_paddle_up") {
             LPaddle.current.y = data.message
         }

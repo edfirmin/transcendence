@@ -5,6 +5,8 @@ import {useNavigate, useLocation} from "react-router-dom"
 
 function PongSelection() {
 
+    const [difficulty, setDifficulty] = useState("medium");
+
     const navigate = useNavigate();
 
     function handleLocalPong() {
@@ -12,11 +14,14 @@ function PongSelection() {
     }
 
     function handleAIPong() {
-        navigate('/pong', {state : { isAI : true }});
+        navigate('/pong', {state : { isAI : true, difficult : difficulty}});
     }
 
     return (
         <>
+            <button className='button' onClick={() => setDifficulty("easy")}>Easy</button>
+            <button className='button' onClick={() => setDifficulty("medium")}>Medium</button>
+            <button className='button' onClick={() => setDifficulty("hard")}>Hard</button>
             <Button name={'Local'} callback={handleLocalPong} />
             <Button name={'AI'} callback={handleAIPong} />
         </>
