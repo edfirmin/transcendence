@@ -9,7 +9,7 @@ function Pong() {
 
 	var ws = useMemo(() => {return new WebSocket("ws://localhost:8000/ws/pong/")}, [ws]);
     const canvasRef = useRef(null);
-	const keys = useRef({ lu: false, ld: false, ru: false, rd: false});
+	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
 	const LPaddle = useRef({ x: 50, y: 250});
 	const RPaddle = useRef({ x: 750, y: 250});
 	const [score, setScore] = useState({left: 0, right: 0});
@@ -62,16 +62,16 @@ function Pong() {
 			switch (event.key)
 			{
 				case 'ArrowUp':
-					keys.current.ru = true;
+					keys.current.right_up = true;
 					break;
 				case 'ArrowDown':
-					keys.current.rd = true;
+					keys.current.right_down = true;
 					break;
 				case 'e':
-					keys.current.lu = true;
+					keys.current.left_up = true;
 					break;
 				case 'd':
-					keys.current.ld = true;
+					keys.current.left_down = true;
 					break;
 			}
 		};
@@ -81,16 +81,16 @@ function Pong() {
 			switch (event.key)
 			{
 				case 'ArrowUp':
-					keys.current.ru = false;
+					keys.current.right_up = false;
 					break;
 				case 'ArrowDown':
-					keys.current.rd = false;
+					keys.current.right_down = false;
 					break;
 				case 'e':
-					keys.current.lu = false;
+					keys.current.left_up = false;
 					break;
 				case 'd':
-					keys.current.ld = false;
+					keys.current.left_down = false;
 					break;
 			}
 		};
@@ -107,19 +107,19 @@ function Pong() {
 	{
 		// Moves the paddles in the corresponding direction depending on pressed keys
 		// See handleKeyUp() and handleKeyDown() above
-		if (keys.current.lu)
+		if (keys.current.left_up)
 			ws.send(JSON.stringify({
 				'message':'left_paddle_up'
 			}))
-		if (keys.current.ld)
+		if (keys.current.left_down)
 			ws.send(JSON.stringify({
 				'message':'left_paddle_down'
 			}))
-		if (keys.current.ru)
+		if (keys.current.right_up && !isAI)
 			ws.send(JSON.stringify({
 				'message':'right_paddle_up'
 			}))
-		if (keys.current.rd)
+		if (keys.current.right_down && !isAI)
 			ws.send(JSON.stringify({
 				'message':'right_paddle_down'
 			}))

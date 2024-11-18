@@ -60,6 +60,11 @@ class PongConsumer(AsyncWebsocketConsumer):
             'message':'You are now connected!'
         }))
 
+        self.ball_pos = [400, 250]
+        self.ball_speed = 2
+        self.left_paddle_pos = [0, 250]
+        self.right_paddle_pos = [0, 250]
+
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message = data_json['message']
@@ -110,6 +115,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         logger.info("salut mon pote")
+
+        if (self.game_task):
+            self.game_task.cancel()
 
 
     async def main_loop(self):

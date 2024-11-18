@@ -8,11 +8,11 @@ function PongSelection() {
     const navigate = useNavigate();
 
     function handleLocalPong() {
-        navigate('/pong', {state : { isAI : 'false' }});
+        navigate('/pong', {state : { isAI : false }});
     }
 
     function handleAIPong() {
-        navigate('/pong', {state : { isAI : 'true' }});
+        navigate('/pong', {state : { isAI : true }});
     }
 
     return (
