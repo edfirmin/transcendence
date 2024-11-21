@@ -26,7 +26,6 @@ function Home() {
         navigate("/profil")
     }
 
-
     const handlePong = () => {
         navigate("/selection")
     }

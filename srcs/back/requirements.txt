@@ -10,3 +10,5 @@ djangorestframework-simplejwt
 PyJWT
 pytz
 python-dotenv
+channels==3.0.5
+channels_redis

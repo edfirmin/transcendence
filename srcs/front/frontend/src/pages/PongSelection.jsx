@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import "../styles/PongSelection.css"
 import {useNavigate, useLocation} from "react-router-dom"
-
+import {v4 as uuidv4} from 'uuid';
 
 function PongSelection() {
 
@@ -17,6 +17,11 @@ function PongSelection() {
         navigate('/pong', {state : { isAI : true, difficult : difficulty}});
     }
 
+    function handleRemotePong() {
+      const roomId = uuidv4();
+      navigate(`/multipong/${roomId}`);
+    }
+
     return (
         <>
             <button className='button' onClick={() => setDifficulty("easy")}>Easy</button>
@@ -24,6 +29,7 @@ function PongSelection() {
             <button className='button' onClick={() => setDifficulty("hard")}>Hard</button>
             <Button name={'Local'} callback={handleLocalPong} />
             <Button name={'AI'} callback={handleAIPong} />
+            <Button name={'Remote'} callback={handleRemotePong} />
         </>
     );
 }
