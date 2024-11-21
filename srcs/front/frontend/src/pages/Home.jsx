@@ -1,7 +1,9 @@
 //import { useState, useEffect } from "react"
 import React, {useEffect} from 'react'
 import "../styles/Home.css"
-import {useNavigate, useLocation} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
+import Navbar from '../components/Navbar';
+import back_home from '../assets/home_back.mp4'
 
 function Home() {
     const navigate = useNavigate();
@@ -11,16 +13,11 @@ function Home() {
         navigate("/login")
     }
 
-    const handleProfil = () => {
-        navigate("/profil")
-    }
-
 	return (
 		<div>
-			<h2>Transcendence</h2>{/*replacer par le logo*/}
+            {/* <video src={back_home} autoPlay muted loop /> */}
+            <Navbar></Navbar>
 			<button className="logout-button" onClick={() => handleLogout()}>Logout</button>
-			<br/>
-			<button onClick={() => handleProfil()}>Profil</button>
 		</div>
     );
 }

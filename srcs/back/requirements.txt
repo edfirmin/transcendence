@@ -3,10 +3,10 @@ Django==5.1.1
 sqlparse==0.5.1
 tzdata==2022.7
 whitenoise==6.7.0
+channels==3.0.5
 psycopg2-binary
 djangorestframework
 django-cors-headers
-djangorestframework-simplejwt
 PyJWT
 pytz
 python-dotenv

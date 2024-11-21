@@ -11,7 +11,7 @@ function Register() {
     }
 
     return (
-        <div style={{padding:'8%'}}>
+        <div>
             {localStorage.clear()}
             <Form route="/api/user/register/" method="register" />
             <button className="go-to-login-button" onClick={() => handleGoToLoginButton()}>Login</button>

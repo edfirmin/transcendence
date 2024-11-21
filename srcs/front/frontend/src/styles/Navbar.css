@@ -1,0 +1,40 @@
+nav {
+    display: flex;
+    position: sticky;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.384);
+}
+
+.navbar ul {
+    display: flex;
+    list-style-type: none;
+}
+
+.navbar li {
+    position: absolute;
+    right: 7%;
+    top: 40%;
+}
+
+.navbar a {
+    display: block;
+    color: aliceblue;
+    text-align: left;
+    text-decoration: none;
+}
+
+.pp_nav {
+    border-radius: 10000000px;
+    width: 100px;
+}
+
+.logo { 
+    width: 70%;
+}
+
+
+/* .navbar a:hover {
+    background-color: rgba(161, 155, 155, 0.384);
+} */
