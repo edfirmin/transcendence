@@ -1,4 +1,5 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 import json
 import time
 import asyncio
@@ -39,11 +40,8 @@ class GlobalConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         logger.info("salut mon pote")
 
-
-class MultiPongConsumer(AsyncWebsocketConsumer):
+class MultiPongConsumer(AsyncJsonWebsocketConsumer):
     
-    room_id = 0
-    room_group_name = 0
     ball_pos = [400, 250]
     ball_direction = [1, 1]
     ball_speed = 3
@@ -57,29 +55,23 @@ class MultiPongConsumer(AsyncWebsocketConsumer):
     is_ai = False
     difficulty = "medium"
 
-    async def sendMessage(self, message, type):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": type,
-                "message": message
-            }
-        )
-
     async def connect(self):
+        self.room_name = self.scope['url_route']['kwargs']['roomid']
+        self.room_group_name = f'game_{self.room_name}'
 
-        self.room_id = self.scope['url_route']['kwargs']['roomid']
-        self.room_group_name = f'game_{self.room_id}'
+        logger.info(f"Player connected to room {self.room_group_name}")
 
-        logger.info("je suis connect")
-
+        # Join the game group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
         await self.accept()
-        self.sendMessage("connection_established", "message")
 
+        # Send connection established message
+        #await self.send_message("connection_established", "connection_established")
+
+        # Initialize game state
         self.ball_pos = [400, 250]
         self.ball_speed = 2
         self.left_paddle_pos = [0, 250]
@@ -96,7 +88,8 @@ class MultiPongConsumer(AsyncWebsocketConsumer):
                 return
 
             self.left_paddle_pos[1] += 5
-            self.sendMessage("left_paddle_down", self.left_paddle_pos[1])
+            
+            await self.send_message("left_paddle_down_type", self.left_paddle_pos[1])
 
         if (message == "left_paddle_up"):
             
@@ -104,32 +97,34 @@ class MultiPongConsumer(AsyncWebsocketConsumer):
                 return
 
             self.left_paddle_pos[1] -= 5
-            self.sendMessage("left_paddle_up", self.left_paddle_pos[1])
+            await self.send_message("left_paddle_up_type", self.left_paddle_pos[1])
 
         if (message == "right_paddle_up"):
             if self.right_paddle_pos[1] < self.up_limit:
                 return
             
             self.right_paddle_pos[1] -= 5
-            self.sendMessage("right_paddle_up", self.right_paddle_pos[1])
+            await self.send_message("right_paddle_up_type", self.right_paddle_pos[1])
 
         if (message == "right_paddle_down"):
             if self.right_paddle_pos[1] > self.down_limit:
                 return
 
             self.right_paddle_pos[1] += 5
-            self.sendMessage("right_paddle_down", self.right_paddle_pos[1])
+            await self.send_message("right_paddle_down_type", self.right_paddle_pos[1])
 
         if self.game_task == None:
             self.game_task = asyncio.create_task(self.main_loop())
 
 
     async def disconnect(self, close_code):
-        logger.info("salut mon pote")
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
 
-        if (self.game_task):
+        if self.game_task:
             self.game_task.cancel()
-
 
     async def main_loop(self):
         while True:
@@ -149,12 +144,12 @@ class MultiPongConsumer(AsyncWebsocketConsumer):
                     self.score[0] += 1
                     # check winner
                     if (self.score[0] >= self.score_to_win):
-                        self.sendMessage("winner", "LEFT")
+                        await self.send_message("winner_type", "LEFT")
                         self.game_task.cancel()
 
                     await self.channel_layer.group_send(
                         self.room_group_name,{
-                            'type':'score',
+                            'type':'score_type',
                             'left': self.score[0],
                             'right': self.score[1]
                         })
@@ -171,12 +166,12 @@ class MultiPongConsumer(AsyncWebsocketConsumer):
 
                     # check winner
                     if (self.score[1] >= self.score_to_win):
-                        self.sendMessage("winner", "RIGHT")
+                        await self.send_message("winner_type", "RIGHT")
                         self.game_task.cancel()
 
                     await self.channel_layer.group_send(
                         self.room_group_name,{
-                            'type':'score',
+                            'type':'score_type',
                             'left': self.score[0],
                             'right': self.score[1]
                         })
@@ -189,20 +184,68 @@ class MultiPongConsumer(AsyncWebsocketConsumer):
             self.ball_pos[0] += self.ball_direction[0] * self.ball_speed
             self.ball_pos[1] += self.ball_direction[1] * self.ball_speed
 
-            logger.info(f"{self.ball_pos}")
+            logger.info(f'{self.ball_pos}')
 
             await self.channel_layer.group_send(
                 self.room_group_name,{
-                    'type':'ball_pos',
+                    'type':'ball_pos_type',
                     'x': self.ball_pos[0],
                     'y': self.ball_pos[1]
                 })
             await asyncio.sleep(1 / 30)
+
+    async def ball_pos_type(self, event):
+        await self.send_json({
+                'type': "ball_pos",
+                'x': event['x'],
+                'y': event['y']
+            })
         
+    async def left_paddle_down_type(self, event):
+        await self.send_json({
+                'type': "left_paddle_down",
+                'message': event['message']
+            })
+        
+    async def left_paddle_up_type(self, event):
+        await self.send_json({
+                'type': "left_paddle_up",
+                'message': event['message']
+            })
+        
+    async def right_paddle_down_type(self, event):
+        await self.send_json({
+                'type': "right_paddle_down",
+                'message': event['message']
+            })
+        
+    async def right_paddle_up_type(self, event):
+        await self.send_json({
+                'type': "right_paddle_up",
+                'message': event['message']
+            })
 
+    async def winner_type(self, event):
+        await self.send_json({
+                'type': "winner",
+                'message': event['message']
+            })
 
+    async def score_type(self, event):
+        await self.send_json({
+                'type': "score",
+                'left': event['left'],
+                'right': event['right']
+            })
 
-
+    async def send_message(self, _type, message):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": _type,
+                "message": message
+            }
+        )
 
 class PongConsumer(AsyncWebsocketConsumer):
     
@@ -409,6 +452,3 @@ class PongConsumer(AsyncWebsocketConsumer):
             }))
             await asyncio.sleep(1 / 30)
         
-
-
-
