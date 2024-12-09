@@ -1,8 +1,24 @@
+
+html {
+	height: 100%;
+}
+
 body {
+	display : block;
+	position: absolute;
+
 	background-image: url(../../assets/background_pong.png);
+	height: 100%;
+}
+
+#root {
+	position: absolute;
+	height: 100%;
+	width: 100%;
 }
 
 .MovingBall {
+	position: relative;
 	display : flex;
 	max-width: fit-content;
 	flex-direction: column;
@@ -32,11 +48,21 @@ body {
 
 
 #winPanel {
+	display:inline-block;
 	position: absolute;
-	top: 50%;
-	left: 50%;
+	transform: translate(-50%, -50%);	
 
 	background-color: rgb(10, 81, 143);
 	padding: 30px;
 	color: black;
+}
+
+#leftBar {
+	width: 5rem;
+	background-color: gray;
+}
+
+#leftBar span {
+	background-color: aqua;
+	width: 25%;
 }

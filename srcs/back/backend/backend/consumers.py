@@ -42,18 +42,20 @@ class GlobalConsumer(AsyncWebsocketConsumer):
 
 class MultiPongConsumer(AsyncJsonWebsocketConsumer):
     
-    ball_pos = [400, 250]
-    ball_direction = [1, 1]
-    ball_speed = 3
-    left_paddle_pos = [0, 250]
-    right_paddle_pos = [0, 250]
-    score = [0, 0]
-    game_task = None
+    players = {}
+    ball_pos = {}
+    ball_direction = {}
+    ball_speed = {}
+    left_paddle_pos = {}
+    right_paddle_pos = {}
+    score = {}
+    game_task = {}
     up_limit = 60
     down_limit = 440
     score_to_win = 5
     is_ai = False
     difficulty = "medium"
+    nb_players_connected = {}
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['roomid']
@@ -72,49 +74,85 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
         #await self.send_message("connection_established", "connection_established")
 
         # Initialize game state
-        self.ball_pos = [400, 250]
-        self.ball_speed = 2
-        self.left_paddle_pos = [0, 250]
-        self.right_paddle_pos = [0, 250]
+        if self.room_name not in MultiPongConsumer.nb_players_connected:
+            MultiPongConsumer.nb_players_connected[self.room_name] = 1
+        else:
+            MultiPongConsumer.nb_players_connected[self.room_name] += 1
+
+        if self.room_name not in MultiPongConsumer.players:
+            MultiPongConsumer.players[self.room_name] = [None, None]
+        if self.room_name not in MultiPongConsumer.ball_pos:
+            MultiPongConsumer.ball_pos[self.room_name] = [400, 250]
+        if self.room_name not in MultiPongConsumer.ball_speed:
+            MultiPongConsumer.ball_speed[self.room_name] = 2
+        if self.room_name not in MultiPongConsumer.ball_direction:
+            MultiPongConsumer.ball_direction[self.room_name] = [1, 1]
+        if self.room_name not in MultiPongConsumer.left_paddle_pos:
+            MultiPongConsumer.left_paddle_pos[self.room_name] = [0, 250]
+        if self.room_name not in MultiPongConsumer.right_paddle_pos:
+            MultiPongConsumer.right_paddle_pos[self.room_name] = [0, 250]
+        if self.room_name not in MultiPongConsumer.score:
+            MultiPongConsumer.score[self.room_name] = [0, 0]
+        if self.room_name not in MultiPongConsumer.game_task:
+            MultiPongConsumer.game_task[self.room_name] = None
+
+        if MultiPongConsumer.nb_players_connected[self.room_name] == 2:
+            MultiPongConsumer.game_task[self.room_name] = asyncio.create_task(self.main_loop())
+            logger.info(f"game started")
+
+        logger.info(f"nb player connected  to {self.room_name} = {MultiPongConsumer.nb_players_connected[self.room_name]}")
 
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message = data_json['message']
+        id = data_json['id']
 
         logger.info(self.ball_pos)
 
-        if (message == "left_paddle_down"):
-            if self.left_paddle_pos[1] > self.down_limit:
-                return
+        if (message == "on_connect"):
+            if (MultiPongConsumer.players[self.room_name][0] == None):
+                MultiPongConsumer.players[self.room_name][0] = id
+            else:
+                MultiPongConsumer.players[self.room_name][1] = id
 
-            self.left_paddle_pos[1] += 5
+        if (message == "paddle_down"):
+            # Left
+            if (id == MultiPongConsumer.players[self.room_name][0]):
+
+                if MultiPongConsumer.left_paddle_pos[self.room_name][1] > self.down_limit:
+                    return
+
+                MultiPongConsumer.left_paddle_pos[self.room_name][1] += 5
             
-            await self.send_message("left_paddle_down_type", self.left_paddle_pos[1])
+                await self.send_message("left_paddle_down_type", MultiPongConsumer.left_paddle_pos[self.room_name][1])
 
-        if (message == "left_paddle_up"):
-            
-            if self.left_paddle_pos[1] < self.up_limit:
-                return
+            # Right
+            else:
+                
+                if MultiPongConsumer.right_paddle_pos[self.room_name][1] > self.down_limit:
+                    return
 
-            self.left_paddle_pos[1] -= 5
-            await self.send_message("left_paddle_up_type", self.left_paddle_pos[1])
+                MultiPongConsumer.right_paddle_pos[self.room_name][1] += 5
+                await self.send_message("right_paddle_down_type", MultiPongConsumer.right_paddle_pos[self.room_name][1])
 
-        if (message == "right_paddle_up"):
-            if self.right_paddle_pos[1] < self.up_limit:
-                return
-            
-            self.right_paddle_pos[1] -= 5
-            await self.send_message("right_paddle_up_type", self.right_paddle_pos[1])
 
-        if (message == "right_paddle_down"):
-            if self.right_paddle_pos[1] > self.down_limit:
-                return
+        if (message == "paddle_up"):
+            # Left
+            if (id == MultiPongConsumer.players[self.room_name][0]):
 
-            self.right_paddle_pos[1] += 5
-            await self.send_message("right_paddle_down_type", self.right_paddle_pos[1])
+                if MultiPongConsumer.left_paddle_pos[self.room_name][1] < self.up_limit:
+                    return
 
-        if self.game_task == None:
-            self.game_task = asyncio.create_task(self.main_loop())
+                MultiPongConsumer.left_paddle_pos[self.room_name][1] -= 5
+                await self.send_message("left_paddle_up_type", MultiPongConsumer.left_paddle_pos[self.room_name][1])
+
+            # Right
+            else:
+                if MultiPongConsumer.right_paddle_pos[self.room_name][1] < self.up_limit:
+                    return
+
+                MultiPongConsumer.right_paddle_pos[self.room_name][1] -= 5
+                await self.send_message("right_paddle_up_type", MultiPongConsumer.right_paddle_pos[self.room_name][1])
 
 
     async def disconnect(self, close_code):
@@ -123,74 +161,77 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name
         )
 
-        if self.game_task:
-            self.game_task.cancel()
+        MultiPongConsumer.nb_players_connected[self.room_name] -= 1
+        logger.info(f"nb player connected  to {self.room_name} = {MultiPongConsumer.nb_players_connected[self.room_name]}")
+
+        await self.send_message("winner_type", "YOU")
+
+        if MultiPongConsumer.game_task[self.room_name]:
+            MultiPongConsumer.game_task[self.room_name].cancel()
 
     async def main_loop(self):
         while True:
             # Ceilling and Floor Ball Detection
-            if (self.ball_pos[1] + self.ball_direction[1] > 490 or self.ball_pos[1] + self.ball_direction[1] < 10):
-                self.ball_direction[1] *= -1
+            if (MultiPongConsumer.ball_pos[self.room_name][1] + MultiPongConsumer.ball_direction[self.room_name][1] > 490 or MultiPongConsumer.ball_pos[self.room_name][1] + MultiPongConsumer.ball_direction[self.room_name][1] < 10):
+                MultiPongConsumer.ball_direction[self.room_name][1] *= -1
                # await self.send(text_data=json.dumps({
                #     'type':'hit'
                # }))
 
             # right side
-            if (self.ball_pos[0] + self.ball_direction[0] > 750):
-                if (self.ball_pos[1] < self.right_paddle_pos[1] + 60 and self.ball_pos[1] > self.right_paddle_pos[1] - 60):
-                    self.ball_direction[0] *= -1
-                    self.ball_speed += 1
+            if (MultiPongConsumer.ball_pos[self.room_name][0] + MultiPongConsumer.ball_direction[self.room_name][0] > 750):
+                if (MultiPongConsumer.ball_pos[self.room_name][1] < MultiPongConsumer.right_paddle_pos[self.room_name][1] + 60 and MultiPongConsumer.ball_pos[self.room_name][1] > MultiPongConsumer.right_paddle_pos[self.room_name][1] - 60):
+                    MultiPongConsumer.ball_direction[self.room_name][0] *= -1
+                    MultiPongConsumer.ball_speed[self.room_name] += 1
                 else:
-                    self.score[0] += 1
+                    MultiPongConsumer.score[self.room_name][0] += 1
                     # check winner
-                    if (self.score[0] >= self.score_to_win):
+                    if (MultiPongConsumer.score[self.room_name][0] >= self.score_to_win):
                         await self.send_message("winner_type", "LEFT")
-                        self.game_task.cancel()
+                        MultiPongConsumer.game_task[self.room_name].cancel()
 
                     await self.channel_layer.group_send(
                         self.room_group_name,{
                             'type':'score_type',
-                            'left': self.score[0],
-                            'right': self.score[1]
+                            'left': MultiPongConsumer.score[self.room_name][0],
+                            'right': MultiPongConsumer.score[self.room_name][1]
                         })
-                    self.ball_pos = [400, 250]
-                    self.ball_speed = 3
+                    MultiPongConsumer.ball_pos[self.room_name] = [400, 250]
+                    MultiPongConsumer.ball_speed[self.room_name] = 3
 
             # left side
-            if (self.ball_pos[0] + self.ball_direction[0] < 50):
-                if (self.ball_pos[1] < self.left_paddle_pos[1] + 60 and self.ball_pos[1] > self.left_paddle_pos[1] - 60):
-                    self.ball_direction[0] *= -1
-                    self.ball_speed += 1
+            if (MultiPongConsumer.ball_pos[self.room_name][0] + MultiPongConsumer.ball_direction[self.room_name][0] < 50):
+                if (MultiPongConsumer.ball_pos[self.room_name][1] < MultiPongConsumer.left_paddle_pos[self.room_name][1] + 60 and MultiPongConsumer.ball_pos[self.room_name][1] > MultiPongConsumer.left_paddle_pos[self.room_name][1] - 60):
+                    MultiPongConsumer.ball_direction[self.room_name][0] *= -1
+                    MultiPongConsumer.ball_speed[self.room_name] += 1
                 else:
-                    self.score[1] += 1
+                    MultiPongConsumer.score[self.room_name][1] += 1
 
                     # check winner
-                    if (self.score[1] >= self.score_to_win):
+                    if (MultiPongConsumer.score[self.room_name][1] >= self.score_to_win):
                         await self.send_message("winner_type", "RIGHT")
-                        self.game_task.cancel()
+                        MultiPongConsumer.game_task[self.room_name].cancel()
 
                     await self.channel_layer.group_send(
                         self.room_group_name,{
                             'type':'score_type',
-                            'left': self.score[0],
-                            'right': self.score[1]
+                            'left': MultiPongConsumer.score[self.room_name][0],
+                            'right': MultiPongConsumer.score[self.room_name][1]
                         })
 
                     # re-init ball
-                    self.ball_pos = [400, 250]
-                    self.ball_speed = 3
+                    MultiPongConsumer.ball_pos[self.room_name] = [400, 250]
+                    MultiPongConsumer.ball_speed[self.room_name] = 3
 
 
-            self.ball_pos[0] += self.ball_direction[0] * self.ball_speed
-            self.ball_pos[1] += self.ball_direction[1] * self.ball_speed
-
-            logger.info(f'{self.ball_pos}')
+            MultiPongConsumer.ball_pos[self.room_name][0] += MultiPongConsumer.ball_direction[self.room_name][0] * MultiPongConsumer.ball_speed[self.room_name]
+            MultiPongConsumer.ball_pos[self.room_name][1] += MultiPongConsumer.ball_direction[self.room_name][1] * MultiPongConsumer.ball_speed[self.room_name]
 
             await self.channel_layer.group_send(
                 self.room_group_name,{
                     'type':'ball_pos_type',
-                    'x': self.ball_pos[0],
-                    'y': self.ball_pos[1]
+                    'x': MultiPongConsumer.ball_pos[self.room_name][0],
+                    'y': MultiPongConsumer.ball_pos[self.room_name][1] 
                 })
             await asyncio.sleep(1 / 30)
 

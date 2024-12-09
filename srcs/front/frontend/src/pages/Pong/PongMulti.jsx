@@ -3,12 +3,13 @@ import styles from './Pong.module.css';
 import axios from 'axios';
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
-
+import {v4 as uuidv4} from 'uuid';
 
 function PongMulti() {
 
     const { roomid } = useParams();
-	var ws = useMemo(() => {return new WebSocket(`ws://localhost:8000/ws/multipong/${roomid}`)}, [ws]);
+	var ws;
+	var id;
     const canvasRef = useRef(null);
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
 	const LPaddle = useRef({ x: 50, y: 250});
@@ -25,42 +26,48 @@ function PongMulti() {
 	const trails = [];
 	const [winner, setWinner] = useState("");
     
-    // When receiving a message from the back
-    ws.onmessage = function(event) {
-        let data = JSON.parse(event.data);
-        console.log('Data:', data);
-        
-		if (data.type == "connection_established") {
-            
-            console.log("victoire");
-        }
-        
-        if (data.type == "left_paddle_down" || data.type == "left_paddle_up") {
-            LPaddle.current.y = data.message
-        }
-        if (data.type == "right_paddle_down" || data.type == "right_paddle_up") {
-            RPaddle.current.y = data.message
-        }
-        if (data.type == "ball_pos") {
-            ball.x = data.x;
-            ball.y = data.y;
-			//trails.push(new Trail(ball.x, ball.y));
-        }
-		if (data.type == "score") {
-            setScore({left: data.left, right: data.right});
+	useEffect(() => {
+		ws = new WebSocket(`ws://localhost:8000/ws/multipong/${roomid}`);
+	  	id = uuidv4();
+
+		ws.onopen = function(event) {
+			ws.send(JSON.stringify({
+				'id':id,
+				'message':'on_connect'
+	    	}))
 		}
-		if (data.type == "hit") {
-            let audio = new Audio("../../assets/sounds/pong.mp3");
-			audio.play();
+
+		// When receiving a message from the back
+		ws.onmessage = function(event) {
+			let data = JSON.parse(event.data);
+			console.log('Data:', data);
+			
+			if (data.type == "left_paddle_down" || data.type == "left_paddle_up") {
+				LPaddle.current.y = data.message
+			}
+			if (data.type == "right_paddle_down" || data.type == "right_paddle_up") {
+				RPaddle.current.y = data.message
+			}
+			if (data.type == "ball_pos") {
+				ball.x = data.x;
+				ball.y = data.y;
+				//trails.push(new Trail(ball.x, ball.y));
+			}
+			if (data.type == "score") {
+				setScore({left: data.left, right: data.right});
+			}
+			if (data.type == "hit") {
+				let audio = new Audio("../../assets/sounds/pong.mp3");
+				audio.play();
+			}
+			if (data.type == "winner") {
+				setWinner(data.message + " WIN !");
+			}
 		}
-		if (data.type == "winner") {
-            setWinner(data.message + " WIN !");
-		}
-	}
+	}, [])
     
 	useEffect(() => {
-        console.log("non rooooom idddd", roomid);
-        
+    
         // Listens for KeyDown event
 		const handleKeyDown = (event) => {
             switch (event.key)
@@ -113,25 +120,19 @@ function PongMulti() {
 		// See handleKeyUp() and handleKeyDown() above
 		if (keys.current.left_up)
 			ws.send(JSON.stringify({
-        'message':'left_paddle_up'
-    }))
-    if (keys.current.left_down)
-        ws.send(JSON.stringify({
-    'message':'left_paddle_down'
-}))
-if (keys.current.right_up)
-    ws.send(JSON.stringify({
-'message':'right_paddle_up'
-}))
-if (keys.current.right_down)
-    ws.send(JSON.stringify({
-'message':'right_paddle_down'
-}))
-}
+			'id':id,
+        	'message':'paddle_up'
+    	}))
+		if (keys.current.left_down)
+			ws.send(JSON.stringify({
+			'id':id,
+			'message':'paddle_down'
+		}))
+	}
 
-const drawBall = (ctx, x, y) => {
-    // Drawing the ball at the given position
-    ctx.beginPath();
+	const drawBall = (ctx, x, y) => {
+	// Drawing the ball at the given position
+		ctx.beginPath();
 		ctx.arc(x, y, 10, 0, 2 * Math.PI);
 		ctx.fillStyle = 'white';
 		ctx.fill();
@@ -143,6 +144,19 @@ const drawBall = (ctx, x, y) => {
 		ctx.rect(x, y - 60, 10, 120);
 		ctx.fillStyle = 'white';
 		ctx.fill();
+	}
+
+	const drawWinner = (ctx) => {
+		if (winner != "") {
+			ctx.textAlign = "center";
+			ctx.fillStyle = "grey";
+			ctx.fillRect(ctx.canvas.width / 2 - ctx.canvas.width / 4 ,ctx.canvas.height / 2 - ctx.canvas.height / 4, ctx.canvas.width / 2, ctx.canvas.height / 2);
+
+			ctx.font = "40px Arial ";
+			ctx.fillStyle = "white";
+			ctx.textAlign = "center";
+			ctx.fillText(winner, ctx.canvas.width / 2,ctx.canvas.height / 2);
+		}
 	}
     
 	class Trail {
@@ -187,6 +201,8 @@ const drawBall = (ctx, x, y) => {
 			}
 		});
 
+		drawWinner(ctx);
+		
 		// Drawing non-static game elements
 		drawPaddle(ctx, LPaddle.current.x - 10, LPaddle.current.y);
 		drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y);
@@ -213,11 +229,9 @@ const drawBall = (ctx, x, y) => {
 
     return (
 		<>
-		<WinPanel winner={'Oui'} />
         <div className={styles.MovingBall}>
-			<h2>{score.left}:{score.right}</h2>
+			<ScoreBar score={score}/>
             <canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white' }}></canvas>
-			<div id='ball' style={{left: {ball}+"px"}}></div>
 			<div>
 			</div>
         </div>
@@ -225,9 +239,19 @@ const drawBall = (ctx, x, y) => {
 	);
 }
 
-function WinPanel({winner}) {
+function WinPanel({winneur}) {
 	return (
-		<h1 id='winPanel'>{winner}</h1>
+		<div id='winPanel'>
+			<h1>{winneur}</h1>
+		</div>
+	)
+}
+
+function ScoreBar({score}) {
+	return (
+		<div id='leftBar'>
+			<span></span>
+		</div>
 	)
 }
 

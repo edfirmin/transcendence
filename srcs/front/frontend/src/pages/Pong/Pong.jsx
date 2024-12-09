@@ -3,6 +3,14 @@ import styles from './Pong.module.css';
 import axios from 'axios';
 import { useLocation, useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
+import classic_paddle_design from '../../assets/img/classic_paddle_design.png'
+import classic_ball_design from '../../assets/img/classic_ball_design.png'
+import tennis_paddle_design from '../../assets/img/tennis_paddle_design.png'
+import tennis_ball_design from '../../assets/img/tennis_ball_design.png'
+import classic_map_design from '../../assets/img/classic_map_design.png'
+import tennis_map_design from '../../assets/img/tennis_map_design.png'
+import classic_design from '../../assets/img/classic_design.png'
+import tennis_design from '../../assets/img/tennis_design.png'
 
 
 function Pong() {
@@ -27,6 +35,8 @@ function Pong() {
 	const data = useLocation();
 	const isAI = data.state == null ? false : data.state.isAI;
 	const difficulty = data.state == null ? "medium" : data.state.difficulty;
+	const map = data.state.map;
+	const design = data.state.design;
 
     // When receiving a message from the back
     ws.onmessage = function(event) {
@@ -44,7 +54,6 @@ function Pong() {
 					'value': difficulty
 				}));
 			}
-
 		}
 
         if (data.type == "left_paddle_down" || data.type == "left_paddle_up") {
@@ -140,19 +149,17 @@ function Pong() {
 			}))
 	}
 
-	const drawBall = (ctx, x, y) => {
+	const drawBall = (ctx, x, y, img) => {
 		// Drawing the ball at the given position
 		ctx.beginPath();
-		ctx.arc(x, y, 10, 0, 2 * Math.PI);
-		ctx.fillStyle = 'white';
+		ctx.drawImage(img, x - 8, y - 8);
 		ctx.fill();
 	};
 
-	const drawPaddle = (ctx, x, y) => {
+	const drawPaddle = (ctx, x, y, img) => {
 		// Drawing a paddle centered at the given position
 		ctx.beginPath();
-		ctx.rect(x, y - 60, 10, 120);
-		ctx.fillStyle = 'white';
+		ctx.drawImage(img, x, y - 60, 10, 120);
 		ctx.fill();
 	}
 
@@ -175,13 +182,15 @@ function Pong() {
 		}
 	}
 
-	const drawGame = (ctx) =>
+	const drawGame = (ctx, background, paddle_img, ball_img) =>
 	{
 		// Fill background in black
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-		ctx.fillStyle = 'black';
+		ctx.drawImage(background, 0, 0, ctx.canvas.width, ctx.canvas.height);
+		
+		/*ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
+*/
 		// Drawing center lines for esthetics (looks nice, right ?)
 		ctx.beginPath();
 		for (let i = 0; i != 500; i += 10)
@@ -199,19 +208,44 @@ function Pong() {
 		});
 
 		// Drawing non-static game elements
-		drawPaddle(ctx, LPaddle.current.x - 10, LPaddle.current.y);
-		drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y);
-		drawBall(ctx, ball.x, ball.y);
+		drawPaddle(ctx, LPaddle.current.x - 10, LPaddle.current.y, paddle_img);
+		drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y, paddle_img);
+		drawBall(ctx, ball.x, ball.y, ball_img);
 	}
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		const context = canvas.getContext('2d');
 
+		var background = new Image();
+		var paddle_img = new Image();
+		var ball_img = new Image();
+		
+		background.src = map;
+		context.drawImage(background, 0, 0);
+		background.onload = function(){
+			context.drawImage(background,0,0);   
+		}
+
+		switch (design) {
+			case classic_design:
+				paddle_img.src = classic_paddle_design;
+				ball_img.src = classic_ball_design;
+				break;
+
+			case tennis_design:
+				paddle_img.src = tennis_paddle_design;
+				ball_img.src = tennis_ball_design;
+				break;
+
+			default:
+				break;
+		}
+
 		const animate = (time) =>
 		{
 			handlePaddlesMovement();
-			drawGame(context);
+			drawGame(context, background, paddle_img, ball_img);
 
 			requestAnimationFrame(animate);
 		};
@@ -225,11 +259,12 @@ function Pong() {
     return (
 		<>
 		<WinPanel winner={'Oui'} />
-		<h1>Oui {isAI}</h1>
+		<h1>map {map}</h1>
         <div className={styles.MovingBall}>
 			<h2>{score.left}:{score.right}</h2>
-            <canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white' }}></canvas>
-			<div id='ball' style={{left: {ball}+"px"}}></div>
+			<div id="game">
+            	<canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white'}}></canvas>
+			</div>
 			<div>
 			</div>
         </div>
