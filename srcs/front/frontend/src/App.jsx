@@ -24,7 +24,7 @@ function App() {
         <Route path="/profil" element={<ProtectedRoute> <Profil/> </ProtectedRoute>}/>
         <Route path="/register" element={<Register/>}></Route>
         <Route path="*" element={<NotFound/>}></Route>
-        <Route path="/pong" element={<ProtectedRoute> <Pong/> </ProtectedRoute>}/>
+        <Route path="/pong/:roomid" element={<ProtectedRoute> <Pong/> </ProtectedRoute>}/>
         <Route path="/multipong/:roomid" element={<ProtectedRoute> <PongMulti/> </ProtectedRoute>}/>
         <Route path="/selection" element={<ProtectedRoute> <PongSelection/> </ProtectedRoute>}/>
       </Routes>

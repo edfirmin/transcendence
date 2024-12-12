@@ -4,6 +4,14 @@ import axios from 'axios';
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
 import {v4 as uuidv4} from 'uuid';
+import classic_paddle_design from '../../assets/img/classic_paddle_design.png'
+import classic_ball_design from '../../assets/img/classic_ball_design.png'
+import tennis_paddle_design from '../../assets/img/tennis_paddle_design.png'
+import tennis_ball_design from '../../assets/img/tennis_ball_design.png'
+import classic_map_design from '../../assets/img/classic_map_design.png'
+import tennis_map_design from '../../assets/img/tennis_map_design.png'
+import classic_design from '../../assets/img/classic_design.png'
+import tennis_design from '../../assets/img/tennis_design.png'
 
 function PongMulti() {
 
@@ -11,6 +19,7 @@ function PongMulti() {
 	var ws;
 	var id;
     const canvasRef = useRef(null);
+    const canvasRef2 = useRef(null);
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
 	const LPaddle = useRef({ x: 50, y: 250});
 	const RPaddle = useRef({ x: 750, y: 250});
@@ -25,7 +34,17 @@ function PongMulti() {
     const [count, setCount]  = useState(0);
 	const trails = [];
 	const [winner, setWinner] = useState("");
+
+	const map_design = [classic_map_design, tennis_map_design];
+	const ball_design = [classic_ball_design, tennis_ball_design];
+	const paddle_design = [classic_paddle_design, tennis_paddle_design];
+
+	const data = useLocation();
+	const map_index = data.state == null ? 0 : data.state.map;
+	const design_index = data.state == null ? 0 : data.state.design;
     
+	const [countdown, setCountdown] = useState(-1);
+
 	useEffect(() => {
 		ws = new WebSocket(`ws://localhost:8000/ws/multipong/${roomid}`);
 	  	id = uuidv4();
@@ -62,6 +81,9 @@ function PongMulti() {
 			}
 			if (data.type == "winner") {
 				setWinner(data.message + " WIN !");
+			}
+			if (data.type == "begin_countdown") {
+				setCountdown(3);
 			}
 		}
 	}, [])
@@ -130,21 +152,20 @@ function PongMulti() {
 		}))
 	}
 
-	const drawBall = (ctx, x, y) => {
-	// Drawing the ball at the given position
+	const drawBall = (ctx, x, y, img) => {
+		// Drawing the ball at the given position
 		ctx.beginPath();
-		ctx.arc(x, y, 10, 0, 2 * Math.PI);
-		ctx.fillStyle = 'white';
+		ctx.drawImage(img, x - 8, y - 8);
 		ctx.fill();
 	};
-    
-	const drawPaddle = (ctx, x, y) => {
-        // Drawing a paddle centered at the given position
+
+	const drawPaddle = (ctx, x, y, img) => {
+		// Drawing a paddle centered at the given position
 		ctx.beginPath();
-		ctx.rect(x, y - 60, 10, 120);
-		ctx.fillStyle = 'white';
+		ctx.drawImage(img, x, y - 60, 10, 120);
 		ctx.fill();
 	}
+
 
 	const drawWinner = (ctx) => {
 		if (winner != "") {
@@ -159,6 +180,20 @@ function PongMulti() {
 		}
 	}
     
+	const drawCountdown = (ctx) => {
+		if (countdown != -1) {
+			ctx.textAlign = "center";
+			ctx.fillStyle = "grey";
+			ctx.fillRect(ctx.canvas.width / 2 - ctx.canvas.width / 4 ,ctx.canvas.height / 2 - ctx.canvas.height / 4, ctx.canvas.width / 2, ctx.canvas.height / 2);
+
+			ctx.font = "40px Arial ";
+			ctx.fillStyle = "white";
+			ctx.textAlign = "center";
+			ctx.fillText(countdown, ctx.canvas.width / 2,ctx.canvas.height / 2);
+		}
+	}
+    
+	
 	class Trail {
 		constructor(x, y) {
             this.x = x;
@@ -178,19 +213,11 @@ function PongMulti() {
 		}
 	}
 
-	const drawGame = (ctx) =>
+	const drawGame = (ctx, background, paddle_img, ball_img) =>
 	{
 		// Fill background in black
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-		ctx.fillStyle = 'black';
-		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-		// Drawing center lines for esthetics (looks nice, right ?)
-		ctx.beginPath();
-		for (let i = 0; i != 500; i += 10)
-			ctx.rect(398, i, 4, 1);
-		ctx.fillStyle = 'grey';
-		ctx.fill();
+		ctx.drawImage(background, 0, 0, ctx.canvas.width, ctx.canvas.height);
 
 		trails.forEach(element => {
 			element.update();
@@ -201,22 +228,38 @@ function PongMulti() {
 			}
 		});
 
+		if (countdown != 0)
+			drawCountdown(ctx);
+
 		drawWinner(ctx);
 		
 		// Drawing non-static game elements
-		drawPaddle(ctx, LPaddle.current.x - 10, LPaddle.current.y);
-		drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y);
-		drawBall(ctx, ball.x, ball.y);
+		drawPaddle(ctx, LPaddle.current.x - 10, LPaddle.current.y, paddle_img);
+		drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y, paddle_img);
+		drawBall(ctx, ball.x, ball.y, ball_img);
 	}
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		const context = canvas.getContext('2d');
 
+		var background = new Image();
+		var paddle_img = new Image();
+		var ball_img = new Image();
+		
+		background.src = map_design[map_index];
+		context.drawImage(background, 0, 0);
+		background.onload = function(){
+			context.drawImage(background,0,0);   
+		}
+
+		paddle_img.src = paddle_design[design_index];
+		ball_img.src = ball_design[design_index];
+
 		const animate = (time) =>
 		{
 			handlePaddlesMovement();
-			drawGame(context);
+				drawGame(context, background, paddle_img, ball_img);
 
 			requestAnimationFrame(animate);
 		};
@@ -225,34 +268,46 @@ function PongMulti() {
         return () => cancelAnimationFrame(animate);
     }, []);
 
-	
+	useEffect(() => {
+		const canvas = canvasRef2.current;
+		const ctx = canvas.getContext('2d');
+
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+		ctx.fillStyle = 'grey';
+		ctx.fillRect(ctx.canvas.width / 2 - 1, 0, 2, ctx.canvas.height);
+
+		ctx.shadowBlur = 10;
+		ctx.shadowColor = "black";
+		ctx.fillStyle = `rgb(
+			0
+			${Math.floor(42.5 * score.left)}
+			${Math.floor(42.5 * score.left)})`;
+		ctx.fillRect(2, 2, score.left * ctx.canvas.width / 2 / 5, ctx.canvas.height - 6);
+
+		ctx.fillStyle = `rgb(
+			${Math.floor(42.5 * score.right)}
+			0
+			${Math.floor(42.5 * score.right)})`;
+		ctx.fillRect(ctx.canvas.width - score.right * ctx.canvas.width / 2 / 5, 2, score.right * ctx.canvas.width / 2 / 5 - 2, ctx.canvas.height - 6);
+
+
+    }, [score]);
+
+	useEffect(() => {
+		countdown > 0 && setTimeout(() => setCountdown(countdown - 1), 1000);
+	}, [countdown]);
 
     return (
 		<>
         <div className={styles.MovingBall}>
-			<ScoreBar score={score}/>
+			<canvas ref={canvasRef2} width={800} height={50} style={{ border: '5px solid white', borderRadius: '5px', marginBottom: '5px' }}></canvas>
             <canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white' }}></canvas>
-			<div>
-			</div>
         </div>
 		</>
 	);
 }
 
-function WinPanel({winneur}) {
-	return (
-		<div id='winPanel'>
-			<h1>{winneur}</h1>
-		</div>
-	)
-}
-
-function ScoreBar({score}) {
-	return (
-		<div id='leftBar'>
-			<span></span>
-		</div>
-	)
-}
 
 export default PongMulti;

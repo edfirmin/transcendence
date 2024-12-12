@@ -1,22 +1,24 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './Pong.module.css';
 import axios from 'axios';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
 import classic_paddle_design from '../../assets/img/classic_paddle_design.png'
 import classic_ball_design from '../../assets/img/classic_ball_design.png'
 import tennis_paddle_design from '../../assets/img/tennis_paddle_design.png'
 import tennis_ball_design from '../../assets/img/tennis_ball_design.png'
-import classic_map_design from '../../assets/img/classic_map_design.png'
-import tennis_map_design from '../../assets/img/tennis_map_design.png'
+import classic_map from '../../assets/img/classic_map.png'
+import tennis_map from '../../assets/img/tennis_map.png'
 import classic_design from '../../assets/img/classic_design.png'
 import tennis_design from '../../assets/img/tennis_design.png'
 
 
 function Pong() {
 
-	var ws = useMemo(() => {return new WebSocket("ws://localhost:8000/ws/pong/")}, [ws]);
+    const { roomid } = useParams();
+	var ws = useMemo(() => {return new WebSocket(`ws://localhost:8000/ws/pong/${roomid}`)}, [ws]);
     const canvasRef = useRef(null);
+    const canvasRef2 = useRef(null);
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
 	const LPaddle = useRef({ x: 50, y: 250});
 	const RPaddle = useRef({ x: 750, y: 250});
@@ -32,11 +34,20 @@ function Pong() {
 	const trails = [];
 	const [winner, setWinner] = useState("");
 
+	const map_design = [classic_map, tennis_map];
+	const ball_design = [classic_ball_design, tennis_ball_design];
+	const paddle_design = [classic_paddle_design, tennis_paddle_design];
+
 	const data = useLocation();
 	const isAI = data.state == null ? false : data.state.isAI;
 	const difficulty = data.state == null ? "medium" : data.state.difficulty;
-	const map = data.state.map;
-	const design = data.state.design;
+	const map_index = data.state.map;
+	const design_index = data.state.design;
+	const points = data.state.points + 2;
+
+	const [countdown, setCountdown] = useState(-1);
+
+    const navigate = useNavigate();
 
     // When receiving a message from the back
     ws.onmessage = function(event) {
@@ -44,6 +55,10 @@ function Pong() {
         console.log('Data:', data);
     
 		if (data.type == "connection_established") {
+			ws.send(JSON.stringify({
+				'message':'points',
+				'value': points
+			}));
 			ws.send(JSON.stringify({
 				'message':'isAi',
 				'value': isAI
@@ -54,6 +69,7 @@ function Pong() {
 					'value': difficulty
 				}));
 			}
+			setCountdown(3);	
 		}
 
         if (data.type == "left_paddle_down" || data.type == "left_paddle_up") {
@@ -76,6 +92,7 @@ function Pong() {
 		}
 		if (data.type == "winner") {
 			setWinner(data.message + " WIN !");
+			setTimeout(() => { navigate('/selection') }, 3000);
 		}
 	}
 
@@ -182,6 +199,32 @@ function Pong() {
 		}
 	}
 
+	const drawWinner = (ctx) => {
+		if (winner != "") {
+			ctx.textAlign = "center";
+			ctx.fillStyle = "grey";
+			ctx.fillRect(ctx.canvas.width / 2 - ctx.canvas.width / 4 ,ctx.canvas.height / 2 - ctx.canvas.height / 4, ctx.canvas.width / 2, ctx.canvas.height / 2);
+
+			ctx.font = "40px Arial ";
+			ctx.fillStyle = "white";
+			ctx.textAlign = "center";
+			ctx.fillText(winner, ctx.canvas.width / 2,ctx.canvas.height / 2);
+		}
+	}
+
+	const drawCountdown = (ctx) => {
+		if (countdown != -1) {
+			ctx.textAlign = "center";
+			ctx.fillStyle = "grey";
+			ctx.fillRect(ctx.canvas.width / 2 - ctx.canvas.width / 4 ,ctx.canvas.height / 2 - ctx.canvas.height / 4, ctx.canvas.width / 2, ctx.canvas.height / 2);
+
+			ctx.font = "40px Arial ";
+			ctx.fillStyle = "white";
+			ctx.textAlign = "center";
+			ctx.fillText(countdown, ctx.canvas.width / 2,ctx.canvas.height / 2);
+		}
+	}
+
 	const drawGame = (ctx, background, paddle_img, ball_img) =>
 	{
 		// Fill background in black
@@ -191,13 +234,6 @@ function Pong() {
 		/*ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 */
-		// Drawing center lines for esthetics (looks nice, right ?)
-		ctx.beginPath();
-		for (let i = 0; i != 500; i += 10)
-			ctx.rect(398, i, 4, 1);
-		ctx.fillStyle = 'grey';
-		ctx.fill();
-
 		trails.forEach(element => {
 			element.update();
 			element.draw(ctx);
@@ -207,10 +243,18 @@ function Pong() {
 			}
 		});
 
-		// Drawing non-static game elements
-		drawPaddle(ctx, LPaddle.current.x - 10, LPaddle.current.y, paddle_img);
-		drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y, paddle_img);
-		drawBall(ctx, ball.x, ball.y, ball_img);
+		if (winner != "") {
+			drawWinner(ctx);
+		}
+		else if (countdown > 0) {
+			drawCountdown(ctx);
+		}
+		else {
+			// Drawing non-static game elements
+			drawPaddle(ctx, LPaddle.current.x - 10, LPaddle.current.y, paddle_img);
+			drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y, paddle_img);
+			drawBall(ctx, ball.x, ball.y, ball_img);
+		}
 	}
 
 	useEffect(() => {
@@ -221,26 +265,14 @@ function Pong() {
 		var paddle_img = new Image();
 		var ball_img = new Image();
 		
-		background.src = map;
+		background.src = map_design[map_index];
 		context.drawImage(background, 0, 0);
 		background.onload = function(){
 			context.drawImage(background,0,0);   
 		}
 
-		switch (design) {
-			case classic_design:
-				paddle_img.src = classic_paddle_design;
-				ball_img.src = classic_ball_design;
-				break;
-
-			case tennis_design:
-				paddle_img.src = tennis_paddle_design;
-				ball_img.src = tennis_ball_design;
-				break;
-
-			default:
-				break;
-		}
+		paddle_img.src = paddle_design[design_index];
+		ball_img.src = ball_design[design_index];
 
 		const animate = (time) =>
 		{
@@ -252,30 +284,63 @@ function Pong() {
 		requestAnimationFrame(animate);
 
         return () => cancelAnimationFrame(animate);
-    }, []);
+    }, [winner, countdown]);
 
-	
+	useEffect(() => {
+		const canvas = canvasRef2.current;
+		const ctx = canvas.getContext('2d');
+
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+		ctx.fillStyle = 'grey';
+		ctx.fillRect(ctx.canvas.width / 2 - 1, 0, 2, ctx.canvas.height);
+
+		ctx.shadowBlur = 10;
+		ctx.shadowColor = "black";
+		ctx.fillStyle = `rgb(
+			0
+			${Math.floor(255 / points * score.left)}
+			${Math.floor(255 / points * score.left)})`;
+		ctx.fillRect(2, 2, score.left * ctx.canvas.width / 2 / points, ctx.canvas.height - 6);
+
+		ctx.fillStyle = `rgb(
+			${Math.floor(255 / points * score.right)}
+			0
+			${Math.floor(255 / points * score.right)})`;
+		ctx.fillRect(ctx.canvas.width - score.right * ctx.canvas.width / 2 / points, 2, score.right * ctx.canvas.width / 2 / points - 2, ctx.canvas.height - 6);
+
+		ctx.fillStyle = 'white';
+		let dist = ctx.canvas.width / (points * 2);
+		for (let i = 1; i < points * 2; i++) {
+			if (i == points) {
+				ctx.fillRect(dist * i - 2, 0, 4, 15);
+				ctx.fillRect(dist * i - 2, ctx.canvas.height - 15, 4, 15);
+			}
+			else {
+				ctx.fillRect(dist * i - 2, 0, 4, 10);
+				ctx.fillRect(dist * i - 2, ctx.canvas.height - 10, 4, 10);
+			}
+		}
+
+    }, [score]);
+
+	useEffect(() => {
+		countdown > 0 && setTimeout(() => setCountdown(countdown - 1), 1000);
+		if (countdown == 0)
+			ws.send(JSON.stringify({
+				'message':'begin_game'
+			}));
+	}, [countdown]);
 
     return (
 		<>
-		<WinPanel winner={'Oui'} />
-		<h1>map {map}</h1>
         <div className={styles.MovingBall}>
-			<h2>{score.left}:{score.right}</h2>
-			<div id="game">
-            	<canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white'}}></canvas>
-			</div>
-			<div>
-			</div>
+			<canvas ref={canvasRef2} width={800} height={50} style={{ border: '5px solid white', borderRadius: '5px', marginBottom: '5px' }}></canvas>
+            <canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white' }}></canvas>
         </div>
 		</>
 	);
-}
-
-function WinPanel({winner}) {
-	return (
-		<h1 id='winPanel'>{winner}</h1>
-	)
 }
 
 export default Pong;

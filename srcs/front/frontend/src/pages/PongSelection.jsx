@@ -6,44 +6,43 @@ import classic_design from '../assets/img/classic_design.png'
 import tennis_design from '../assets/img/tennis_design.png'
 import classic_map_design from '../assets/img/classic_map_design.png'
 import tennis_map_design from '../assets/img/tennis_map_design.png'
-
+import design_2 from '../assets/img/2.png'; import design_3 from '../assets/img/3.png'; import design_4 from '../assets/img/4.png';
+import design_5 from '../assets/img/5.png'; import design_6 from '../assets/img/6.png'; import design_7 from '../assets/img/7.png';
+import design_8 from '../assets/img/8.png'; import design_9 from '../assets/img/9.png'; 
 
 function PongSelection() {
 
-    const [difficulty, setDifficulty] = useState("medium");
+    const [difficulty, set_difficulty] = useState("medium");
     const paddle_designs = [classic_design, tennis_design];
     const map_designs = [classic_map_design, tennis_map_design];
+    const point_design = [design_2, design_3, design_4, design_5, design_6, design_7, design_8, design_9];
+    const [index_design, set_index_design] = useState(0), [index_map_design, set_index_map_design] = useState(0);
+    const [points, set_points] = useState(0);
 
     const navigate = useNavigate();
 
     function handleLocalPong() {
-        navigate('/pong', {state : { isAI : false, map : classic_map_design, design : tennis_design}});
+      const roomId = uuidv4();
+      navigate(`/pong/${roomId}`, {state : { isAI : false, map : index_map_design, design : index_design, points : points}});
     }
 
     function handleAIPong() {
-        navigate('/pong', {state : { isAI : true, difficult : difficulty, map : classic_map_design, design : classic_design}});
+      navigate('/pong', {state : { isAI : true, difficult : difficulty, map : index_map_design, design : index_design, points : points}});
     }
 
     function handleRemotePong() {
       const roomId = uuidv4();
-      navigate(`/multipong/${roomId}`);
-    }
-
-    function handlePoints() {
-      
+      navigate(`/multipong/${roomId}`,  {state : {map : index_map_design, design : index_design, points : points}});
     }
 
     return (
         <>
             <div className='container'>
               <div></div>
-              <Selector name={"Map"} designs={map_designs} />
-              <Selector name={'Design'} designs={paddle_designs}/>
-              {/*<Selector name={'PowerUp'} img_src={"../assets/img/classic_design.png"} />*/}
+              <Selector name={"Map"} designs={map_designs} index={index_map_design} setIndex={set_index_map_design} />
+              <Selector name={"Points"} designs={point_design} index={points} setIndex={set_points} />
+              <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} />
               <div></div>
-            </div>
-            <div id="points">
-              <input type="range" min="1" max="100" value="50" class="slider" id="myRange" onInput={handlePoints}/>
             </div>
             <div className='container'>
               <div></div>
@@ -69,15 +68,29 @@ function Button({name, callback}) {
 	)
 }
 
-function Selector({name, designs}) {
-  let index = 0;
+function Selector({name, designs, index, setIndex}) {
   const [imgDesign, setImgDesign] = useState(designs[0]);
   
-  function handleOnClick()
+  function handleOnClickLeftArrow()
   {
+    setIndex(index + 1);
     index++;
-    if (index >= designs.length)
+    if (index >= designs.length) {
+      setIndex(0);
       index = 0;
+    }
+
+    setImgDesign(designs[index]);
+  }
+
+  function handleOnClickRightArrow()
+  {
+    setIndex(index - 1);
+    index--;
+    if (index < 0) {
+      setIndex(designs.length - 1);
+      index = designs.length - 1;
+    }
 
     setImgDesign(designs[index]);
   }
@@ -86,9 +99,9 @@ function Selector({name, designs}) {
     <div className='selector'>
       <p>{name}</p>
       <div>
-        <button className='arrowButton' onClick={handleOnClick} id='leftArrow'>&lt;</button>
+        <button className='arrowButton' onClick={handleOnClickRightArrow} id='leftArrow'>&lt;</button>
         <img src={imgDesign}/>
-        <button className='arrowButton' onClick={handleOnClick} id='rightArrow'>&gt;</button>
+        <button className='arrowButton' onClick={handleOnClickLeftArrow} id='rightArrow'>&gt;</button>
       </div>
     </div>
   )
