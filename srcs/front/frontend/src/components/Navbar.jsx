@@ -1,9 +1,14 @@
+import React, {Component} from "react";
 import { useState, useEffect } from "react";
 import { getUser } from "../api"
-import "../styles/Navbar.css"
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import '../styles/Navbar.css';
 import logo from "../assets/logo.png"
+import 'bootstrap/dist/css/bootstrap.css';
 
-function Navbar () {
+function Navbarr() {
     const [user_pp, setUser] = useState([])
 
     const inituser = async () => {
@@ -14,21 +19,21 @@ function Navbar () {
     useEffect(() => {
         inituser()
     }, []);
-
-    return(
-        <nav className="navbar">
-            <a href="/"><img className="logo" src={logo} alt="Logo" /></a>
-            <ul>
-                {/* <li><a href="">Chat</a></li> */}
-                <li><select>
-                    <option value="0">FR</option>
-                    <option value="1">EN</option>
-                    <option value="0">JP</option>
-                    </select></li>
-            </ul>
-                <a href="/profil"><img className="pp_nav" src={user_pp} alt="profil" /></a>
-         </nav>
-    )
+  return (
+    <Navbar bg="myBG" variant="dark" className="navi">
+        <Navbar.Brand href="/home"><img className="logo" src={logo}/></Navbar.Brand>
+          <Nav>
+            <Nav.Link href="/profil"><img className="pp_nav" src={user_pp}/></Nav.Link>
+            <NavDropdown title="Language">
+              <NavDropdown.Item href="">FR</NavDropdown.Item>
+              <NavDropdown.Item href="">EN</NavDropdown.Item>
+              <NavDropdown.Item href="">JP</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="">Change default language</NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+    </Navbar>
+  );
 }
 
-export default Navbar
+export default Navbarr;

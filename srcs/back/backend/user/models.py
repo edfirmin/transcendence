@@ -7,4 +7,6 @@ class User(AbstractUser):
     first_name = None
     last_name = None
     profil_pic = models.URLField(default="https://wallpapers-clan.com/wp-content/uploads/2022/08/default-pfp-16.jpg")
+    is2FA = models.BooleanField(default=False)
+    mfa_secret = models.CharField(max_length=32, blank=True, null=True)
     
