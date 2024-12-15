@@ -1,5 +1,6 @@
 import Form from "../components/Form" 
 import {useNavigate} from "react-router-dom"
+import Snowfall from 'react-snowfall'
 
 function Login() {
     const navigate = useNavigate();
@@ -15,12 +16,16 @@ function Login() {
 
     return (
         <div>
-            {localStorage.clear()}
-            <button className="login-with-42-button" onClick={handleLoginWith42}>
-                Se connecter avec 42
-            </button>
-            <Form route="/api/user/token/" method="login"/>
-            <button className="go-to-register-button" onClick={() => handleGoToRegisterButton()}>Create an account</button>
+            <Snowfall />
+            <div className="div-login-page">
+                <Snowfall />
+                {localStorage.clear()}
+                <button className="login-with-42-button" onClick={handleLoginWith42}>
+                    Se connecter avec 42
+                </button>
+                <Form route="/api/user/token/" method="login"/>
+                <button className="go-to-register-button" onClick={() => handleGoToRegisterButton()}>Create an account</button>
+            </div>
         </div>
     );
 }

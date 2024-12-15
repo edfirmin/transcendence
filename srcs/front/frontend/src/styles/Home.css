@@ -16,11 +16,11 @@ div {
   
 .go-to-register-button {
 	display: flex;
-	width: 22%;
+	width: 25vh;
 	justify-content: center;
-	background-color: #cc00ff;
+	background-color: #aee8fd;
 	margin: 10px auto;
-	color: white;
+	color: #0f9acc;
 	padding: 10px 15px;
 	border-radius: 100px;
 	cursor: pointer;
@@ -29,16 +29,18 @@ div {
 }
   
 .go-to-register-button:hover {
-	background-color: #7a0099;
+	background-color: #8addfc;
+	width: 25vh;
+  	color: #ffffff;
 }
   
 .go-to-login-button {
 	display: flex;
-	width: 22%;
+	width: 25vh;
 	justify-content: center;
-	background-color: #cc00ff;
+	background-color: #aee8fd;
 	margin: 10px auto;
-	color: white;
+	color: #0f9acc;
 	padding: 10px 15px;
 	border-radius: 100px;
 	cursor: pointer;
@@ -47,7 +49,9 @@ div {
 }
 
 .go-to-login-button:hover {
-	background-color: #7a0099;
+	background-color: #8addfc;
+  	color: #ffffff;
+	width: 25vh;
 }
 
 video {
@@ -58,4 +62,16 @@ video {
 }
 .logout-button {
 	position: sticky;
+}
+
+
+.div-login-page{
+	margin: 6% auto;
+	border: 3mm ridge #ffffff;
+	background-color: #8adefc52;
+	box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.877);
+	backdrop-filter: blur(6px);
+	border-radius: 20px;
+	height: 65vh;
+    width: 50%;
 }
