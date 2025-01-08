@@ -56,6 +56,9 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
     is_ai = False
     difficulty = "medium"
     nb_players_connected = {}
+    map_index = {}
+    design_index = {}
+    points = {}
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['roomid']
@@ -63,8 +66,6 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
 
         logger.info(f"Player connected to room {self.room_group_name}")
 
-        if (MultiPongConsumer.nb_players_connected[self.room_name] > 2):
-            return
 
         # Join the game group
         await self.channel_layer.group_add(
@@ -81,6 +82,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
             MultiPongConsumer.nb_players_connected[self.room_name] = 1
         else:
             MultiPongConsumer.nb_players_connected[self.room_name] += 1
+        if (MultiPongConsumer.nb_players_connected[self.room_name] > 2):
+            return
 
         if self.room_name not in MultiPongConsumer.players:
             MultiPongConsumer.players[self.room_name] = [None, None]
@@ -96,6 +99,12 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
             MultiPongConsumer.right_paddle_pos[self.room_name] = [0, 250]
         if self.room_name not in MultiPongConsumer.score:
             MultiPongConsumer.score[self.room_name] = [0, 0]
+        if self.room_name not in MultiPongConsumer.map_index:
+            MultiPongConsumer.map_index[self.room_name] = -1
+        if self.room_name not in MultiPongConsumer.design_index:
+            MultiPongConsumer.design_index[self.room_name] = -1
+        if self.room_name not in MultiPongConsumer.points:
+            MultiPongConsumer.points[self.room_name] = -1
         if self.room_name not in MultiPongConsumer.game_task:
             MultiPongConsumer.game_task[self.room_name] = None
 
@@ -117,9 +126,23 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
             else:
                 MultiPongConsumer.players[self.room_name][1] = id
 
-        if (message == "begin_match" and MultiPongConsumer.game_task[self.room_name] == None):
+            if (MultiPongConsumer.map_index[self.room_name] != -1):           
+                await self.channel_layer.group_send(
+                    self.room_group_name,{
+                        'type':'game_custom_options_type',
+                        'design_index': MultiPongConsumer.design_index[self.room_name],
+                        'map_index': MultiPongConsumer.map_index[self.room_name],
+                        'points': MultiPongConsumer.points[self.room_name]
+                    })
+
+        if (message == "begin_game" and MultiPongConsumer.game_task[self.room_name] == None):
             MultiPongConsumer.game_task[self.room_name] = asyncio.create_task(self.main_loop())
             logger.info(f"game started")
+
+        if (message == "game_custom_options"):
+            MultiPongConsumer.map_index[self.room_name] = data_json['map']
+            MultiPongConsumer.design_index[self.room_name] = data_json['design']
+            MultiPongConsumer.points[self.room_name] = data_json['points']
 
         if (message == "paddle_down"):
             # Left
@@ -192,7 +215,7 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 else:
                     MultiPongConsumer.score[self.room_name][0] += 1
                     # check winner
-                    if (MultiPongConsumer.score[self.room_name][0] >= self.score_to_win):
+                    if (MultiPongConsumer.score[self.room_name][0] >= MultiPongConsumer.points[self.room_name]):
                         await self.send_message("winner_type", "LEFT")
                         MultiPongConsumer.game_task[self.room_name].cancel()
 
@@ -214,7 +237,7 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                     MultiPongConsumer.score[self.room_name][1] += 1
 
                     # check winner
-                    if (MultiPongConsumer.score[self.room_name][1] >= self.score_to_win):
+                    if (MultiPongConsumer.score[self.room_name][1] >= MultiPongConsumer.points[self.room_name]):
                         await self.send_message("winner_type", "RIGHT")
                         MultiPongConsumer.game_task[self.room_name].cancel()
 
@@ -297,6 +320,14 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 'left': event['left'],
                 'right': event['right']
             })
+        
+    async def game_custom_options_type(self, event):
+        await self.send_json({
+                'type': "game_custom_options",
+                'design_index': event['design_index'],
+                'map_index': event['map_index'],
+                'points': event['points']
+            })
 
     async def send_message(self, _type, message):
         await self.channel_layer.group_send(
@@ -306,6 +337,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 "message": message
             }
         )
+
+
 
 class PongConsumer(AsyncWebsocketConsumer):
     
@@ -421,13 +454,13 @@ class PongConsumer(AsyncWebsocketConsumer):
 
                 if (PongConsumer.difficulty[self.room_name] == "easy"):
                     if (PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
-                        PongConsumer.right_paddle_pos[self.room_name][1] += 2
+                        PongConsumer.right_paddle_pos[self.room_name][1] += 5
                         await self.send(text_data=json.dumps({
                             'type':'right_paddle_down',
                             'message': PongConsumer.right_paddle_pos[self.room_name][1]
                         }))
                     elif (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] > self.up_limit):
-                        PongConsumer.right_paddle_pos[self.room_name][1] -= 2
+                        PongConsumer.right_paddle_pos[self.room_name][1] -= 5
                         await self.send(text_data=json.dumps({
                             'type':'right_paddle_up',
                             'message': PongConsumer.right_paddle_pos[self.room_name][1]
@@ -463,7 +496,9 @@ class PongConsumer(AsyncWebsocketConsumer):
             if (PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] > 490 or PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] < 10):
                 PongConsumer.ball_direction[self.room_name][1] *= -1
                 await self.send(text_data=json.dumps({
-                    'type':'hit'
+                    'type':'hit',
+                    'dx': PongConsumer.ball_direction[self.room_name][0],
+                    'dy': PongConsumer.ball_direction[self.room_name][1]
                 }))
 
             # right side
