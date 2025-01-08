@@ -21,5 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include("rest_framework.urls")),
     path('api/', include("api.urls")),
-    path('pong/', include("pong.urls")),
+    path('pong/<str:room_id>/', include("pong.urls")),
+    path("multipong/<str:room_id>/", include("pong.urls")),
+    path('selection/', include("pong.urls")),
 ]
