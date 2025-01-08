@@ -4,12 +4,13 @@ import "../styles/Home.css"
 import {useNavigate} from "react-router-dom"
 import { useState, useEffect } from "react";
 import Navbarr from '../components/Navbar';
-import back_home from '../assets/home_back.mp4'
 import { getQR } from "../api"
+import 'bootstrap/dist/css/bootstrap.css';
+import logoutLogo from "../assets/logout_logo.png"
 
 function Home() {
     const navigate = useNavigate();
-    const [qr, setQR] = useState([])
+    // const [qr, setQR] = useState([])
 
     const handleLogout = () => {
         localStorage.clear();
@@ -17,21 +18,20 @@ function Home() {
     }
 
     
-    const initqr = async () => {
-        const TMPuser = await getQR()
-        setQR(TMPuser);
-    }
+    // const initqr = async () => {
+    //     const TMPuser = await getQR()
+    //     setQR(TMPuser);
+    // }
 
-    useEffect(() => {
-        initqr()
-    }, []);
+    // useEffect(() => {
+    //     initqr()
+    // }, []);
 
 	return (
 		<div>
-            {/* <video src={back_home} autoPlay muted loop /> */}
             <Navbarr></Navbarr>
-			<button className="logout-button" onClick={() => handleLogout()}>Logout</button>
-            <img src={qr} alt="wq" />
+			<button className="logout-button" onClick={() => handleLogout()}><img className='logout-logo' src={logoutLogo} alt="logoutLogo" /></button>
+            {/* <img src={qr} /> */}
 		</div>
     );
 }

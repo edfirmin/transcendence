@@ -12,8 +12,8 @@ function From({route, method}) {
     const [ffa, setis2fa] = useState(false)
     const [code2fa, set2fa] = useState("")
     const navigate = useNavigate()
-
     const name = method === "login" ? "Login" : "Register";
+    var logo = method === "login" ? "src/assets/login.png" : "src/assets/register.png" ;
 
     const handleSubmit = async (f) => {//pour qu'une fois le bouton "submit" est press, le formulaire reviens a sa config initial, c'est a dire: VIDE// "async" est une "method" de function qui permet de mieux gerer les cas d'erreur, d'ou de "try/catch"
         setLoading(true);
@@ -33,7 +33,7 @@ function From({route, method}) {
                 }
             }
             else {
-                const res = await axios.post(route, {username, password, code2fa})
+                await axios.post(route, {username, password, code2fa})
                 navigate("/login")
             }
         }
@@ -47,7 +47,7 @@ function From({route, method}) {
 
 
     return <form onSubmit={handleSubmit} className="form-container">
-        <h1>{name}</h1>
+        <img src={logo} alt="logo"/>
         <input className="form-imput" type="text" value={username} onChange={(f) => setUsername(f.target.value)} placeholder="Username"></input>
         <input className="form-imput" type="password" value={password} onChange={(f) => setPassword(f.target.value)} placeholder="Password"></input>
         {ffa && (<div>
