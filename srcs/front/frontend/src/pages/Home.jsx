@@ -10,28 +10,16 @@ import logoutLogo from "../assets/logout_logo.png"
 
 function Home() {
     const navigate = useNavigate();
-    // const [qr, setQR] = useState([])
 
     const handleLogout = () => {
         localStorage.clear();
         navigate("/login")
     }
 
-    
-    // const initqr = async () => {
-    //     const TMPuser = await getQR()
-    //     setQR(TMPuser);
-    // }
-
-    // useEffect(() => {
-    //     initqr()
-    // }, []);
-
 	return (
 		<div>
             <Navbarr></Navbarr>
 			<button className="logout-button" onClick={() => handleLogout()}><img className='logout-logo' src={logoutLogo} alt="logoutLogo" /></button>
-            {/* <img src={qr} /> */}
 		</div>
     );
 }

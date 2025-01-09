@@ -119,7 +119,7 @@ def getQrcode(request):
 
     otp_uri = pyotp.totp.TOTP(user.mfa_secret).provisioning_uri(
         name=user.username,
-        issuer_name="LE TUFU"
+        issuer_name="SnowPong"
     )
 
     qr = qrcode.make(otp_uri)

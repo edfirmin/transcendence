@@ -19,18 +19,22 @@ form {
 	max-width: 500px;
 	margin: auto;
 }
+
+.formm h2 {
+	margin: 10px 1000px;
+}
   
-form h1 {
+/* form h1 {
 	color: #1b1297;
 	font-size: 30px;
 	margin-bottom: 20px;
-}
+} */
 	
-form h2 {
+/* form h2 {
 	color: #333;
-	font-size: 24px;
-	margin-bottom: 20px;
-}
+	width: 56vh;
+	font-size: 25px;
+} */
 	
 form label {
 	font-weight: bold;
@@ -94,6 +98,7 @@ form input[type="submit"]:hover {
 
 .logo42 {
 	border-radius: 10px;
+	margin: 0px 13px;
 }
 
 .div-login-page h2{

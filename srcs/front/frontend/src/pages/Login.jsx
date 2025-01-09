@@ -1,7 +1,6 @@
 import Form from "../components/Form" 
 import {useNavigate} from "react-router-dom"
 import Snowfall from 'react-snowfall'
-import logo from "../assets/42logo.png"
 
 function Login() {
     const navigate = useNavigate();
@@ -10,10 +9,6 @@ function Login() {
         localStorage.clear();
         navigate("/register")
     }
-
-    const handleLoginWith42 = () => {
-        window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-efb8810a6794b0509ab1b30b4baeb56fff909df009eb5c29cde1d675f5309a75&redirect_uri=https%3A%2F%2Flocalhost%3A5173%2Fcheck42user&response_type=code";
-    };
 
 
     return (
@@ -24,8 +19,8 @@ function Login() {
                 {localStorage.clear()}
                 <Form route="/api/user/token/" method="login"/>
                 <button className="go-to-register-button" onClick={() => handleGoToRegisterButton()}>Create an account</button>
-                <h2>━━━━━━━━ Or continue with ━━━━━━━━</h2>
-                <button className="login-with-42-button" onClick={handleLoginWith42}><img className="logo42" src={logo} alt="42 Authentication"/></button>
+                {/* <h2>━━━━━━━━ Or continue with ━━━━━━━━</h2>
+                <button className="login-with-42-button" onClick={handleLoginWith42}><img className="logo42" src={logo} alt="42 Authentication"/></button> */}
             </div>
         </div>
     );
