@@ -30,6 +30,34 @@ def is2fa(username):
         return (True)
     return (False)
 
+def getQrcode(request):
+    myPath = request.build_absolute_uri()
+    token_string = myPath.split("?")[1]
+    token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+    user_id = token.get('id')
+    user = User.objects.get(id=user_id)
+
+
+    if not user.mfa_secret:
+        user.mfa_secret = pyotp.random_base32()
+        user.save()
+
+    otp_uri = pyotp.totp.TOTP(user.mfa_secret).provisioning_uri(
+        name=user.username,
+        issuer_name="SnowPong"
+    )
+
+    qr = qrcode.make(otp_uri)
+    buffer = io.BytesIO()
+    qr.save(buffer, format="PNG")
+
+    buffer.seek(0)
+    qr_code = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    qr_code_data_uri = f"data:image/png;base64,{qr_code}"
+    
+    return JsonResponse({"qrcode": qr_code_data_uri}, safe=False)
+
 class CreatUserView(APIView):
     def post(self, request):
         myData = request.data
@@ -104,34 +132,6 @@ def getUser(request):
 
     return JsonResponse(myUserFinal, safe=False)
 
-
-def getQrcode(request):
-    myPath = request.build_absolute_uri()
-    token_string = myPath.split("?")[1]
-    token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
-    user_id = token.get('id')
-    user = User.objects.get(id=user_id)
-
-
-    if not user.mfa_secret:
-        user.mfa_secret = pyotp.random_base32()
-        user.save()
-
-    otp_uri = pyotp.totp.TOTP(user.mfa_secret).provisioning_uri(
-        name=user.username,
-        issuer_name="SnowPong"
-    )
-
-    qr = qrcode.make(otp_uri)
-    buffer = io.BytesIO()
-    qr.save(buffer, format="PNG")
-
-    buffer.seek(0)
-    qr_code = base64.b64encode(buffer.getvalue()).decode("utf-8")
-
-    qr_code_data_uri = f"data:image/png;base64,{qr_code}"
-    
-    return JsonResponse({"qrcode": qr_code_data_uri}, safe=False)
     
 # def verify_2fa_otp(user, otp):
 #     totp = pyotp.TOTP(user.mfa_secret)
