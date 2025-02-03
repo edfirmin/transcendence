@@ -12,5 +12,10 @@ export const getUser = async () => {
 export const getQR = async () => {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const oui = await axios.get("/api/user/qrcode/?" + userToken);
-    return (oui.data.qrcode)
+    return (oui.data)
 }
+
+// export const changeUser = async () => {
+//     const userToken = localStorage.getItem(ACCESS_TOKEN);
+//     await axios.post("api/user/edit/?" + userToken)
+// }

@@ -55,8 +55,12 @@ def getQrcode(request):
     qr_code = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     qr_code_data_uri = f"data:image/png;base64,{qr_code}"
+    data = {
+        "qrcode": qr_code_data_uri,
+        "key" : user.mfa_secret
+    }
     
-    return JsonResponse({"qrcode": qr_code_data_uri}, safe=False)
+    return JsonResponse(data, safe=False)
 
 class CreatUserView(APIView):
     def post(self, request):
@@ -120,7 +124,6 @@ def getUser(request):
     user_id = token.get('id')
     myUser = User.objects.get(id=user_id)
 
-
     # logger.info("OBJET DB myUsfrom django.contrib.auth importer ---> %s", myUser)
     myUserSer = UserSerializer(myUser)
 
@@ -132,7 +135,55 @@ def getUser(request):
 
     return JsonResponse(myUserFinal, safe=False)
 
-    
+class EditUserView(APIView):
+    def post (self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        user = User.objects.get(id=user_id)
+
+        fname = request.data['fname']
+        lname = request.data['lname']
+        pp = request.data['newpp']
+        mail = request.data['newmail']
+
+        if fname:
+            user.first_name = fname
+        if lname:
+            user.last_name = lname
+        if pp:
+            user.profil_pic = pp
+        if mail:
+            user.email = mail
+        user.save()
+        return Response(request.data)
+
+class Enable2FAView(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        code = request.data['code2fa']
+        if (check2fa(myUser, code)):
+            myUser.is2FA = True
+            myUser.save()
+            return Response(True)
+        else :
+            return Response(False)
+
+class Disable2FAView(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        myUser.is2FA = False
+        myUser.save()
+        return Response(True)
+
 # def verify_2fa_otp(user, otp):
 #     totp = pyotp.TOTP(user.mfa_secret)
 #     totp.verify(otp)

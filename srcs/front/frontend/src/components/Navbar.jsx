@@ -21,7 +21,7 @@ function Navbarr() {
     }, []);
   return (
     <Navbar bg="myBG" variant="dark" className="navi">
-      <Snowfall snowflakeCount={30}/>
+      <Snowfall snowflakeCount={30} radius={[0.5,0.5]}/>
         <Navbar.Brand href="/home"><img className="logo" src={logo}/></Navbar.Brand>
           <Nav.Link href="/profil"><img className="pp_nav" src={user_pp}/></Nav.Link>
           <Nav className="language">
