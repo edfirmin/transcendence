@@ -1,4 +1,5 @@
 .active-2fa {
+    position: absolute;
     display: flex;
     flex-direction: column;
     border: 4mm ridge rgb(255, 255, 255);
@@ -42,8 +43,8 @@
 .form-2fa h2{
     animation: fade 2s;
     position: absolute;
-    color: red;
-    margin: -24px;
+    color: rgb(255, 0, 0);
+    margin: -29px 0px;
 }
 
 @keyframes fade {
@@ -60,6 +61,7 @@
     margin: 5px;
     background-color: #8addfc;
     color: #ffffff;
+    transition: background-color 0.3s ease-in-out;
 }
 
 .form-2fa button:hover {
@@ -81,6 +83,7 @@
 
 .disable-2fa {
     display: block;
+    position: absolute;
     /* flex-direction: column; */
     border: 4mm ridge rgb(255, 255, 255);
     border-radius: 20px;
@@ -100,6 +103,7 @@
     /* margin: 25px; */
     background-color: #8addfc;
     color: #ffffff;
+    transition: background-color 0.3s ease-in-out;
     
 }
 

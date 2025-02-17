@@ -6,6 +6,7 @@ import { ACCESS_TOKEN } from "../constants";
 import { useNavigate } from "react-router-dom";
 import lock from "../assets/le.png"
 import "../styles/Config2FA.css"
+import Snowfall from 'react-snowfall'
 
 function Config2FA () {
     const [qr, setQR] = useState([])
@@ -66,6 +67,7 @@ function Config2FA () {
 
     return(
         <div>
+            <Snowfall snowflakeCount={500}></Snowfall>
             {!user.is2FA ?
             <div className="active-2fa">
                 <h1>Configuration de la 2FA</h1>

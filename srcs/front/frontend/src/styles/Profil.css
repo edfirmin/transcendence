@@ -6,7 +6,7 @@
     background-color: rgba(10, 88, 190, 0.356);
     box-shadow: inset 0 0 50px rgb(255, 255, 255);
     backdrop-filter: blur(10px);
-    height: 59.7vh;
+    height: 65vh;
     width: 50%;
     margin: 5% 25%;
 }
@@ -16,11 +16,12 @@
     justify-content: center;
 }
 
-.top h1{
-    color: rgb(255, 255, 255);
+.profile-logo {
+    width: 12.9%;
 }
 
 .tas {
+    animation: fade 4s;
     position: absolute;
     margin: -13% -4%;
     height: 22%;
@@ -34,13 +35,13 @@
     /* border-style: solid; */
     border-width: 7px;
     border-color: rgb(231,232,241);
-    height: 50vh;
+    height: 55.3vh;
     width: 50.5%;
 }
 
 .left h1{
     position: absolute;
-    margin: -95px 220px;
+    margin: -95px 45%;
     border-style: none none solid none;
     border-width: 7px;
     border-color: #ffffff;
@@ -50,6 +51,8 @@
     border: 1mm double rgb(255, 255, 255);
     margin: 25px;
     font-size: 20px;
+    overflow: hidden;
+    word-wrap: unset;
 }
 
 .left button{
@@ -57,6 +60,7 @@
     border-radius: 5px;
     background-color: #8addfc;
     color: #ffffff;
+    transition: background-color 0.3s ease-in-out;
 }
 
 .left button:hover{
@@ -66,13 +70,13 @@
 
 .lb{
     margin: 20px 70px;
-    width: 12vh;
+    width: 15vh;
     height: 4vh;
 }
 
 .rb{
     margin: 20px 300px;
-    width: 9vh;
+    width: 12vh;
     height: 4vh;
 }
 
@@ -90,7 +94,7 @@
     border-style: double none none solid;
     border-width: 7px;
     border-color: #5257e0;
-    height: 50vh;
+    height: 55.3vh;
     width: 51%;
 }
 

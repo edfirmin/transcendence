@@ -64,14 +64,21 @@ def getQrcode(request):
 
 class CreatUserView(APIView):
     def post(self, request):
+        # if (request.data['username'] == "" | request.data['password'] == ""):
+        #     return Response(False)
         myData = request.data
+        username = myData['username']
+        if (User.objects.filter(username=username).first()):
+            return Response (True)
+        if (username.find("_42") != -1):
+            return Response(False)
         myUserToSave = CreatUserSerializer(data=myData)
-
         if myUserToSave.is_valid(raise_exception=True):
             myUserToSave.save()
         
         logger.info("LE USER EST CREEE ->>>>>>>>>> %s", myData['username'])
-        return Response(myUserToSave.data)
+        return JsonResponse(username, safe=False)
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -83,12 +90,12 @@ class LoginView(APIView):
 
         if user is None:
             logging.info("PAS BON 1")
-            raise AuthenticationFailed('pas bon user')
+            return Response(False)
         
         if (user.is42stud==False):
             if not user.check_password(password):
                 logging.info("PAS BON 2")
-                raise AuthenticationFailed('pas bon mdp')
+                return Response(False)
         if (is2fa(username)) :
             if (code2fa == ""):
                 return JsonResponse({"is2fa": "true"}, safe=False)

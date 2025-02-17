@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
+    username = models.CharField(max_length=11, unique=(True))
     is42stud = models.BooleanField(default=False)
     first_name = models.CharField(default="Undefined")
     last_name = models.CharField(default="Undefined")

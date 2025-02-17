@@ -19,13 +19,13 @@
 	margin-bottom: 20px;
 } */
 	
-form h2 {
+.form-container h2 {
 	color: #333;
 	width: 40vh;
 	font-size: 25px;
 }
 	
-form label {
+.form-container label {
 	font-weight: bold;
 	margin-top: 10px;
 }
@@ -38,9 +38,10 @@ form textarea {
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	box-sizing: border-box;
+	font-style: italic;
 }
 	
-form input[type="submit"] {
+.form-container input[type="submit"] {
 	background-color: #007bff;
 	color: white;
 	padding: 10px 20px;
@@ -50,7 +51,7 @@ form input[type="submit"] {
 	font-size: 16px;
 }
 	
-form input[type="submit"]:hover {
+.form-container input[type="submit"]:hover {
 	background-color: #0056b3;
 }
   
@@ -96,3 +97,36 @@ form input[type="submit"]:hover {
 	margin: 0% 19%;
 }
   
+
+.pass-false {
+	animation: fade 2s;
+	position: absolute;
+	margin: -152px 328px;
+	width: 300px;
+	color: red;
+}
+
+.code2fa-input-login{
+	width: 60%;
+	margin: 10px 65px;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	text-align: center;
+}
+
+.login-false{
+	animation: fade 2s;
+	position: absolute;
+	margin: -153px 340px;
+	color: red;
+	width: 300px;
+}
+
+.username-register{
+	color: red;
+	position: absolute;
+	animation: fade 2s;
+	font-size: 14px;
+	margin: -290px 325px;
+	width: 350px;
+}
