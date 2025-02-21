@@ -9,6 +9,8 @@
     height: 65vh;
     width: 50%;
     margin: 5% 25%;
+
+    overflow:hidden ;
 }
 
 .top {
@@ -96,6 +98,66 @@
     border-color: #5257e0;
     height: 55.3vh;
     width: 51%;
+    padding: 2%;
+}
+
+#winrate {
+    width: 100%;
+    height: 10%;
+    background-color: #0f9acc;
+
+    border-radius: 2em;
+    border-width: 3px;
+    border-color: #ffffff;
+    border-style: solid;
+}
+
+#progress {
+    margin: 0;
+    height: 100%;
+    background-color: #cc0f38;
+
+    border-radius: 2em;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+
+    text-align: center;
+
+}
+
+.center {
+    text-align: center;
 }
 
 
+#matchHistory {
+    overflow: scroll;
+    overflow-x: hidden;
+
+    height: 50%;
+
+    border-radius: 2em;
+    border-width: 3px;
+    border-color: #ffffff;
+    border-style: solid;
+
+    padding-top: 5px;
+}
+
+.matchResult {
+    display: flex;
+    justify-content: space-evenly;
+
+    border-radius: 2em;
+    border-width: 2px;
+    border-color: #ffffff;
+    border-style: solid;
+
+    margin: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.matchResult p {
+    margin-bottom: 0;
+}

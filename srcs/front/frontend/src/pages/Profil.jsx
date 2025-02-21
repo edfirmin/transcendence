@@ -11,7 +11,9 @@ import Snowfall from 'react-snowfall'
 function Profil() {
     const [user, setUser] = useState([])
     const [edit, setEdit] = useState(false)
-    
+    const [loses, setLoses] = useState(3)
+    const [wins, setWins] = useState(2)
+
     useEffect(() => {
         inituser()
     }, []);
@@ -51,12 +53,47 @@ function Profil() {
                         <button onClick={handleButton} className="rb">Activer la 2FA</button>
                     </div>
                     <div className="rigth">
-                    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Arrivera dans la prochaie MAJ :)</p>
+                        <h2>Stats</h2>
+                        <h4 className="center">Winrate</h4>
+                        <WinrateBar loses={loses} wins={wins} />
+                        <div style={{display: "flex", justifyContent: "space-between"}}>
+                            <p>Defaites : {loses}</p><p></p><p> Victoires : {wins}</p>
+                        </div>
+                        <h4 className="center">Match History</h4>
+                        <div id="matchHistory">
+                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
+                            <MatchResult result={"DEFAITE"} date={"02/10/25"} />
+                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
+                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
+                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
+                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
+                        </div>
                     </div>
                 </div> :
             <EditProfil></EditProfil>}
         </div>
     );
+}
+
+function WinrateBar({loses, wins}) {
+    var fill = (loses / (loses + wins)) * 100
+    console.log(fill)
+
+    return (
+        <div id="winrate">
+            <div id='progress' style={{width: fill + "%"}}> </div>
+        </div>
+    )
+}
+
+function MatchResult({result, date}) {
+    return (
+        <div className="matchResult" style={{backgroundColor: result == "VICTOIRE" ? "#0f9acc" : "#cc0f38"}}>
+            <p>{result}</p>
+            <p></p>
+            <p>{date}</p>
+        </div>
+    )
 }
 
 export default Profil
