@@ -119,8 +119,13 @@ function PongMulti() {
 		}
 	}, [])
 
-	const postMatchStats = async (e) => {
-		const res = await axios.post('api/user/addMatchStats/', {userToken})
+	async function postMatchStats() {
+		const d = new Date();
+		const day = d.getDate();
+		const month = d.getMonth()+1;
+		const year = d.getFullYear();
+		const a = year + '-' + month + '-' + day;
+		const res = await axios.post('api/user/addMatchStats/', {userToken, date: a})
 	}
 
 	useEffect(() => {

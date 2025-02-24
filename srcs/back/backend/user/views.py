@@ -150,7 +150,7 @@ def getMatches(request):
     user_id = token.get('id')
     matches = Match.objects.filter(user=user_id)
 
-    matchesSer = MatchSerializer(matches)
+    matchesSer = MatchSerializer(matches, many=True)
     return JsonResponse(matchesSer.data, safe=False)
 
 
@@ -215,7 +215,7 @@ class AddMatchStats(APIView):
         myUser = User.objects.get(id=user_id)
 
         #create match
-        match = Match(user=myUser, result='win', date='2010-10-10')
+        match = Match(user=myUser, result='VICTOIRE', date=request.data['date'])
         match.save()
 
         myUser.win_count = myUser.win_count + 1

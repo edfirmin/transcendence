@@ -15,10 +15,8 @@ function Profil() {
 
     useEffect(() => {
         inituser()
-       /* initmatches()
-        matches.forEach(element => {
-            console.log(element)
-        });*/
+        initmatches()
+        console.log(matches)
     }, []);
     
     const inituser = async () => {
@@ -68,14 +66,7 @@ function Profil() {
                             <p>Defaites : {user.lose_count}</p><p></p><p> Victoires : {user.win_count}</p>
                         </div>
                         <h4 className="center">Match History</h4>
-                        <div id="matchHistory">
-                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
-                            <MatchResult result={"DEFAITE"} date={"02/10/25"} />
-                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
-                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
-                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
-                            <MatchResult result={"VICTOIRE"} date={"02/10/25"} />
-                        </div>
+                        <MatchArray matches={matches} />
                     </div>
                 </div> :
             <EditProfil></EditProfil>}
@@ -102,6 +93,18 @@ function MatchResult({result, date}) {
             <p>{date}</p>
         </div>
     )
+}
+
+function MatchArray({matches}) {
+    let matchesResults = []
+    
+    for (let i = 0; i < matches.length; i++) {
+        matchesResults.push(<MatchResult result={matches[i].result} date={matches[i].date} />)
+    }
+   
+    return(<div id="matchHistory">
+        {matchesResults.map(input=>input)}
+        </div>)
 }
 
 export default Profil
