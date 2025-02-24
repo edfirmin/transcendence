@@ -70,11 +70,20 @@ div {
 } */
 
 .logout-button {
-	position: absolute;
+	position: fixed;
+	top: 20px;
+	right: 20px;
 	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
 	margin: 40.2% 92.8%;
 }
 
+.logout-logo {
+	width: 30px;
+	height: 30px;
+}
 
 .div-login-page{
 	margin: 6% auto;
@@ -87,6 +96,16 @@ div {
     width: 50%;
 }
 
-.logout-logo {
-	width: 15vh;
+.chat-container {
+	position: fixed;
+	bottom: 0;
+	right: 300px;
+	display: flex;
+	gap: 20px;
+	padding: 20px;
+	z-index: 1000;
+}
+
+.chat-container > * {
+	flex-shrink: 0;
 }

@@ -4,7 +4,6 @@ import Snowfall from 'react-snowfall'
 import logo_42auth from "../assets/42logo.png"
 
 function Register() {
-
     const navigate = useNavigate();
 
     const handleGoToLoginButton = () => {
@@ -18,7 +17,7 @@ function Register() {
 
     return (
         <div>
-             <Snowfall />
+            <Snowfall />
             <div className="div-login-page">
                 <Snowfall />
                 {localStorage.clear()}
