@@ -57,7 +57,7 @@ def login42(request):
     logger.info("MA PP FDP --> %s", link)
     # JE REMPLIE TOUS CES ELEMENTS DANS UN JSON
     my42UserInfo = {
-        "username" : myLogin+"_42",
+        "username" : myLogin,
         "profil_pic" : link,
         "is42stud" : True,
         "password": "password_default"

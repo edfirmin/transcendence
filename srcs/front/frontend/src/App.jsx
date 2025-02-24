@@ -10,10 +10,6 @@ import RedirectHome from './pages/RedirectHome';
 import CheckUser from './pages/CheckUser';
 import PongMulti from "./pages/Pong/PongMulti"
 import PongSelection from "./pages/PongSelection"
-import RounoHome from "./pages/RounoHome"
-import Config2FA from "./components/Config2FA"
-import Tourney from "./pages/PongTourney"
-import TourneyPresentation from "./pages/PongTourneyPresentation"
 import React, {useMemo} from 'react';
 
 
@@ -30,14 +26,10 @@ function App() {
         <Route path="/register" element={<Register/>}></Route>
         <Route path="*" element={<NotFound/>}></Route>
         <Route path="/pong" element={<ProtectedRoute> <Pong/> </ProtectedRoute>}/>
-        <Route path="/Config2FA" element={<ProtectedRoute> <Config2FA/> </ProtectedRoute>}/>
         <Route path="/check42user" element={<CheckUser/>}></Route>
         <Route path="/pong/:roomid" element={<ProtectedRoute> <Pong/> </ProtectedRoute>}/>
         <Route path="/multipong/:roomid" element={<ProtectedRoute> <PongMulti/> </ProtectedRoute>}/>
         <Route path="/selection" element={<ProtectedRoute> <PongSelection/> </ProtectedRoute>}/>
-        <Route path="/rounohome" element={<ProtectedRoute> <RounoHome/> </ProtectedRoute>}></Route>
-        <Route path="/tourney" element={<ProtectedRoute> <Tourney/> </ProtectedRoute>}></Route>
-        <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <TourneyPresentation/> </ProtectedRoute>}></Route>
       </Routes>
     </BrowserRouter>
 	)

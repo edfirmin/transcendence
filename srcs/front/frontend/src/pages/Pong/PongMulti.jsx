@@ -12,13 +12,10 @@ import tennis_map from '../../assets/img/tennis_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
 import classic_design from '../../assets/img/classic_design.png'
 import tennis_design from '../../assets/img/tennis_design.png'
-import useToken from 'antd/es/theme/useToken';
-import { ACCESS_TOKEN } from "../../constants";
 
 function PongMulti() {
 
     const { roomid } = useParams();
-	const userToken = localStorage.getItem(ACCESS_TOKEN);
 	const ws = useMemo(() => {return new WebSocket(`ws://localhost:8000/ws/multipong/${roomid}`)}, []); 
 	const id = useMemo(() => {return uuidv4()}, []);
     const canvasRef = useRef(null);
@@ -118,14 +115,6 @@ function PongMulti() {
 			}
 		}
 	}, [])
-
-	const postMatchStats = async (e) => {
-		const res = await axios.post('api/user/addMatchStats/', {userToken})
-	}
-
-	useEffect(() => {
-		postMatchStats();
-	}, [winner])
     
 	useEffect(() => {
     

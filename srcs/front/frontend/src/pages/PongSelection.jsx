@@ -37,10 +37,6 @@ function PongSelection() {
       navigate(`/multipong/${roomId}`,  {state : {map : index_map_design, design : index_design, points : points}});
     }
 
-    function handleTourneyPong() {
-      navigate(`/tourney/`,  {state : {map : index_map_design, design : index_design, points : points}});
-    }
-
     return (
         <>
             <div className='container'>
@@ -55,7 +51,6 @@ function PongSelection() {
               <Button name={'Local'} callback={handleLocalPong} />
               <Button name={'AI'} callback={handleAIPong} />
               <Button name={'Remote'} callback={handleRemotePong} />
-              <Button name={'Tourney'} callback={handleTourneyPong} />
               <div></div>
             </div>
            {/* <button className='button' onClick={() => setDifficulty("easy")}>Easy</button>

@@ -90,28 +90,3 @@ div {
 .logout-logo {
 	width: 15vh;
 }
-
-.pong-button {
-	position: absolute;
-	left: 37%;
-	top: 34%;
-	background-image: url("../assets/img/Hockey.png");
-	background-size: contain;
-	background-color: transparent;
-	background-repeat: no-repeat;
-	overflow: hidden;
-
-	width: 25%;
-	height: 40%;
-
-	image-rendering: pixelated;
-	image-rendering: -moz-crisp-edges;
-	image-rendering: crisp-edges;
-}
-
-.pong-button:hover {
-	left: 36%;
-	top: 33%;
-	height: 45%;
-	width: 30%;
-}

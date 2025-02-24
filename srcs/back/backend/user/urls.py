@@ -3,12 +3,7 @@ from .views import *
 
 urlpatterns = [
     path('getUser/', getUser, name="getUser"),
-    path('getMatches/', getMatches, name="getMatches"),
     path('register/', CreatUserView.as_view(), name="register"),
     path('token/', LoginView.as_view(), name="login"),
     path('qrcode/', getQrcode, name="get_qrcode"),
-    path('edit/', EditUserView.as_view(), name="EditUser"),
-    path('active2fa/',Enable2FAView.as_view() ,name="active2fa"),
-    path('desactiver2fa/',Disable2FAView.as_view() ,name="desactiver2fa"),
-    path('addMatchStats/', AddMatchStats.as_view() ,name="addMatchStats")
 ]

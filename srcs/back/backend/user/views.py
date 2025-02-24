@@ -1,8 +1,7 @@
 from django.shortcuts import render
 from .models import User
-from .models import Match
 from rest_framework.views import APIView
-from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer
+from .serializers import UserSerializer, CreatUserSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from django.http import JsonResponse
@@ -56,30 +55,19 @@ def getQrcode(request):
     qr_code = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     qr_code_data_uri = f"data:image/png;base64,{qr_code}"
-    data = {
-        "qrcode": qr_code_data_uri,
-        "key" : user.mfa_secret
-    }
     
-    return JsonResponse(data, safe=False)
+    return JsonResponse({"qrcode": qr_code_data_uri}, safe=False)
 
 class CreatUserView(APIView):
     def post(self, request):
-        # if (request.data['username'] == "" | request.data['password'] == ""):
-        #     return Response(False)
         myData = request.data
-        username = myData['username']
-        if (User.objects.filter(username=username).first()):
-            return Response (True)
-        if (username.find("_42") != -1):
-            return Response(False)
         myUserToSave = CreatUserSerializer(data=myData)
+
         if myUserToSave.is_valid(raise_exception=True):
             myUserToSave.save()
         
         logger.info("LE USER EST CREEE ->>>>>>>>>> %s", myData['username'])
-        return JsonResponse(username, safe=False)
-
+        return Response(myUserToSave.data)
 
 class LoginView(APIView):
     def post(self, request):
@@ -91,12 +79,12 @@ class LoginView(APIView):
 
         if user is None:
             logging.info("PAS BON 1")
-            return Response(False)
+            raise AuthenticationFailed('pas bon user')
         
         if (user.is42stud==False):
             if not user.check_password(password):
                 logging.info("PAS BON 2")
-                return Response(False)
+                raise AuthenticationFailed('pas bon mdp')
         if (is2fa(username)) :
             if (code2fa == ""):
                 return JsonResponse({"is2fa": "true"}, safe=False)
@@ -132,6 +120,7 @@ def getUser(request):
     user_id = token.get('id')
     myUser = User.objects.get(id=user_id)
 
+
     # logger.info("OBJET DB myUsfrom django.contrib.auth importer ---> %s", myUser)
     myUserSer = UserSerializer(myUser)
 
@@ -143,82 +132,9 @@ def getUser(request):
 
     return JsonResponse(myUserFinal, safe=False)
 
-def getMatches(request):
-    myPath = request.build_absolute_uri()
-    token_string = myPath.split("?")[1]
-    token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
-    user_id = token.get('id')
-    matches = Match.objects.filter(user=user_id)
-
-    matchesSer = MatchSerializer(matches)
-    return JsonResponse(matchesSer.data, safe=False)
-
-
-class EditUserView(APIView):
-    def post (self, request):
-        token_string = request.data['userToken']
-        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
-        user_id = token.get('id')
-        user = User.objects.get(id=user_id)
-
-        fname = request.data['fname']
-        lname = request.data['lname']
-        pp = request.data['newpp']
-        mail = request.data['newmail']
-
-        if fname:
-            user.first_name = fname
-        if lname:
-            user.last_name = lname
-        if pp:
-            user.profil_pic = pp
-        if mail:
-            user.email = mail
-        user.save()
-        return Response(request.data)
-
-class Enable2FAView(APIView):
-    def post(self, request):
-        token_string = request.data['userToken']
-        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
-        user_id = token.get('id')
-        myUser = User.objects.get(id=user_id)
-
-        code = request.data['code2fa']
-        if (check2fa(myUser, code)):
-            myUser.is2FA = True
-            myUser.save()
-            return Response(True)
-        else :
-            return Response(False)
-
-class Disable2FAView(APIView):
-    def post(self, request):
-        token_string = request.data['userToken']
-        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
-        user_id = token.get('id')
-        myUser = User.objects.get(id=user_id)
-
-        myUser.is2FA = False
-        myUser.save()
-        return Response(True)
-
+    
 # def verify_2fa_otp(user, otp):
 #     totp = pyotp.TOTP(user.mfa_secret)
 #     totp.verify(otp)
 
-class AddMatchStats(APIView):
-    def post(self, request):
-        token_string = request.data['userToken']
-        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
-        user_id = token.get('id')
-        myUser = User.objects.get(id=user_id)
 
-        #create match
-        match = Match(user=myUser, result='win', date='2010-10-10')
-        match.save()
-
-        myUser.win_count = myUser.win_count + 1
-
-        myUser.save()
-        return Response(True)

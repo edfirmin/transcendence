@@ -9,19 +9,8 @@ export const getUser = async () => {
     return (response.data)
 }
 
-export const getMatches = async () => {
-    const userToken = localStorage.getItem(ACCESS_TOKEN);
-    const response = await axios.get("/api/user/getMatches/?" + userToken);
-    return (response.data)
-}
-
 export const getQR = async () => {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const oui = await axios.get("/api/user/qrcode/?" + userToken);
-    return (oui.data)
+    return (oui.data.qrcode)
 }
-
-// export const changeUser = async () => {
-//     const userToken = localStorage.getItem(ACCESS_TOKEN);
-//     await axios.post("api/user/edit/?" + userToken)
-// }

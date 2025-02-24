@@ -75,30 +75,14 @@
     color: aliceblue;
 }
   
-.content-notfound h1:nth-child(2) {
-  color: #25ddbb;
-  animation: glitch2 1s infinite;
-}
-  
-.content-notfound h1:nth-child(3) {
-  color: #3fc3f7;
-  animation: glitch3 1.5s infinite;
-}
-
-  .ligth-button{
-    position: absolute;
-    border-radius: 20%;
-    background: none;
-    height: 70%;
-    width: 5%;
-    margin: 9% 95%;
+  h1:nth-child(2) {
+    color: #25ddbb;
+    animation: glitch2 1s infinite;
   }
-
-  .ligth {
-    position: absolute;
-    margin: 0px 63.5%;
-    width: 36.5%;
-    height: 100%;
+  
+  h1:nth-child(3) {
+    color: #3fc3f7;
+    animation: glitch3 1.5s infinite;
   }
   
   @keyframes glitch1 {
