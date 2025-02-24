@@ -9,6 +9,12 @@ export const getUser = async () => {
     return (response.data)
 }
 
+export const getMatches = async () => {
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    const response = await axios.get("/api/user/getMatches/?" + userToken);
+    return (response.data)
+}
+
 export const getQR = async () => {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const oui = await axios.get("/api/user/qrcode/?" + userToken);

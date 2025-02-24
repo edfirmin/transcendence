@@ -12,7 +12,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.1",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "antd": "^5.24.0",
+    "antd": "^5.24.2",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "build": "^0.1.4",
@@ -24,7 +24,7 @@
     "react-router-dom": "^6.27.0",
     "react-snowfall": "^2.2.0",
     "reshake": "^2.0.0",
-    "uuid": "^11.0.5"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

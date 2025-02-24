@@ -27,9 +27,9 @@
     background-color: white;
   
     box-shadow:
-    0 0 50px #fff,            /* outer white */
-    -10px 0 80px #f0f,        /* outer left magenta */
-    10px 0 80px #0ff;         /* outer right cyan */
+    0 0 50px #fff,
+    -10px 0 80px #f0f,
+    10px 0 80px #0ff;
   
     width: 100%;
   
@@ -39,10 +39,19 @@
 .container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-evenly;
 
-    margin-top: 100px;
+    margin-top: 50px;
     margin-bottom: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 250px 250px 250px;
+    grid-template-rows: auto;
+    column-gap: 10px;
+    row-gap: 15px;
+
 }
 
 .selector {
@@ -92,4 +101,44 @@
 
 .slider:hover {
 opacity: 1; /* Fully shown on mouse-over */
+}
+
+.player {
+    width: 250px;
+    height: 80px;
+
+    position: relative;
+
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-right: 70px;
+    padding-bottom: 15px;
+
+    background-color: #0f9acc;
+    color: #fff;
+    font-size: 22px;
+    display: flex;
+    justify-content: space-evenly;
+
+    overflow: hidden;
+
+    border-radius: 2em;
+    border-width: 2px;
+    border-color: #ffffff;
+    border-style: solid;    
+}
+
+.player p {
+    margin: 0px;
+
+    font-family: 'Futurama';
+}
+
+.player img {
+    width: 50%;
+    height: 100%;
+
+    border-radius: 100px;
+
+    margin-right: 20px;
 }
