@@ -1,9 +1,3 @@
-/* #root {
-    margin-top: 10%;
-    margin-bottom: 20%;
-} */
-
-
 @font-face {
     font-family: 'Futurama';
     src: url("../assets/fonts/fr-bold.ttf");
@@ -45,69 +39,40 @@
     margin-bottom: 20px;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: 250px 250px 250px;
-    grid-template-rows: auto;
-    column-gap: 10px;
-    row-gap: 15px;
+#victory_cup {
+    position: absolute;
+    left: 47.5%;
+    top: 45%;
+    width: 5em;
 
+    background-color: yellow;
+
+    border-radius: 5em;
 }
 
-.selector {
-    justify-content: center;
-    text-align: center;
+#branch_left {
+    position: absolute;
+    left: 23%;
+    top: 25%;
+    width: 30em; 
+    
+    image-rendering:pixelated;
 }
 
-.selector div {
-    margin: auto;
-    display: flex;
-    flex-direction: row;
+#branch_right {
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    width: 30em;  
+    
+    image-rendering:pixelated;
 }
 
-.selector div img {
-    border-style: solid;
-    border-width: 5px;
-    color: white;
-    border-radius: 10px;
-
-    padding: 10px;
-    margin: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
-}
-
-.selector p
-{
-    color: white;
-    font-size: 25px;
-}
-
-#points {
-    width: 100%;
-}
-
-.slider {
-    -webkit-appearance: none;  
-    appearance: none;
-    width: 100%; 
-    height: 25px; 
-    background: #d3d3d3; 
-    outline: none; 
-    opacity: 0.7; 
-    -webkit-transition: .2s; 
-    transition: opacity .2s;
-}
-
-.slider:hover {
-opacity: 1; /* Fully shown on mouse-over */
-}
-
-.player {
+.player2 {
     width: 250px;
     height: 80px;
 
-    position: relative;
+    position: absolute;
 
     padding-top: 15px;
     padding-left: 20px;
@@ -118,7 +83,7 @@ opacity: 1; /* Fully shown on mouse-over */
     color: #fff;
     font-size: 22px;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
 
     overflow: hidden;
 
@@ -128,17 +93,11 @@ opacity: 1; /* Fully shown on mouse-over */
     border-style: solid;    
 }
 
-.player p {
+
+.player2 p {
     margin: 0px;
+    margin-top: 8px;
+    margin-left: 10px;
 
     font-family: 'Futurama';
-}
-
-.player img {
-    width: 50%;
-    height: 100%;
-
-    border-radius: 100px;
-
-    margin-right: 20px;
 }

@@ -14,12 +14,27 @@ function Home() {
         navigate("/login")
     }
 
+    const handlePong = () => {
+        navigate("/selection")
+    }
+
 	return (
 		<div>
-            <Navbarr></Navbarr>
+      <Navbarr></Navbarr>
+      <button className='pong-button' onClick={() => handlePong()}></button>
 			<button className="logout-button" onClick={() => handleLogout()}><img className='logout-logo' src={logoutLogo} alt="logoutLogo" /></button>
 		</div>
     );
+}
+
+function Button({name, callback}) {
+	return (
+	  <tr>
+		<td>
+		  <button className='button' onClick={() => callback()}>{name} </button>
+		</td>
+	  </tr>
+	)
 }
 
 export default Home
