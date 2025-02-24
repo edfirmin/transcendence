@@ -1,7 +1,7 @@
 import "../styles/Profil.css"
 import EditProfil from "../components/EditProfil";
 import { useState, useEffect } from "react";
-import { getUser } from "../api"
+import { getUser, getMatches } from "../api"
 import Navbarr from "../components/Navbar";
 import tas from "../assets/tas-de-neige.png"
 import profile_logo from "../assets/profile_logo.png"
@@ -10,17 +10,25 @@ import Snowfall from 'react-snowfall'
 
 function Profil() {
     const [user, setUser] = useState([])
+    const [matches, setMatches] = useState([])
     const [edit, setEdit] = useState(false)
-    const [loses, setLoses] = useState(3)
-    const [wins, setWins] = useState(2)
 
     useEffect(() => {
         inituser()
+       /* initmatches()
+        matches.forEach(element => {
+            console.log(element)
+        });*/
     }, []);
     
     const inituser = async () => {
         const TMPuser = await getUser()
         setUser(TMPuser);
+    }
+
+    const initmatches = async () => {
+        const TMPmatches = await getMatches()
+        setMatches(TMPmatches);
     }
 
     const formEdit = () => {
@@ -55,9 +63,9 @@ function Profil() {
                     <div className="rigth">
                         <h2>Stats</h2>
                         <h4 className="center">Winrate</h4>
-                        <WinrateBar loses={loses} wins={wins} />
+                        <WinrateBar loses={user.lose_count} wins={user.win_count} />
                         <div style={{display: "flex", justifyContent: "space-between"}}>
-                            <p>Defaites : {loses}</p><p></p><p> Victoires : {wins}</p>
+                            <p>Defaites : {user.lose_count}</p><p></p><p> Victoires : {user.win_count}</p>
                         </div>
                         <h4 className="center">Match History</h4>
                         <div id="matchHistory">
@@ -75,7 +83,7 @@ function Profil() {
     );
 }
 
-function WinrateBar({loses, wins}) {
+function WinrateBar({loses = 0, wins = 1}) {
     var fill = (loses / (loses + wins)) * 100
     console.log(fill)
 

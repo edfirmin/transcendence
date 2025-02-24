@@ -11,4 +11,11 @@ class User(AbstractUser):
     profil_pic = models.URLField(default="https://wallpapers-clan.com/wp-content/uploads/2022/08/default-pfp-16.jpg")
     is2FA = models.BooleanField(default=False, null=True)
     mfa_secret = models.CharField(max_length=32, blank=True, null=True)
-    
+    win_count = models.BigIntegerField(default=0)
+    lose_count = models.BigIntegerField(default=0)
+
+
+class Match(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    result = models.CharField(max_length=15)
+    date = models.DateField()

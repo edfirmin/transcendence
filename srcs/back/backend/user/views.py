@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from .models import User
+from .models import Match
 from rest_framework.views import APIView
-from .serializers import UserSerializer, CreatUserSerializer
+from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from django.http import JsonResponse
@@ -132,7 +133,7 @@ def getUser(request):
     myUser = User.objects.get(id=user_id)
 
     # logger.info("OBJET DB myUsfrom django.contrib.auth importer ---> %s", myUser)
-    myUserSer = UserSerializer(myUser)
+    myUserSer = UserSerializer(myUser, many=True)
 
     # logger.info("myUserSer ---> %s", myUserSer)
 
@@ -141,6 +142,18 @@ def getUser(request):
     # logger.info("myUserFinal ---> %s", myUserFinal)
 
     return JsonResponse(myUserFinal, safe=False)
+
+def getMatches(request):
+    myPath = request.build_absolute_uri()
+    token_string = myPath.split("?")[1]
+    token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+    user_id = token.get('id')
+    matches = Match.objects.filter(user=user_id)
+
+    matchesSer = MatchSerializer(matches)
+    matchesFinal = matchesSer.data
+    return JsonResponse(matchesFinal, safe=False)
+
 
 class EditUserView(APIView):
     def post (self, request):
@@ -195,4 +208,18 @@ class Disable2FAView(APIView):
 #     totp = pyotp.TOTP(user.mfa_secret)
 #     totp.verify(otp)
 
+class AddMatchStats(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
 
+        #create match
+        match = Match(user=myUser, result='win', date='2010-10-10')
+        match.save()
+
+        myUser.win_count = myUser.win_count + 1
+
+        myUser.save()
+        return Response(True)
