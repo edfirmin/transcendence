@@ -151,8 +151,7 @@ def getMatches(request):
     matches = Match.objects.filter(user=user_id)
 
     matchesSer = MatchSerializer(matches)
-    matchesFinal = matchesSer.data
-    return JsonResponse(matchesFinal, safe=False)
+    return JsonResponse(matchesSer.data, safe=False)
 
 
 class EditUserView(APIView):
