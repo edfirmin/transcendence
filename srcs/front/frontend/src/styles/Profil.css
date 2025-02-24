@@ -9,8 +9,6 @@
     height: 65vh;
     width: 50%;
     margin: 5% 25%;
-
-    overflow:hidden ;
 }
 
 .top {
@@ -23,7 +21,7 @@
 }
 
 .tas {
-    animation: fade 4s;
+    animation: fade 0.1s;
     position: absolute;
     margin: -13% -4%;
     height: 22%;
@@ -110,6 +108,7 @@
     border-width: 3px;
     border-color: #ffffff;
     border-style: solid;
+    overflow:hidden ;
 }
 
 #progress {

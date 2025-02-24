@@ -133,7 +133,7 @@ def getUser(request):
     myUser = User.objects.get(id=user_id)
 
     # logger.info("OBJET DB myUsfrom django.contrib.auth importer ---> %s", myUser)
-    myUserSer = UserSerializer(myUser, many=True)
+    myUserSer = UserSerializer(myUser)
 
     # logger.info("myUserSer ---> %s", myUserSer)
 

@@ -21,9 +21,9 @@
     background-color: white;
   
     box-shadow:
-    0 0 50px #fff,            /* outer white */
-    -10px 0 80px #f0f,        /* outer left magenta */
-    10px 0 80px #0ff;         /* outer right cyan */
+    0 0 50px #fff,
+    -10px 0 80px #f0f,
+    10px 0 80px #0ff;
   
     width: 100%;
   
