@@ -74,9 +74,12 @@ function Profil() {
     );
 }
 
-function WinrateBar({loses = 0, wins = 1}) {
-    var fill = (loses / (loses + wins)) * 100
-    console.log(fill)
+function WinrateBar({loses, wins}) {
+    var fill;
+    if (loses == 0 && wins == 0)
+        fill = 50
+    else
+        fill = (loses / (loses + wins)) * 100
 
     return (
         <div id="winrate">

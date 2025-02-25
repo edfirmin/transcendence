@@ -48,6 +48,19 @@ function Pong() {
 	const map_index = data.state.map;
 	const design_index = data.state.design;
 	const points = data.state.points + 2;
+	const players = data.state.players;
+	const leftPlayerName = data.state.leftPlayerName;
+	const rightPlayerName = data.state.rightPlayerName;
+	const name1 = data.state.name1;
+    const name2 = data.state.name2;
+    const name3 = data.state.name3;
+    const name4 = data.state.name4;
+    const name5 = data.state.name5;
+    const name6 = data.state.name6;
+    const name7 = data.state.name7;
+    const name8 = data.state.name8;
+    const currentBattleIndex = data.state.currentBattleIndex;
+	const returnPage = data.state.returnPage == null ? '/selection' : data.state.returnPage;
 
 	const [countdown, setCountdown] = useState(-1);
 
@@ -113,7 +126,9 @@ function Pong() {
 		}
 		if (data.type == "winner") {
 			setWinner(data.message + " WIN !");
-			setTimeout(() => { navigate('/selection') }, 3000);
+			setTimeout(() => { navigate(returnPage, {state : { isAI : isAI, map : map_index, design : design_index, points : points - 2, players : players, winner : data.message, leftPlayerName : leftPlayerName, rightPlayerName : rightPlayerName,
+				name1 : name1, name2 : name2, name2, name3 : name3, name4 : name4, name5: name5, name6 : name6, name7 : name7, name8 : name8, currentBattleIndex : currentBattleIndex
+			}}) }, 3000);
 		}
 	}
 
@@ -359,4 +374,3 @@ function Pong() {
 }
 
 export default Pong;
-
