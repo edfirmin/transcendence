@@ -10,6 +10,7 @@ import table_tennis_map_design from '../assets/img/table_tennis_map_design.png'
 import design_2 from '../assets/img/2.png'; import design_3 from '../assets/img/3.png'; import design_4 from '../assets/img/4.png';
 import design_5 from '../assets/img/5.png'; import design_6 from '../assets/img/6.png'; import design_7 from '../assets/img/7.png';
 import design_8 from '../assets/img/8.png'; import design_9 from '../assets/img/9.png'; 
+import Navbarr from '../components/Navbar';
 
 function PongSelection() {
 
@@ -43,6 +44,7 @@ function PongSelection() {
 
     return (
         <>
+            <Navbarr></Navbarr>
             <div className='container'>
               <div></div>
               <Selector name={"Map"} designs={map_designs} index={index_map_design} setIndex={set_index_map_design} />

@@ -1,5 +1,6 @@
 from .models import User
 from .models import Match
+from .models import Tourney
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,3 +28,9 @@ class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
         fields = ["result", "date", "user"]
+
+
+class TourneySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tourney
+        fields = ["name1", "name2", "name3", "name4", "name5", "name6", "name7", "name8", "winner_match1", "winner_match2", "winner_match3", "winner_match4", "winner_match5", "winner_match6", "winner_match7", "user", "tourney_id"]

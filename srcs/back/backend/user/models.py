@@ -19,3 +19,23 @@ class Match(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     result = models.CharField(max_length=15)
     date = models.DateField()
+
+class Tourney(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name1 = models.CharField(unique=(False))
+    name2 = models.CharField(unique=(False))
+    name3 = models.CharField(unique=(False))
+    name4 = models.CharField(unique=(False))
+    name5 = models.CharField(unique=(False))
+    name6 = models.CharField(unique=(False))
+    name7 = models.CharField(unique=(False))
+    name8 = models.CharField(unique=(False))
+    winner_match1 = models.CharField(unique=(False))
+    winner_match2 = models.CharField(unique=(False))
+    winner_match3 = models.CharField(unique=(False))
+    winner_match4 = models.CharField(unique=(False))
+    winner_match5 = models.CharField(unique=(False))
+    winner_match6 = models.CharField(unique=(False))
+    winner_match7 = models.CharField(unique=(False))
+
+    tourney_id = models.CharField(unique=(True))

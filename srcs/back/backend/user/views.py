@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from .models import User
 from .models import Match
+from .models import Tourney
 from rest_framework.views import APIView
-from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer
+from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer, TourneySerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from django.http import JsonResponse
@@ -153,6 +154,15 @@ def getMatches(request):
     matchesSer = MatchSerializer(matches, many=True)
     return JsonResponse(matchesSer.data, safe=False)
 
+def getTourney(request):
+    myPath = request.build_absolute_uri()
+    token_string = myPath.split("?")[1]
+    tourney = Tourney.objects.get(tourney_id=token_string)
+
+    logger.info(tourney)
+    tourneySer = TourneySerializer(tourney, many=False)
+    return JsonResponse(tourneySer.data, safe=False)
+
 
 class EditUserView(APIView):
     def post (self, request):
@@ -193,7 +203,7 @@ class Enable2FAView(APIView):
             return Response(False)
 
 class Disable2FAView(APIView):
-    def post(self, request):
+    def post(self, rePlayer2quest):
         token_string = request.data['userToken']
         token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
         user_id = token.get('id')
@@ -221,4 +231,45 @@ class AddMatchStats(APIView):
         myUser.win_count = myUser.win_count + 1
 
         myUser.save()
+        return Response(True)
+    
+class AddTourneyStats(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        tourney = Tourney(user=myUser, name1=request.data['name1'], name2=request.data['name2'],
+                          name3=request.data['name3'], name4=request.data['name4'],
+                          name5=request.data['name5'], name6=request.data['name6'],
+                          name7=request.data['name7'], name8=request.data['name8'],
+                          tourney_id=request.data['tourney_id'])
+
+        tourney.save()
+        return Response(True)
+    
+class AddWinnerToTourney(APIView):
+    def post(self, request):
+        tourney_id = request.data['tourney_id']
+        tourney = Tourney.objects.get(tourney_id=tourney_id)
+
+        winner = request.data['winner']
+        match_number = request.data['match_number']
+        if (match_number == 1):
+            tourney.winner_match1 = winner
+        if (match_number == 2):
+            tourney.winner_match2 = winner        
+        if (match_number == 3):
+            tourney.winner_match3 = winner
+        if (match_number == 4):
+            tourney.winner_match4 = winner
+        if (match_number == 5):
+            tourney.winner_match5 = winner
+        if (match_number == 6):
+            tourney.winner_match6 = winner
+        if (match_number == 7):
+            tourney.winner_match7 = winner
+        
+        tourney.save()
         return Response(True)

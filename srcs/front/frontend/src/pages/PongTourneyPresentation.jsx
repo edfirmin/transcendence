@@ -10,6 +10,8 @@ import branch_1 from '../assets/img/tourney_branch_0.png'; import branch_2 from 
 import branch_3 from '../assets/img/tourney_branch_2.png'; import branch_4 from '../assets/img/tourney_branch_3.png';
 import branch_5 from '../assets/img/tourney_branch_4.png'; import branch_6 from '../assets/img/tourney_branch_5.png';
 import branch_7 from '../assets/img/tourney_branch_6.png';
+import { getUser, getMatches, getTourney } from "../api"
+
 
 function TourneyPresentation() {
     const data = useLocation();
@@ -22,24 +24,50 @@ function TourneyPresentation() {
     const winner = data.state.winner;
     const leftPlayerName = data.state.leftPlayerName;
 	const rightPlayerName = data.state.rightPlayerName;
-    const name1 = data.state.name1;
-    const name2 = data.state.name2;
-    const name3 = data.state.name3;
-    const name4 = data.state.name4;
-    const name5 = data.state.name5;
-    const name6 = data.state.name6;
-    const name7 = data.state.name7;
-    const name8 = data.state.name8;
     const nbOfBattleInTotal = players - 1;
-    const currentBattleIndex = data.state.currentBattleIndex == null ? 0 : data.state.currentBattleIndex + 1;7
-    var has_ended = false;
+    const tourney_id = data.state.tourney_id;
+    const currentBattleIndex = data.state.currentBattleIndex == null ? 0 : data.state.currentBattleIndex + 1;
+    const [has_ended, set_has_ended] = useState(false);
     const navigate = useNavigate();    
+    const [user, setUser] = useState()
+    const [tourney, setTourney] = useState(null)
+    const [user_icone, set_user_icone] = useState()
+
+    useEffect(() => {
+        inituser();
+        inittourney();
+        console.log(currentBattleIndex);
+        //addwinnertourney();
+    }, []);
+  
+    useEffect(() => {
+        if (user) {
+            set_user_icone(user.profil_pic);
+        }
+    }, [user]);
+  
+    const inituser = async () => {
+        const TMPuser = await getUser()
+        setUser(TMPuser);
+    }
+    const inittourney = async () => {
+        const TMPtourney = await getTourney(tourney_id)
+        setTourney(TMPtourney);
+    }
+
+    const addwinnertourney = async () => {
+        if (leftPlayerName) {
+            if (winner == 'LEFT')
+		        await axios.post('api/user/addWinnerToTourney/', {tourney_id, winner : leftPlayerName, match_number : currentBattleIndex})
+            else
+                await axios.post('api/user/addWinnerToTourney/', {tourney_id, winner : rightPlayerName, match_number : currentBattleIndex})
+        }
+        setTourney(tourney);
+    }
 
     function beginNextMatch(leftPlayerName, rightPlayerName) {
         const roomId = uuidv4();
-        navigate(`/pong/${roomId}`, {state : { isAI : false, map : map_index, design : design_index, points : p, players : players, leftPlayerName : leftPlayerName, rightPlayerName : rightPlayerName, returnPage : '/tourney/tourneyPresentation',
-            name1 : name1, name2 : name2, name2, name3 : name3, name4 : name4, name5: name5, name6 : name6, name7 : name7, name8 : name8, currentBattleIndex : currentBattleIndex,
-            matchs : { first : { left : null, right : null}, second : { left : null, right : null}, third : { left : null, right : null }, fourth : { left : null, right : null } }
+        navigate(`/pong/${roomId}`, {state : { isAI : false, map : map_index, design : design_index, points : p, players : players, leftPlayerName : leftPlayerName, rightPlayerName : rightPlayerName, returnPage : '/tourney/tourneyPresentation', tourney_id : tourney_id, currentBattleIndex : currentBattleIndex
         }});
     }
 
@@ -63,119 +91,147 @@ function TourneyPresentation() {
         }, [delay]);
     }
 
+    useEffect(() => {
+        determineNextMatch();
+    }, [tourney])
+
     // Determiner prochain match
     function determineNextMatch() {
+        if (!tourney)
+            return;
+
         switch (players) {
             case 0:
                 if (currentBattleIndex == 0)
-                    useInterval(beginNextMatch, 3000, name1, name2);
+                    setTimeout(beginNextMatch, 5000, tourney.name1, tourney.name2);
                 else
-                    has_ended = true;
+                    set_has_ended(true);
                 break;
         
+            case 1:
+                if (currentBattleIndex == 0)
+                    setTimeout(beginNextMatch, 5000, tourney.name1, tourney.name2);
+                else if (currentBattleIndex == 1)
+                    setTimeout(beginNextMatch, 5000, tourney.winner_match1, tourney.name2);
+                else
+                    set_has_ended(true);
+                break;  
+
             default:
                 break;
         }
     }
 
-    determineNextMatch();
+    if (!tourney)
+        return
 
     switch (players) {
         case 0:
             return (
                 <>
-                    <Player name={name1} image={icone_1} left={250} top={403} />
+                    <Player name={tourney.name1} image={user_icone} left={250} top={403} />
                     <img id='branch_left' src={branch_1} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_1} />
-                    <Player name={name2} image={icone_2} left={1390} top={403}/>
-                    <Victory show={has_ended} winner_name={name1} winner_icone={icone_1} />
+                    <Player name={tourney.name2} image={icone_1} left={1390} top={403}/>
+                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
                 </>
             )
         case 1:
             return (
                 <>
-                    <Player name={name1} image={icone_1} left={250} top={340} />
-                    <Player name={name3} image={icone_3} left={250} top={466} />
+                    <Player name={tourney.name1} image={user_icone} left={250} top={340} />
+                    <Player name={tourney.name3} image={icone_2} left={250} top={466} />
                     <img id='branch_left' src={branch_2} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_1} />
-                    <Player name={name2} image={icone_2} left={1390} top={403}/>
+                    <Player name={tourney.name2} image={icone_1} left={1390} top={403}/>
+                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
                 </>
             )
 
         case 2:
             return (
                 <>
-                    <Player name={name1} image={icone_1} left={250} top={340} />
-                    <Player name={name3} image={icone_3} left={250} top={466} />
+                    <Player name={tourney.name1} image={user_icone} left={250} top={340} />
+                    <Player name={tourney.name3} image={icone_2} left={250} top={466} />
                     <img id='branch_left' src={branch_2} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_3} />
-                    <Player name={name2} image={icone_2} left={1390} top={340} />
-                    <Player name={name4} image={icone_4} left={1390} top={466} />
+                    <Player name={tourney.name2} image={icone_1} left={1390} top={340} />
+                    <Player name={tourney.name4} image={icone_3} left={1390} top={466} />
+                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
+                
                 </>
             )
 
         case 3:
             return (
                 <>
-                    <Player name={name1} image={icone_1} left={230} top={280} />
-                    <Player name={name3} image={icone_3} left={230} top={468} />
-                    <Player name={name5} image={icone_5} left={230} top={595} />
+                    <Player name={tourney.name1} image={user_icone} left={230} top={280} />
+                    <Player name={tourney.name3} image={icone_2} left={230} top={468} />
+                    <Player name={tourney.name5} image={icone_4} left={230} top={595} />
                     <img id='branch_left' src={branch_4} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_3} />
-                    <Player name={name2} image={icone_2} left={1390} top={340} />
-                    <Player name={name4} image={icone_4} left={1390} top={466} />
+                    <Player name={tourney.name2} image={icone_1} left={1390} top={340} />
+                    <Player name={tourney.name4} image={icone_3} left={1390} top={466} />
+                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
+                
                 </>
             )
 
         case 4:
             return (
                 <>
-                    <Player name={name1} image={icone_1} left={230} top={280} />
-                    <Player name={name3} image={icone_3} left={230} top={468} />
-                    <Player name={name5} image={icone_5} left={230} top={595} />
+                    <Player name={tourney.name1} image={user_icone} left={230} top={280} />
+                    <Player name={tourney.name3} image={icone_2} left={230} top={468} />
+                    <Player name={tourney.name5} image={icone_4} left={230} top={595} />
                     <img id='branch_left' src={branch_4} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_5} />
-                    <Player name={name2} image={icone_2} left={1415} top={280} />
-                    <Player name={name4} image={icone_4} left={1415} top={468} />
-                    <Player name={name6} image={icone_6} left={1415} top={595} />
+                    <Player name={tourney.name2} image={icone_1} left={1415} top={280} />
+                    <Player name={tourney.name4} image={icone_3} left={1415} top={468} />
+                    <Player name={tourney.name6} image={icone_5} left={1415} top={595} />
+                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
+                
                 </>
             )
 
         case 5:
             return (
                 <>
-                    <Player name={name1} image={icone_1} left={230} top={215} />
-                    <Player name={name3} image={icone_3} left={230} top={340} />
-                    <Player name={name5} image={icone_5} left={230} top={470} />
-                    <Player name={name7} image={icone_7} left={230} top={595} />
+                    <Player name={tourney.name1} image={user_icone} left={230} top={215} />
+                    <Player name={tourney.name3} image={icone_2} left={230} top={340} />
+                    <Player name={tourney.name5} image={icone_4} left={230} top={470} />
+                    <Player name={tourney.name7} image={icone_6} left={230} top={595} />
                     <img id='branch_left' src={branch_6} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_5} />
-                    <Player name={name2} image={icone_2} left={1415} top={280} />
-                    <Player name={name4} image={icone_4} left={1415} top={468} />
-                    <Player name={name6} image={icone_6} left={1415} top={595} />
+                    <Player name={tourney.name2} image={icone_1} left={1415} top={280} />
+                    <Player name={tourney.name4} image={icone_3} left={1415} top={468} />
+                    <Player name={tourney.name6} image={icone_5} left={1415} top={595} />
+                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
+                
                 </>
             )
 
         default:
             return (
                 <>
-                    <Player name={name1} image={icone_1} left={230} top={215} />
-                    <Player name={name3} image={icone_3} left={230} top={340} />
-                    <Player name={name5} image={icone_5} left={230} top={470} />
-                    <Player name={name7} image={icone_7} left={230} top={595} />
+                    <Player name={tourney.name1} image={user_icone} left={230} top={215} />
+                    <Player name={tourney.name3} image={icone_2} left={230} top={340} />
+                    <Player name={tourney.name5} image={icone_4} left={230} top={470} />
+                    <Player name={tourney.name7} image={icone_6} left={230} top={595} />
                     <img id='branch_left' src={branch_6} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_7} />
-                    <Player name={name2} image={icone_2} left={1415} top={215} />
-                    <Player name={name4} image={icone_4} left={1415} top={340} />
-                    <Player name={name6} image={icone_6} left={1415} top={470} />
-                    <Player name={name8} image={icone_8} left={1415} top={595} />
+                    <Player name={tourney.name2} image={icone_1} left={1415} top={215} />
+                    <Player name={tourney.name4} image={icone_3} left={1415} top={340} />
+                    <Player name={tourney.name6} image={icone_5} left={1415} top={470} />
+                    <Player name={tourney.name8} image={icone_7} left={1415} top={595} />
+                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
+                
                 </>
             )
     }
