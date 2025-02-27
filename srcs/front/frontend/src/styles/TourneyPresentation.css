@@ -143,6 +143,22 @@
     padding: 20px;
 }
 
+#next_match {
+    position: absolute;
+
+    left: 37%;
+    top: 35%;
+
+    background-color: #3a4d54;
+
+    text-align: center;
+    color: white;
+    font-family: 'Futurama';
+    font-size: 30px;
+
+    padding: 40px;
+}
+
 #space {
     padding: 50px;
 }

@@ -11,6 +11,7 @@ import branch_3 from '../assets/img/tourney_branch_2.png'; import branch_4 from 
 import branch_5 from '../assets/img/tourney_branch_4.png'; import branch_6 from '../assets/img/tourney_branch_5.png';
 import branch_7 from '../assets/img/tourney_branch_6.png';
 import { getUser, getMatches, getTourney } from "../api"
+import axios from 'axios';
 
 
 function TourneyPresentation() {
@@ -28,6 +29,9 @@ function TourneyPresentation() {
     const tourney_id = data.state.tourney_id;
     const currentBattleIndex = data.state.currentBattleIndex == null ? 0 : data.state.currentBattleIndex + 1;
     const [has_ended, set_has_ended] = useState(false);
+    const [next_match, set_next_match] = useState(false);
+    const [left_opponent, set_left_opponent] = useState();
+    const [right_opponent, set_right_opponent] = useState();
     const navigate = useNavigate();    
     const [user, setUser] = useState()
     const [tourney, setTourney] = useState(null)
@@ -36,8 +40,7 @@ function TourneyPresentation() {
     useEffect(() => {
         inituser();
         inittourney();
-        console.log(currentBattleIndex);
-        //addwinnertourney();
+        addwinnertourney();
     }, []);
   
     useEffect(() => {
@@ -62,14 +65,29 @@ function TourneyPresentation() {
             else
                 await axios.post('api/user/addWinnerToTourney/', {tourney_id, winner : rightPlayerName, match_number : currentBattleIndex})
         }
-        setTourney(tourney);
+        const TMPtourney = await getTourney(tourney_id)
+        setTourney(TMPtourney);
     }
 
-    function beginNextMatch(leftPlayerName, rightPlayerName) {
-        const roomId = uuidv4();
-        navigate(`/pong/${roomId}`, {state : { isAI : false, map : map_index, design : design_index, points : p, players : players, leftPlayerName : leftPlayerName, rightPlayerName : rightPlayerName, returnPage : '/tourney/tourneyPresentation', tourney_id : tourney_id, currentBattleIndex : currentBattleIndex
-        }});
-    }
+    function getIconeWithName(name) {
+        if (name == tourney.name1)
+            return user_icone;
+        if (name == tourney.name2)
+            return icone_1;
+        if (name == tourney.name3)
+            return icone_2;
+        if (name == tourney.name4)
+            return icone_3;
+        if (name == tourney.name5)
+            return icone_4;
+        if (name == tourney.name6)
+            return icone_5;
+        if (name == tourney.name7)
+            return icone_6;
+        if (name == tourney.name8)
+            return icone_7;
+        return icone_8;
+    } 
 
     function useInterval(callback, delay) {
         const savedCallback = useRef();
@@ -95,6 +113,12 @@ function TourneyPresentation() {
         determineNextMatch();
     }, [tourney])
 
+    function nextMatch(name_first, name_second) {
+        set_left_opponent(name_first);
+        set_right_opponent(name_second);
+        set_next_match(true);
+    }
+
     // Determiner prochain match
     function determineNextMatch() {
         if (!tourney)
@@ -102,23 +126,96 @@ function TourneyPresentation() {
 
         switch (players) {
             case 0:
-                if (currentBattleIndex == 0)
-                    setTimeout(beginNextMatch, 5000, tourney.name1, tourney.name2);
+                if (currentBattleIndex == 0) 
+                    nextMatch(tourney.name1, tourney.name2);
                 else
                     set_has_ended(true);
                 break;
         
             case 1:
-                if (currentBattleIndex == 0)
-                    setTimeout(beginNextMatch, 5000, tourney.name1, tourney.name2);
+                if (currentBattleIndex == 0) 
+                    nextMatch(tourney.name1, tourney.name3);
                 else if (currentBattleIndex == 1)
-                    setTimeout(beginNextMatch, 5000, tourney.winner_match1, tourney.name2);
+                    nextMatch(tourney.winner_match1, tourney.name2);
                 else
                     set_has_ended(true);
                 break;  
 
-            default:
-                break;
+            case 2:
+                if (currentBattleIndex == 0)
+                    nextMatch(tourney.name1, tourney.name3);
+                else if (currentBattleIndex == 1)
+                    nextMatch(tourney.name2, tourney.name4);
+                else if (currentBattleIndex == 2)
+                    nextMatch(tourney.winner_match1, tourney.winner_match2);
+                else
+                    set_has_ended(true);
+                break;  
+
+            case 3:
+                if (currentBattleIndex == 0)
+                    nextMatch(tourney.name3, tourney.name5);
+                else if (currentBattleIndex == 1)
+                    nextMatch(tourney.name2, tourney.name4);
+                else if (currentBattleIndex == 2)
+                    nextMatch(tourney.name1, tourney.winner_match1);
+                else if (currentBattleIndex == 3)
+                    nextMatch(tourney.winner_match3, tourney.winner_match2);
+                else
+                    set_has_ended(true);
+                break;  
+
+            case 4:
+                if (currentBattleIndex == 0)
+                    nextMatch(tourney.name3, tourney.name5);
+                else if (currentBattleIndex == 1)
+                    nextMatch(tourney.name4, tourney.name6);
+                else if (currentBattleIndex == 2)
+                    nextMatch(tourney.name1, tourney.winner_match1);
+                else if (currentBattleIndex == 3)
+                    nextMatch(tourney.name2, tourney.winner_match2);
+                else if (currentBattleIndex == 4)
+                    nextMatch(tourney.winner_match3, tourney.winner_match4);
+                else
+                    set_has_ended(true);
+                break;  
+
+            case 5:
+                if (currentBattleIndex == 0)
+                    nextMatch(tourney.name1, tourney.name3);
+                else if (currentBattleIndex == 1)
+                    nextMatch(tourney.name5, tourney.name7);
+                else if (currentBattleIndex == 2)
+                    nextMatch(tourney.name4, tourney.name6);
+                else if (currentBattleIndex == 3)
+                    nextMatch(tourney.name2, tourney.winner_match3);
+                else if (currentBattleIndex == 4)
+                    nextMatch(tourney.winner_match1, tourney.winner_match2);
+                else if (currentBattleIndex == 5)
+                    nextMatch(tourney.winner_match4, tourney.winner_match5);
+                else
+                    set_has_ended(true);
+                break;  
+
+            case 6:
+                if (currentBattleIndex == 0)
+                    nextMatch(tourney.name1, tourney.name3);
+                else if (currentBattleIndex == 1)
+                    nextMatch(tourney.name5, tourney.name7);
+                else if (currentBattleIndex == 2)
+                    nextMatch(tourney.name2, tourney.name4);
+                else if (currentBattleIndex == 3)
+                    nextMatch(tourney.name6, tourney.name8);
+                else if (currentBattleIndex == 4)
+                    nextMatch(tourney.winner_match1, tourney.winner_match2);
+                else if (currentBattleIndex == 5)
+                    nextMatch(tourney.winner_match3, tourney.winner_match4);
+                else if (currentBattleIndex == 6)
+                    nextMatch(tourney.winner_match5, tourney.winner_match6);
+                else
+                    set_has_ended(true);
+                break;  
+
         }
     }
 
@@ -134,7 +231,9 @@ function TourneyPresentation() {
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_1} />
                     <Player name={tourney.name2} image={icone_1} left={1390} top={403}/>
-                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
+                    <Victory show={has_ended} winner_name={tourney.winner_match1} winner_icone={getIconeWithName(tourney.winner_match1)} />
+                    <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
+                    map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
                 </>
             )
         case 1:
@@ -146,7 +245,9 @@ function TourneyPresentation() {
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_1} />
                     <Player name={tourney.name2} image={icone_1} left={1390} top={403}/>
-                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
+                    <Victory show={has_ended} winner_name={tourney.winner_match2} winner_icone={getIconeWithName(tourney.winner_match2)} />
+                    <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
+                    map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
                 </>
             )
 
@@ -160,8 +261,9 @@ function TourneyPresentation() {
                     <img id='branch_right' src={branch_3} />
                     <Player name={tourney.name2} image={icone_1} left={1390} top={340} />
                     <Player name={tourney.name4} image={icone_3} left={1390} top={466} />
-                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
-                
+                    <Victory show={has_ended} winner_name={tourney.winner_match3} winner_icone={getIconeWithName(tourney.winner_match3)} />
+                    <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
+                    map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
                 </>
             )
 
@@ -176,8 +278,10 @@ function TourneyPresentation() {
                     <img id='branch_right' src={branch_3} />
                     <Player name={tourney.name2} image={icone_1} left={1390} top={340} />
                     <Player name={tourney.name4} image={icone_3} left={1390} top={466} />
-                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
-                
+                    <Victory show={has_ended} winner_name={tourney.winner_match4} winner_icone={getIconeWithName(tourney.winner_match4)} />
+                    <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
+                    map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
+
                 </>
             )
 
@@ -193,8 +297,10 @@ function TourneyPresentation() {
                     <Player name={tourney.name2} image={icone_1} left={1415} top={280} />
                     <Player name={tourney.name4} image={icone_3} left={1415} top={468} />
                     <Player name={tourney.name6} image={icone_5} left={1415} top={595} />
-                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
-                
+                    <Victory show={has_ended} winner_name={tourney.winner_match5} winner_icone={getIconeWithName(tourney.winner_match5)} />
+                    <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
+                    map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
+
                 </>
             )
 
@@ -211,8 +317,10 @@ function TourneyPresentation() {
                     <Player name={tourney.name2} image={icone_1} left={1415} top={280} />
                     <Player name={tourney.name4} image={icone_3} left={1415} top={468} />
                     <Player name={tourney.name6} image={icone_5} left={1415} top={595} />
-                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
-                
+                    <Victory show={has_ended} winner_name={tourney.winner_match6} winner_icone={getIconeWithName(tourney.winner_match6)} />
+                    <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
+                    map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
+
                 </>
             )
 
@@ -230,8 +338,10 @@ function TourneyPresentation() {
                     <Player name={tourney.name4} image={icone_3} left={1415} top={340} />
                     <Player name={tourney.name6} image={icone_5} left={1415} top={470} />
                     <Player name={tourney.name8} image={icone_7} left={1415} top={595} />
-                    <Victory show={has_ended} winner_name={tourney.name1} winner_icone={icone_1} />
-                
+                    <Victory show={has_ended} winner_name={tourney.winner_match7} winner_icone={getIconeWithName(tourney.winner_match7)} />
+                    <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
+                    map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
+
                 </>
             )
     }
@@ -275,6 +385,30 @@ function Victory({show, winner_name, winner_icone}) {
     }
 }
 
+function NextMatch({show, left_name, right_name, left_icone, right_icone, map_index, design_index, p, players, currentBattleIndex, tourney_id}) {
+    const navigate = useNavigate();    
+    
+    function beginNextMatch() {
+        const roomId = uuidv4();
+        navigate(`/pong/${roomId}`, {state : { isAI : false, map : map_index, design : design_index, points : p, players : players, leftPlayerName : left_name, rightPlayerName : right_name, returnPage : '/tourney/tourneyPresentation', tourney_id : tourney_id, currentBattleIndex : currentBattleIndex
+        }});
+    }
+    
+    if (show) {
+        return (
+            <div id='next_match'>
+                <p>PROCHAIN MATCH</p>
+                <div id='space'></div>
+                <Player name={left_name} image={left_icone} left={20} top={90} />
+                <Player name={right_name} image={right_icone} left={260} top={90} />
+                <Button name={"Prochain Match"} callback={() => {beginNextMatch()}} />
+            </div>
+        )
+    }
+    else {
+        return;
+    }
+}
 
 function Button({name, callback}) {
 	return (
