@@ -17,7 +17,6 @@ import Navbarr from '../components/Navbar';
 
 function PongSelection() {
 
-    const [difficulty, set_difficulty] = useState("medium");
     const paddle_designs = [classic_design, tennis_design];
     const difficulty_designs = [easy_design, medium_design, hard_design];
     const map_designs = [classic_map_design, tennis_map_design, table_tennis_map_design];

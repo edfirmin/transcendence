@@ -357,13 +357,48 @@ class PongConsumer(AsyncWebsocketConsumer):
     difficulty = {}
     ai_direction_go_up = {}
 
-    async def change_ai_direction(self, time): 
+    async def change_ai_direction_easy(self, time): 
         await asyncio.sleep(time)
         PongConsumer.ai_direction_go_up[self.room_name] = bool(random.getrandbits(1))
 
         new_time = random.uniform(1, 2)
-        asyncio.create_task(self.change_ai_direction(new_time))
+        asyncio.create_task(self.change_ai_direction_easy(new_time))
 
+    async def change_ai_direction_medium(self, time): 
+        await asyncio.sleep(time)
+
+        if (PongConsumer.ball_pos[self.room_name][1] <= PongConsumer.right_paddle_pos[self.room_name][1]):
+            ran = random.random()
+            if (ran <= 0.90):
+                PongConsumer.ai_direction_go_up[self.room_name] = True
+            else:
+                PongConsumer.ai_direction_go_up[self.room_name] = False
+        else :
+            ran = random.random()
+            if (ran <= 0.90):
+                PongConsumer.ai_direction_go_up[self.room_name] = False
+            else:
+                PongConsumer.ai_direction_go_up[self.room_name] = True
+        new_time = random.uniform(0.3, 0.5)
+        asyncio.create_task(self.change_ai_direction_medium(new_time))
+
+    async def change_ai_direction_hard(self, time): 
+        await asyncio.sleep(time)
+
+        if (PongConsumer.ball_pos[self.room_name][1] <= PongConsumer.right_paddle_pos[self.room_name][1]):
+            ran = random.random()
+            if (ran <= 0.96):
+                PongConsumer.ai_direction_go_up[self.room_name] = True
+            else:
+                PongConsumer.ai_direction_go_up[self.room_name] = False
+        else :
+            ran = random.random()
+            if (ran <= 0.96):
+                PongConsumer.ai_direction_go_up[self.room_name] = False
+            else:
+                PongConsumer.ai_direction_go_up[self.room_name] = True
+        new_time = random.uniform(0.2, 0.3)
+        asyncio.create_task(self.change_ai_direction_medium(new_time))
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['roomid']
@@ -389,7 +424,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         PongConsumer.right_paddle_pos[self.room_name] = [0, 250]
         PongConsumer.score[self.room_name] = [0, 0]
         
-        asyncio.create_task(self.change_ai_direction(1))
 
     async def receive(self, text_data):
         data_json = json.loads(text_data)
@@ -401,6 +435,13 @@ class PongConsumer(AsyncWebsocketConsumer):
             PongConsumer.is_ai[self.room_name] = data_json['value']
         if (message == "difficulty"):
             PongConsumer.difficulty[self.room_name] = data_json['value']
+            if (PongConsumer.difficulty[self.room_name] == 'easy'):
+                asyncio.create_task(self.change_ai_direction_easy(0.5))
+            elif (PongConsumer.difficulty[self.room_name] == 'medium'):
+                asyncio.create_task(self.change_ai_direction_medium(0.3))
+            else:
+                asyncio.create_task(self.change_ai_direction_hard(1))
+
         if (message == "points"):
             PongConsumer.score_to_win[self.room_name] = data_json['value']
 
@@ -408,7 +449,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if PongConsumer.left_paddle_pos[self.room_name][1] > self.down_limit:
                 return
 
-            PongConsumer.left_paddle_pos[self.room_name][1] += 5
+            PongConsumer.left_paddle_pos[self.room_name][1] += 2
             await self.send(text_data=json.dumps({
                 'type':'left_paddle_down',
                 'message': PongConsumer.left_paddle_pos[self.room_name][1]
@@ -418,7 +459,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if PongConsumer.left_paddle_pos[self.room_name][1] < self.up_limit:
                 return
 
-            PongConsumer.left_paddle_pos[self.room_name][1] -= 5
+            PongConsumer.left_paddle_pos[self.room_name][1] -= 2
             await self.send(text_data=json.dumps({
                 'type':'left_paddle_up',
                 'message': PongConsumer.left_paddle_pos[self.room_name][1]
@@ -427,7 +468,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if PongConsumer.right_paddle_pos[self.room_name][1] < self.up_limit:
                 return
             
-            PongConsumer.right_paddle_pos[self.room_name][1] -= 5
+            PongConsumer.right_paddle_pos[self.room_name][1] -= 2
             await self.send(text_data=json.dumps({
                 'type':'right_paddle_up',
                 'message': PongConsumer.right_paddle_pos[self.room_name][1]
@@ -436,7 +477,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if PongConsumer.right_paddle_pos[self.room_name][1] > self.down_limit:
                 return
 
-            PongConsumer.right_paddle_pos[self.room_name][1] += 5
+            PongConsumer.right_paddle_pos[self.room_name][1] += 2
             await self.send(text_data=json.dumps({
                 'type':'right_paddle_down',
                 'message': PongConsumer.right_paddle_pos[self.room_name][1]
@@ -464,49 +505,21 @@ class PongConsumer(AsyncWebsocketConsumer):
         while True:
             # Bot
             if (PongConsumer.is_ai[self.room_name]):
-
-                if (PongConsumer.difficulty[self.room_name] == "easy"):
-
-                    if (not PongConsumer.ai_direction_go_up[self.room_name]):
-                        if (PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
-                            PongConsumer.right_paddle_pos[self.room_name][1] += 5
-                            await self.send(text_data=json.dumps({
-                                'type':'right_paddle_down',
-                                'message': PongConsumer.right_paddle_pos[self.room_name][1]
-                            }))
-                    else:
-                        if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] > self.up_limit):
-                            PongConsumer.right_paddle_pos[self.room_name][1] -= 5
-                            await self.send(text_data=json.dumps({
-                                'type':'right_paddle_up',
-                                'message': PongConsumer.right_paddle_pos[self.room_name][1]
-                            }))
-                elif (PongConsumer.difficulty[self.room_name] == "medium"):
-                    if (PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
-                        PongConsumer.right_paddle_pos[self.room_name][1] += 5
+                if (not PongConsumer.ai_direction_go_up[self.room_name]):
+                    if (PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
+                        PongConsumer.right_paddle_pos[self.room_name][1] += 12
                         await self.send(text_data=json.dumps({
                             'type':'right_paddle_down',
-                            'message': PongConsumer.right_paddle_pos[self.room_name][1]
-                        }))
-                    elif (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] > self.up_limit):
-                        PongConsumer.right_paddle_pos[self.room_name][1] -= 5
-                        await self.send(text_data=json.dumps({
-                            'type':'right_paddle_up',
                             'message': PongConsumer.right_paddle_pos[self.room_name][1]
                         }))
                 else:
-                    if (PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
-                        PongConsumer.right_paddle_pos[self.room_name][1] += 5
-                        await self.send(text_data=json.dumps({
-                            'type':'right_paddle_down',
-                            'message': PongConsumer.right_paddle_pos[self.room_name][1]
-                        }))
-                    elif (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] > self.up_limit):
-                        PongConsumer.right_paddle_pos[self.room_name][1] -= 5
+                    if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] > self.up_limit):
+                        PongConsumer.right_paddle_pos[self.room_name][1] -= 12
                         await self.send(text_data=json.dumps({
                             'type':'right_paddle_up',
                             'message': PongConsumer.right_paddle_pos[self.room_name][1]
                         }))
+                
 
             # Ceilling and Floor Ball Detection
             if (PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] > 490 or PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] < 10):
