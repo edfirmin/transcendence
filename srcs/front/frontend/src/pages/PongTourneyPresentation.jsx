@@ -89,6 +89,7 @@ function TourneyPresentation() {
         return icone_8;
     } 
 
+
     function useInterval(callback, delay) {
         const savedCallback = useRef();
     
@@ -226,11 +227,11 @@ function TourneyPresentation() {
         case 0:
             return (
                 <>
-                    <Player name={tourney.name1} image={user_icone} left={250} top={403} />
+                    <Player name={tourney.name1} image={user_icone} left_opponent={left_opponent} right_opponent={right_opponent} left={250} top={403} />
                     <img id='branch_left' src={branch_1} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_1} />
-                    <Player name={tourney.name2} image={icone_1} left={1390} top={403}/>
+                    <Player name={tourney.name2} image={icone_1} left_opponent={left_opponent} right_opponent={right_opponent} left={1390} top={403}/>
                     <Victory show={has_ended} winner_name={tourney.winner_match1} winner_icone={getIconeWithName(tourney.winner_match1)} />
                     <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
                     map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
@@ -239,12 +240,12 @@ function TourneyPresentation() {
         case 1:
             return (
                 <>
-                    <Player name={tourney.name1} image={user_icone} left={250} top={340} />
-                    <Player name={tourney.name3} image={icone_2} left={250} top={466} />
+                    <Player name={tourney.name1} image={user_icone} left_opponent={left_opponent} right_opponent={right_opponent} left={250} top={340} />
+                    <Player name={tourney.name3} image={icone_2} left_opponent={left_opponent} right_opponent={right_opponent} left={250} top={466} />
                     <img id='branch_left' src={branch_2} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_1} />
-                    <Player name={tourney.name2} image={icone_1} left={1390} top={403}/>
+                    <Player name={tourney.name2} image={icone_1} left_opponent={left_opponent} right_opponent={right_opponent} left={1390} top={403}/>
                     <Victory show={has_ended} winner_name={tourney.winner_match2} winner_icone={getIconeWithName(tourney.winner_match2)} />
                     <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
                     map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
@@ -254,13 +255,13 @@ function TourneyPresentation() {
         case 2:
             return (
                 <>
-                    <Player name={tourney.name1} image={user_icone} left={250} top={340} />
-                    <Player name={tourney.name3} image={icone_2} left={250} top={466} />
+                    <Player name={tourney.name1} image={user_icone} left_opponent={left_opponent} right_opponent={right_opponent} left={250} top={340} />
+                    <Player name={tourney.name3} image={icone_2} left_opponent={left_opponent} right_opponent={right_opponent} left={250} top={466} />
                     <img id='branch_left' src={branch_2} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_3} />
-                    <Player name={tourney.name2} image={icone_1} left={1390} top={340} />
-                    <Player name={tourney.name4} image={icone_3} left={1390} top={466} />
+                    <Player name={tourney.name2} image={icone_1} left_opponent={left_opponent} right_opponent={right_opponent} left={1390} top={340} />
+                    <Player name={tourney.name4} image={icone_3} left_opponent={left_opponent} right_opponent={right_opponent} left={1390} top={466} />
                     <Victory show={has_ended} winner_name={tourney.winner_match3} winner_icone={getIconeWithName(tourney.winner_match3)} />
                     <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
                     map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
@@ -270,14 +271,14 @@ function TourneyPresentation() {
         case 3:
             return (
                 <>
-                    <Player name={tourney.name1} image={user_icone} left={230} top={280} />
-                    <Player name={tourney.name3} image={icone_2} left={230} top={468} />
-                    <Player name={tourney.name5} image={icone_4} left={230} top={595} />
+                    <Player name={tourney.name1} image={user_icone} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={280} />
+                    <Player name={tourney.name3} image={icone_2} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={468} />
+                    <Player name={tourney.name5} image={icone_4} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={595} />
                     <img id='branch_left' src={branch_4} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_3} />
-                    <Player name={tourney.name2} image={icone_1} left={1390} top={340} />
-                    <Player name={tourney.name4} image={icone_3} left={1390} top={466} />
+                    <Player name={tourney.name2} image={icone_1} left_opponent={left_opponent} right_opponent={right_opponent} left={1390} top={340} />
+                    <Player name={tourney.name4} image={icone_3} left_opponent={left_opponent} right_opponent={right_opponent} left={1390} top={466} />
                     <Victory show={has_ended} winner_name={tourney.winner_match4} winner_icone={getIconeWithName(tourney.winner_match4)} />
                     <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
                     map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
@@ -288,15 +289,15 @@ function TourneyPresentation() {
         case 4:
             return (
                 <>
-                    <Player name={tourney.name1} image={user_icone} left={230} top={280} />
-                    <Player name={tourney.name3} image={icone_2} left={230} top={468} />
-                    <Player name={tourney.name5} image={icone_4} left={230} top={595} />
+                    <Player name={tourney.name1} image={user_icone} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={280} />
+                    <Player name={tourney.name3} image={icone_2} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={468} />
+                    <Player name={tourney.name5} image={icone_4} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={595} />
                     <img id='branch_left' src={branch_4} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_5} />
-                    <Player name={tourney.name2} image={icone_1} left={1415} top={280} />
-                    <Player name={tourney.name4} image={icone_3} left={1415} top={468} />
-                    <Player name={tourney.name6} image={icone_5} left={1415} top={595} />
+                    <Player name={tourney.name2} image={icone_1} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={280} />
+                    <Player name={tourney.name4} image={icone_3} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={468} />
+                    <Player name={tourney.name6} image={icone_5} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={595} />
                     <Victory show={has_ended} winner_name={tourney.winner_match5} winner_icone={getIconeWithName(tourney.winner_match5)} />
                     <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
                     map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
@@ -307,16 +308,16 @@ function TourneyPresentation() {
         case 5:
             return (
                 <>
-                    <Player name={tourney.name1} image={user_icone} left={230} top={215} />
-                    <Player name={tourney.name3} image={icone_2} left={230} top={340} />
-                    <Player name={tourney.name5} image={icone_4} left={230} top={470} />
-                    <Player name={tourney.name7} image={icone_6} left={230} top={595} />
+                    <Player name={tourney.name1} image={user_icone} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={215} />
+                    <Player name={tourney.name3} image={icone_2} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={340} />
+                    <Player name={tourney.name5} image={icone_4} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={470} />
+                    <Player name={tourney.name7} image={icone_6} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={595} />
                     <img id='branch_left' src={branch_6} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_5} />
-                    <Player name={tourney.name2} image={icone_1} left={1415} top={280} />
-                    <Player name={tourney.name4} image={icone_3} left={1415} top={468} />
-                    <Player name={tourney.name6} image={icone_5} left={1415} top={595} />
+                    <Player name={tourney.name2} image={icone_1} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={280} />
+                    <Player name={tourney.name4} image={icone_3} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={468} />
+                    <Player name={tourney.name6} image={icone_5} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={595} />
                     <Victory show={has_ended} winner_name={tourney.winner_match6} winner_icone={getIconeWithName(tourney.winner_match6)} />
                     <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
                     map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
@@ -327,17 +328,17 @@ function TourneyPresentation() {
         default:
             return (
                 <>
-                    <Player name={tourney.name1} image={user_icone} left={230} top={215} />
-                    <Player name={tourney.name3} image={icone_2} left={230} top={340} />
-                    <Player name={tourney.name5} image={icone_4} left={230} top={470} />
-                    <Player name={tourney.name7} image={icone_6} left={230} top={595} />
+                    <Player name={tourney.name1} image={user_icone} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={215} />
+                    <Player name={tourney.name3} image={icone_2} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={340} />
+                    <Player name={tourney.name5} image={icone_4} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={470} />
+                    <Player name={tourney.name7} image={icone_6} left_opponent={left_opponent} right_opponent={right_opponent} left={230} top={595} />
                     <img id='branch_left' src={branch_6} />
                     <img id='victory_cup' src={victory_cup} alt="" />
                     <img id='branch_right' src={branch_7} />
-                    <Player name={tourney.name2} image={icone_1} left={1415} top={215} />
-                    <Player name={tourney.name4} image={icone_3} left={1415} top={340} />
-                    <Player name={tourney.name6} image={icone_5} left={1415} top={470} />
-                    <Player name={tourney.name8} image={icone_7} left={1415} top={595} />
+                    <Player name={tourney.name2} image={icone_1} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={215} />
+                    <Player name={tourney.name4} image={icone_3} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={340} />
+                    <Player name={tourney.name6} image={icone_5} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={470} />
+                    <Player name={tourney.name8} image={icone_7} left_opponent={left_opponent} right_opponent={right_opponent} left={1415} top={595} />
                     <Victory show={has_ended} winner_name={tourney.winner_match7} winner_icone={getIconeWithName(tourney.winner_match7)} />
                     <NextMatch show={next_match} left_name={left_opponent} right_name={right_opponent} left_icone={getIconeWithName(left_opponent)} right_icone={getIconeWithName(right_opponent)} 
                     map_index={map_index} design_index={design_index} p={p} players={players} currentBattleIndex={currentBattleIndex} tourney_id={tourney_id} />
@@ -348,7 +349,12 @@ function TourneyPresentation() {
 
 }
 
-function Player({name, image, left, top, isDefeated = false}) {
+function Player({name, image, left_opponent, right_opponent, left, top, isDefeated = false}) {
+    let highlight = false;
+    
+    if (left_opponent == name || right_opponent == name) 
+        highlight = true;
+
     if (isDefeated) {
         return (
             <div className='player_defeated' style={{left: left+'px', top: top+'px'}}>
@@ -356,6 +362,14 @@ function Player({name, image, left, top, isDefeated = false}) {
                 <p>{name}</p>
             </div>
         )
+    }
+    else if (highlight) {
+        return (
+            <div className='player_highlight' style={{left: left+'px', top: top+'px'}}>
+                <img src={image} />
+                <p>{name}</p>
+            </div>
+        )        
     }
     else {  
         return (
