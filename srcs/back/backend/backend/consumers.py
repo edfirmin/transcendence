@@ -4,6 +4,7 @@ import json
 import time
 import asyncio
 import logging
+import random
 
 logging.basicConfig(level=logging.DEBUG)  # Définir le niveau des logs
 logger = logging.getLogger(__name__)     # Créer un logger avec un nom unique
@@ -354,6 +355,15 @@ class PongConsumer(AsyncWebsocketConsumer):
     score_to_win = {}
     is_ai = {}
     difficulty = {}
+    ai_direction_go_up = {}
+
+    async def change_ai_direction(self, time): 
+        await asyncio.sleep(time)
+        PongConsumer.ai_direction_go_up[self.room_name] = bool(random.getrandbits(1))
+
+        new_time = random.uniform(1, 2)
+        asyncio.create_task(self.change_ai_direction(new_time))
+
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['roomid']
@@ -378,6 +388,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         PongConsumer.left_paddle_pos[self.room_name] = [0, 250]
         PongConsumer.right_paddle_pos[self.room_name] = [0, 250]
         PongConsumer.score[self.room_name] = [0, 0]
+        
+        asyncio.create_task(self.change_ai_direction(1))
 
     async def receive(self, text_data):
         data_json = json.loads(text_data)
@@ -447,12 +459,29 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         await self.close()
 
+
     async def main_loop(self):
         while True:
             # Bot
             if (PongConsumer.is_ai[self.room_name]):
 
                 if (PongConsumer.difficulty[self.room_name] == "easy"):
+
+                    if (not PongConsumer.ai_direction_go_up[self.room_name]):
+                        if (PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
+                            PongConsumer.right_paddle_pos[self.room_name][1] += 5
+                            await self.send(text_data=json.dumps({
+                                'type':'right_paddle_down',
+                                'message': PongConsumer.right_paddle_pos[self.room_name][1]
+                            }))
+                    else:
+                        if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] > self.up_limit):
+                            PongConsumer.right_paddle_pos[self.room_name][1] -= 5
+                            await self.send(text_data=json.dumps({
+                                'type':'right_paddle_up',
+                                'message': PongConsumer.right_paddle_pos[self.room_name][1]
+                            }))
+                elif (PongConsumer.difficulty[self.room_name] == "medium"):
                     if (PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
                         PongConsumer.right_paddle_pos[self.room_name][1] += 5
                         await self.send(text_data=json.dumps({
@@ -465,32 +494,19 @@ class PongConsumer(AsyncWebsocketConsumer):
                             'type':'right_paddle_up',
                             'message': PongConsumer.right_paddle_pos[self.room_name][1]
                         }))
-                #elif (self.difficulty == "medium"):
-                #    if (self.ball_pos[1] > self.right_paddle_pos[1] and self.right_paddle_pos[1] < self.down_limit):
-                #        self.right_paddle_pos[1] += 4
-                #        await self.send(text_data=json.dumps({
-                #            'type':'right_paddle_down',
-                #            'message': self.right_paddle_pos[1]
-                #        }))
-                #    elif (self.ball_pos[1] < self.right_paddle_pos[1] and self.right_paddle_pos[1] > self.up_limit):
-                #        self.right_paddle_pos[1] -= 4
-                #        await self.send(text_data=json.dumps({
-                #            'type':'right_paddle_up',
-                #            'message': self.right_paddle_pos[1]
-                #        }))
-                #else:
-                #    if (self.ball_pos[1] > self.right_paddle_pos[1] and self.right_paddle_pos[1] < self.down_limit):
-                #        self.right_paddle_pos[1] += 5
-                #        await self.send(text_data=json.dumps({
-                #            'type':'right_paddle_down',
-                #            'message': self.right_paddle_pos[1]
-                #        }))
-                #    elif (self.ball_pos[1] < self.right_paddle_pos[1] and self.right_paddle_pos[1] > self.up_limit):
-                #        self.right_paddle_pos[1] -= 5
-                #        await self.send(text_data=json.dumps({
-                #            'type':'right_paddle_up',
-                #            'message': self.right_paddle_pos[1]
-                #        }))
+                else:
+                    if (PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
+                        PongConsumer.right_paddle_pos[self.room_name][1] += 5
+                        await self.send(text_data=json.dumps({
+                            'type':'right_paddle_down',
+                            'message': PongConsumer.right_paddle_pos[self.room_name][1]
+                        }))
+                    elif (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] > self.up_limit):
+                        PongConsumer.right_paddle_pos[self.room_name][1] -= 5
+                        await self.send(text_data=json.dumps({
+                            'type':'right_paddle_up',
+                            'message': PongConsumer.right_paddle_pos[self.room_name][1]
+                        }))
 
             # Ceilling and Floor Ball Detection
             if (PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] > 490 or PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] < 10):
