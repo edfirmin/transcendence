@@ -1,39 +1,57 @@
-//import { useState, useEffect } from "react"
-import React from 'react'
-import "../styles/Home.css"
-import {useNavigate} from "react-router-dom"
-import { useState, useEffect } from "react";
+import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import "../styles/Home.css";
 import Navbarr from '../components/Navbar';
-import back_home from '../assets/home_back.mp4'
-import { getQR } from "../api"
+import ConnectedUsers from '../components/ConnectedUsers';
+import ChatBox from '../components/ChatBox';
+import 'bootstrap/dist/css/bootstrap.css';
+import logoutLogo from "../assets/logout_logo.png";
 
 function Home() {
     const navigate = useNavigate();
-    const [qr, setQR] = useState([])
+    const [privateChats, setPrivateChats] = useState([]);
 
     const handleLogout = () => {
         localStorage.clear();
-        navigate("/login")
-    }
+        navigate("/login");
+    };
 
-    
-    const initqr = async () => {
-        const TMPuser = await getQR()
-        setQR(TMPuser);
-    }
+    const handleStartPrivateChat = (user) => {
+        // Check if chat already exists
+        if (!privateChats.find(chat => chat.id === user.id)) {
+            setPrivateChats(prev => [...prev, {
+                id: user.id,
+                username: user.username,
+                profil_pic: user.profil_pic
+            }]);
+        }
+    };
 
-    useEffect(() => {
-        initqr()
-    }, []);
+    const handleClosePrivateChat = (userId) => {
+        setPrivateChats(prev => prev.filter(chat => chat.id !== userId));
+    };
 
-	return (
-		<div>
-            {/* <video src={back_home} autoPlay muted loop /> */}
-            <Navbarr></Navbarr>
-			<button className="logout-button" onClick={() => handleLogout()}>Logout</button>
-            <img src={qr} alt="wq" />
-		</div>
+    return (
+        <div>
+            <Navbarr />
+            <button className="logout-button" onClick={handleLogout}>
+                <img className='logout-logo' src={logoutLogo} alt="logoutLogo" />
+            </button>
+            
+            <ConnectedUsers onStartPrivateChat={handleStartPrivateChat} />
+            
+            <div className="chat-container">
+                <ChatBox />
+                {privateChats.map(chat => (
+                    <ChatBox
+                        key={chat.id}
+                        privateChat={chat}
+                        onClosePrivateChat={() => handleClosePrivateChat(chat.id)}
+                    />
+                ))}
+            </div>
+        </div>
     );
 }
 
-export default Home
+export default Home;
