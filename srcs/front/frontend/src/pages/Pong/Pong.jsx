@@ -16,8 +16,6 @@ import swag_ball_design from '../../assets/img/swag_ball_design.png'
 import classic_map from '../../assets/img/classic_map.png'
 import tennis_map from '../../assets/img/tennis_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
-import classic_design from '../../assets/img/classic_design.png'
-import tennis_design from '../../assets/img/tennis_design.png'
 import { ACCESS_TOKEN } from "../../constants";
 
 
@@ -45,6 +43,7 @@ function Pong() {
 	const [winner, setWinner] = useState("");
 	const hit_history = useRef([]);
 	const [shake, set_shake] = useState(false);
+	const [time_start, set_time_start] = useState(0)
 
 	const map_design = [classic_map, tennis_map, table_tennis_map];
 	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
@@ -152,7 +151,11 @@ function Pong() {
 		const month = d.getMonth()+1;
 		const year = d.getFullYear();
 		const a = year + '-' + month + '-' + day;
-		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right})
+
+		const time = d.getTime() - time_start.getTime();
+		console.log(time);
+
+		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time})
 	}
 
 	useEffect(() => {
@@ -383,10 +386,13 @@ function Pong() {
 
 	useEffect(() => {
 		countdown > 0 && setTimeout(() => setCountdown(countdown - 1), 1000);
-		if (countdown == 0)
+		if (countdown == 0) {
 			ws.send(JSON.stringify({
 				'message':'begin_game'
 			}));
+			
+			set_time_start(new Date())
+		}
 	}, [countdown]);
 
 

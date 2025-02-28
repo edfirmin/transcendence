@@ -13,5 +13,6 @@ urlpatterns = [
     path('desactiver2fa/',Disable2FAView.as_view() ,name="desactiver2fa"),
     path('addMatchStats/', AddMatchStats.as_view() ,name="addMatchStats"),
     path('addTourneyStats/', AddTourneyStats.as_view() ,name="addTourneyStats"),
-    path('addWinnerToTourney/', AddWinnerToTourney.as_view() ,name="addWinnerToTourney")
+    path('addWinnerToTourney/', AddWinnerToTourney.as_view() ,name="addWinnerToTourney"),
+    path('addTourneyWinCount/', AddTourneyWinCount.as_view() ,name="addTourneyWinCount")
 ]

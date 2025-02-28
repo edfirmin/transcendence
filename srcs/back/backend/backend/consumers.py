@@ -339,8 +339,6 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-
-
 class PongConsumer(AsyncWebsocketConsumer):
     
     ball_pos = {}

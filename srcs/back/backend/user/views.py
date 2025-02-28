@@ -226,7 +226,8 @@ class AddMatchStats(APIView):
 
         #create match
         match = Match(user=myUser, result=request.data['result'], date=request.data['date'],
-                      score_left=request.data['score_left'], score_right=request.data['score_right'])
+                      score_left=request.data['score_left'], score_right=request.data['score_right'],
+                      time=request.data['time'])
         match.save()
 
         if (request.data['result'] == "VICTOIRE"):
@@ -276,4 +277,16 @@ class AddWinnerToTourney(APIView):
             tourney.winner_match7 = winner
         
         tourney.save()
+        return Response(True)
+    
+class AddTourneyWinCount(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        myUser.tourney_win_count = myUser.tourney_win_count + 1
+
+        myUser.save()
         return Response(True)

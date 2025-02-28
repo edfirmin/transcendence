@@ -88,12 +88,22 @@ function WinrateBar({loses, wins}) {
     )
 }
 
-function MatchResult({result, date, score_left, score_right}) {
+function MatchResult({result, date, score_left, score_right, time}) {
     return (
         <div className="matchResult" style={{backgroundColor: result == "VICTOIRE" ? "#0f9acc" : "#cc0f38"}}>
-            <p>{result}</p>
-            <p>{score_left} - {score_right}</p>
-            <p>{date}</p>
+            <span className="matchResultFirstRow">    
+                    <p className="matchResultResult">{score_left}-{score_right}</p>
+                    <p className="matchResultResult">{result}</p>
+                    <span><p>{date}</p></span>
+            </span>
+            <hr/>
+            <div>    
+                <div className="matchResultData">
+                    <p>time</p>
+                    <span></span>
+                    <p>{time} s</p>
+                </div>
+            </div>
         </div>
     )
 }
@@ -102,7 +112,7 @@ function MatchArray({matches}) {
     let matchesResults = []
     
     for (let i = 0; i < matches.length; i++) {
-        matchesResults.push(<MatchResult result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} />)
+        matchesResults.push(<MatchResult result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} time={String(matches[i].time).substring(0, 2)}/>)
     }
    
     return(<div id="matchHistory">

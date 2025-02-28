@@ -13,6 +13,7 @@ class User(AbstractUser):
     mfa_secret = models.CharField(max_length=32, blank=True, null=True)
     win_count = models.BigIntegerField(default=0)
     lose_count = models.BigIntegerField(default=0)
+    tourney_win_count = models.BigIntegerField(default=0)
 
 
 class Match(models.Model):
@@ -21,6 +22,7 @@ class Match(models.Model):
     score_left = models.IntegerField(default=0)
     score_right = models.IntegerField(default=0)
     date = models.DateField()
+    time = models.BigIntegerField(default=0)
 
 class Tourney(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
