@@ -14,6 +14,7 @@ import classic_design from '../../assets/img/classic_design.png'
 import tennis_design from '../../assets/img/tennis_design.png'
 import useToken from 'antd/es/theme/useToken';
 import { ACCESS_TOKEN } from "../../constants";
+import { withInfo } from 'antd/es/modal/confirm';
 
 function PongMulti() {
 
@@ -120,12 +121,21 @@ function PongMulti() {
 	}, [])
 
 	async function postMatchStats() {
+		if (winner == '')
+			return
+
+		var result;
+		if (winner == 'LEFT')
+			result = "VICTOIRE"
+		else
+			result = "DEFAITE"
+
 		const d = new Date();
 		const day = d.getDate();
 		const month = d.getMonth()+1;
 		const year = d.getFullYear();
 		const a = year + '-' + month + '-' + day;
-		const res = await axios.post('api/user/addMatchStats/', {userToken, date: a})
+		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right})
 	}
 
 	useEffect(() => {

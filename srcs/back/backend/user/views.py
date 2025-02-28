@@ -225,10 +225,14 @@ class AddMatchStats(APIView):
         myUser = User.objects.get(id=user_id)
 
         #create match
-        match = Match(user=myUser, result='VICTOIRE', date=request.data['date'])
+        match = Match(user=myUser, result=request.data['result'], date=request.data['date'],
+                      score_left=request.data['score_left'], score_right=request.data['score_right'])
         match.save()
 
-        myUser.win_count = myUser.win_count + 1
+        if (request.data['result'] == "VICTOIRE"):
+            myUser.win_count = myUser.win_count + 1
+        else:
+            myUser.lose_count = myUser.lose_count + 1
 
         myUser.save()
         return Response(True)

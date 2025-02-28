@@ -152,7 +152,7 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 if MultiPongConsumer.left_paddle_pos[self.room_name][1] > self.down_limit:
                     return
 
-                MultiPongConsumer.left_paddle_pos[self.room_name][1] += 5
+                MultiPongConsumer.left_paddle_pos[self.room_name][1] += 2
             
                 await self.send_message("left_paddle_down_type", MultiPongConsumer.left_paddle_pos[self.room_name][1])
 
@@ -162,7 +162,7 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 if MultiPongConsumer.right_paddle_pos[self.room_name][1] > self.down_limit:
                     return
 
-                MultiPongConsumer.right_paddle_pos[self.room_name][1] += 5
+                MultiPongConsumer.right_paddle_pos[self.room_name][1] += 2
                 await self.send_message("right_paddle_down_type", MultiPongConsumer.right_paddle_pos[self.room_name][1])
 
 
@@ -173,7 +173,7 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 if MultiPongConsumer.left_paddle_pos[self.room_name][1] < self.up_limit:
                     return
 
-                MultiPongConsumer.left_paddle_pos[self.room_name][1] -= 5
+                MultiPongConsumer.left_paddle_pos[self.room_name][1] -= 2
                 await self.send_message("left_paddle_up_type", MultiPongConsumer.left_paddle_pos[self.room_name][1])
 
             # Right
@@ -181,7 +181,7 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 if MultiPongConsumer.right_paddle_pos[self.room_name][1] < self.up_limit:
                     return
 
-                MultiPongConsumer.right_paddle_pos[self.room_name][1] -= 5
+                MultiPongConsumer.right_paddle_pos[self.room_name][1] -= 2
                 await self.send_message("right_paddle_up_type", MultiPongConsumer.right_paddle_pos[self.room_name][1])
 
 

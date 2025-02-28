@@ -18,6 +18,8 @@ class User(AbstractUser):
 class Match(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     result = models.CharField(max_length=15)
+    score_left = models.IntegerField(default=0)
+    score_right = models.IntegerField(default=0)
     date = models.DateField()
 
 class Tourney(models.Model):

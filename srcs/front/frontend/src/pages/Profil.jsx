@@ -88,11 +88,11 @@ function WinrateBar({loses, wins}) {
     )
 }
 
-function MatchResult({result, date}) {
+function MatchResult({result, date, score_left, score_right}) {
     return (
         <div className="matchResult" style={{backgroundColor: result == "VICTOIRE" ? "#0f9acc" : "#cc0f38"}}>
             <p>{result}</p>
-            <p></p>
+            <p>{score_left} - {score_right}</p>
             <p>{date}</p>
         </div>
     )
@@ -102,7 +102,7 @@ function MatchArray({matches}) {
     let matchesResults = []
     
     for (let i = 0; i < matches.length; i++) {
-        matchesResults.push(<MatchResult result={matches[i].result} date={matches[i].date} />)
+        matchesResults.push(<MatchResult result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} />)
     }
    
     return(<div id="matchHistory">

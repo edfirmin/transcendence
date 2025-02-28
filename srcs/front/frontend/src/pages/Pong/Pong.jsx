@@ -7,16 +7,24 @@ import classic_paddle_design from '../../assets/img/classic_paddle_design.png'
 import classic_ball_design from '../../assets/img/classic_ball_design.png'
 import tennis_paddle_design from '../../assets/img/tennis_paddle_design.png'
 import tennis_ball_design from '../../assets/img/tennis_ball_design.png'
+import cool_paddle_design from '../../assets/img/cool_paddle_design.png'
+import cool_ball_design from '../../assets/img/cool_ball_design.png'
+import sick_paddle_design from '../../assets/img/sick_paddle_design.png'
+import sick_ball_design from '../../assets/img/sick_ball_design.png'
+import swag_paddle_design from '../../assets/img/swag_paddle_design.png'
+import swag_ball_design from '../../assets/img/swag_ball_design.png'
 import classic_map from '../../assets/img/classic_map.png'
 import tennis_map from '../../assets/img/tennis_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
 import classic_design from '../../assets/img/classic_design.png'
 import tennis_design from '../../assets/img/tennis_design.png'
+import { ACCESS_TOKEN } from "../../constants";
 
 
 function Pong() {
 
     const { roomid } = useParams();
+	const userToken = localStorage.getItem(ACCESS_TOKEN);
 	var ws = useMemo(() => {return new WebSocket(`ws://localhost:8000/ws/pong/${roomid}`)}, [ws]);
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);
@@ -39,8 +47,8 @@ function Pong() {
 	const [shake, set_shake] = useState(false);
 
 	const map_design = [classic_map, tennis_map, table_tennis_map];
-	const ball_design = [classic_ball_design, tennis_ball_design];
-	const paddle_design = [classic_paddle_design, tennis_paddle_design];
+	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
+	const paddle_design = [classic_paddle_design, tennis_paddle_design, cool_paddle_design, sick_paddle_design, swag_paddle_design];
 
 	const data = useLocation();
 	const isAI = data.state == null ? false : data.state.isAI;
@@ -123,6 +131,33 @@ function Pong() {
 			}}) }, 3000);
 		}
 	}
+
+
+	async function postMatchStats() {
+		if (winner == "")
+			return
+
+		var result;
+		if (winner == 'LEFT WIN !') {
+			result = "VICTOIRE"
+			score.left += 1;	
+		}
+		else {
+			result = "DEFAITE"
+			score.right += 1;	
+		}
+		
+		const d = new Date();
+		const day = d.getDate();
+		const month = d.getMonth()+1;
+		const year = d.getFullYear();
+		const a = year + '-' + month + '-' + day;
+		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right})
+	}
+
+	useEffect(() => {
+		postMatchStats();
+	}, [winner])
 
 	useEffect(() => {
 

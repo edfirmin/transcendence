@@ -4,6 +4,9 @@ import {useNavigate, useLocation} from "react-router-dom"
 import {v4 as uuidv4} from 'uuid';
 import classic_design from '../assets/img/classic_design.png'
 import tennis_design from '../assets/img/tennis_design.png'
+import cool_design from '../assets/img/cool_design.png'
+import sick_design from '../assets/img/sick_design.png'
+import swag_design from '../assets/img/swag_design.png'
 import classic_map_design from '../assets/img/classic_map_design.png'
 import tennis_map_design from '../assets/img/tennis_map_design.png'
 import table_tennis_map_design from '../assets/img/table_tennis_map_design.png'
@@ -17,7 +20,7 @@ import Navbarr from '../components/Navbar';
 
 function PongSelection() {
 
-    const paddle_designs = [classic_design, tennis_design];
+    const paddle_designs = [classic_design, tennis_design, cool_design, sick_design, swag_design];
     const difficulty_designs = [easy_design, medium_design, hard_design];
     const map_designs = [classic_map_design, tennis_map_design, table_tennis_map_design];
     const point_design = [design_2, design_3, design_4, design_5, design_6, design_7, design_8, design_9];
@@ -54,6 +57,7 @@ function PongSelection() {
     return (
         <>
             <Navbarr></Navbarr>
+            <div className='space'></div>
             <div className='container'>
               <div></div>
               <Selector name={"Map"} designs={map_designs} index={index_map_design} setIndex={set_index_map_design} />
@@ -61,6 +65,9 @@ function PongSelection() {
               <Selector name={"AI Difficulty"} designs={difficulty_designs} index={difficulty_index} setIndex={set_difficulty_index} />
               <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} />
               <div></div>
+            </div>
+            <div className='container'>
+              <div className='space'></div>
             </div>
             <div className='container'>
               <div></div>
