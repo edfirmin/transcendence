@@ -139,11 +139,11 @@ function Pong() {
 		var result;
 		if (winner == 'LEFT WIN !') {
 			result = "VICTOIRE"
-			score.left += 1;	
+			//score.left += 1;	
 		}
 		else {
 			result = "DEFAITE"
-			score.right += 1;	
+			//score.right += 1;	
 		}
 		
 		const d = new Date();

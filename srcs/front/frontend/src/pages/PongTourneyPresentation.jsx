@@ -12,9 +12,12 @@ import branch_5 from '../assets/img/tourney_branch_4.png'; import branch_6 from 
 import branch_7 from '../assets/img/tourney_branch_6.png';
 import { getUser, getMatches, getTourney } from "../api"
 import axios from 'axios';
+import { ACCESS_TOKEN } from "../constants";
 
 
 function TourneyPresentation() {
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    
     const data = useLocation();
     const isAI = data.state == null ? false : data.state.isAI;
     const difficulty = data.state == null ? "easy" : data.state.difficulty;
@@ -88,6 +91,16 @@ function TourneyPresentation() {
             return icone_7;
         return icone_8;
     } 
+
+    useEffect(() => {
+        async function addtourneywincount() {
+            if (winner == "LEFT"){
+                console.log("oui")
+                await axios.post('api/user/addTourneyWinCount/', {userToken})
+            }
+            }
+        addtourneywincount();
+    }, [has_ended])
 
 
     function useInterval(callback, delay) {
@@ -385,6 +398,7 @@ function Victory({show, winner_name, winner_icone}) {
     const navigate = useNavigate();    
 
     if (show) {
+
         return (
             <div id='victory'>
                 <p>VICTOIRE DE</p>

@@ -51,20 +51,19 @@ function PongMulti() {
 	const paddle_design = [classic_paddle_design, tennis_paddle_design, cool_paddle_design, sick_paddle_design, swag_paddle_design];
 
 	const data = useLocation();
-	const [map_index, set_map_index] = useState(0);
-	const [design_index, set_design_index] = useState(0); 
-	const [points, set_points] = useState(5);
-    
+	const [map_index, set_map_index] = useState(data.state == null ? 0 : data.state.map);
+	const [design_index, set_design_index] = useState(data.state == null ? 0 : data.state.design);
+	const [points, set_points] = useState(data.state == null ? 5 : data.state.points + 2);
+	console.log("map : " + map_index)
+	console.log("design : " + design_index)
+	console.log("points : " + points)
+
 	const [countdown, setCountdown] = useState(-1);
+	
+	const navigate = useNavigate();
+	
 
 	useEffect(() => {
-	  	
-		
-		if (data.state != null) {
-			set_map_index(data.state.map);
-			set_design_index(data.state.design);
-			set_points(data.state.points + 2);
-		}
 
 		ws.onopen = function(event) {
 			ws.send(JSON.stringify({
@@ -112,6 +111,8 @@ function PongMulti() {
 			}
 			if (data.type == "winner") {
 				setWinner(data.message + " WIN !");
+				setTimeout(() => { navigate('/selection', {state : {map : map_index, design : design_index, points : points - 2, winner : data.message
+				}}) }, 3000);
 			}
 			if (data.type == "begin_countdown") {
 				setCountdown(3);
@@ -125,15 +126,19 @@ function PongMulti() {
 	}, [])
 
 	async function postMatchStats() {
-		if (winner == '')
+		if (winner == "")
 			return
 
 		var result;
-		if (winner == 'LEFT')
+		if (winner == 'LEFT WIN !') {
 			result = "VICTOIRE"
-		else
+			//score.left += 1;	
+		}
+		else {
 			result = "DEFAITE"
-
+			//score.right += 1;	
+		}
+		
 		const d = new Date();
 		const day = d.getDate();
 		const month = d.getMonth()+1;
@@ -143,7 +148,7 @@ function PongMulti() {
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);
 
-		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right})
+		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time})
 	}
 
 	useEffect(() => {

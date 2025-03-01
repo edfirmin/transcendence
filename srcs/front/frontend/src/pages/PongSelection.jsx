@@ -86,11 +86,7 @@ function PongSelection() {
 
 function Button({name, callback}) {
 	return (
-	  <tr>
-		<td>
 		  <button className='button' onClick={() => callback()}>{name} </button>
-		</td>
-	  </tr>
 	)
 }
 

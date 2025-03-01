@@ -7,6 +7,7 @@ import tas from "../assets/tas-de-neige.png"
 import profile_logo from "../assets/profile_logo.png"
 import { useNavigate } from "react-router-dom";
 import Snowfall from 'react-snowfall'
+import victory_cup from '../assets/img/victory_cup.png'
 
 function Profil() {
     const [user, setUser] = useState([])
@@ -59,7 +60,13 @@ function Profil() {
                         <button onClick={handleButton} className="rb">Activer la 2FA</button>
                     </div>
                     <div className="rigth">
-                        <h2>Stats</h2>
+                        <div id="stats_up">
+                            <h2>Stats</h2>
+                            <div>
+                                <p>{user.tourney_win_count}</p>
+                                <img src={victory_cup} style={{height: "50px", width: "50px"}} />
+                            </div>
+                        </div>
                         <h4 className="center">Winrate</h4>
                         <WinrateBar loses={user.lose_count} wins={user.win_count} />
                         <div style={{display: "flex", justifyContent: "space-between"}}>
@@ -112,7 +119,7 @@ function MatchArray({matches}) {
     let matchesResults = []
     
     for (let i = 0; i < matches.length; i++) {
-        matchesResults.push(<MatchResult result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} time={String(matches[i].time).substring(0, 2)}/>)
+        matchesResults.push(<MatchResult result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} time={String(matches[i].time).substring(0, String(matches[i].time).length - 3)}/>)
     }
    
     return(<div id="matchHistory">

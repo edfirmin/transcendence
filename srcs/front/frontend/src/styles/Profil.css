@@ -204,3 +204,20 @@ hr {
     margin: 1em 0;
     padding: 0;
 }
+
+#stats_up {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#stats_up div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#stats_up div p {
+    align-self: center;
+    margin-bottom: 0;
+}
