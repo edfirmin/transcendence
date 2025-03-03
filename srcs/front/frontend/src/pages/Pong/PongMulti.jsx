@@ -141,10 +141,14 @@ function PongMulti() {
 		}
 		
 		const d = new Date();
-		const day = d.getDate();
-		const month = d.getMonth()+1;
+		var day = d.getDate();
+		if (day.toString().length == 1)
+			day = '0' + day;
+		var month = d.getMonth()+1;
+		if (month.toString().length == 1)
+			month = '0' + month;
 		const year = d.getFullYear();
-		const a = year + '-' + month + '-' + day;
+		const a = + d.getHours() + ':' + d.getMinutes() + '  ' + year + '-' + month + '-' + day;
 
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);

@@ -203,7 +203,7 @@ class Enable2FAView(APIView):
             return Response(False)
 
 class Disable2FAView(APIView):
-    def post(self, rePlayer2quest):
+    def post(self, request):
         token_string = request.data['userToken']
         token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
         user_id = token.get('id')

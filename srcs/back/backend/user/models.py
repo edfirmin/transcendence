@@ -22,7 +22,7 @@ class Match(models.Model):
     result = models.CharField(max_length=15)
     score_left = models.IntegerField(default=0)
     score_right = models.IntegerField(default=0)
-    date = models.DateField()
+    date = models.CharField()
     time = models.BigIntegerField(default=0)
     type = models.CharField(default="Undefined")
     longest_exchange = models.BigIntegerField(default=0)
