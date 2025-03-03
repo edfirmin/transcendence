@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 class User(AbstractUser):
@@ -23,6 +24,10 @@ class Match(models.Model):
     score_right = models.IntegerField(default=0)
     date = models.DateField()
     time = models.BigIntegerField(default=0)
+    type = models.CharField(default="Undefined")
+    longest_exchange = models.BigIntegerField(default=0)
+    shortest_exchange = models.BigIntegerField(default=0)
+    #score_history = ArrayField(models.CharField())
 
 class Tourney(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

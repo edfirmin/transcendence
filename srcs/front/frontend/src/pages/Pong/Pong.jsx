@@ -41,9 +41,12 @@ function Pong() {
     const lastUpdateTimeRef = useRef(0);
     const [count, setCount]  = useState(0);
 	const [winner, setWinner] = useState("");
+	const [longest_exchange, set_longest_exchange] = useState(0);
+	const [shortest_exchange, set_shortest_exchange] = useState(0);
 	const hit_history = useRef([]);
 	const [shake, set_shake] = useState(false);
 	const [time_start, set_time_start] = useState(0)
+	//const [score_history, set_score_history] = useState([])
 
 	const map_design = [classic_map, tennis_map, table_tennis_map];
 	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
@@ -108,6 +111,7 @@ function Pong() {
 			set_shake(true);
 			setTimeout(() => { set_shake(false); }, 200);
 			setScore({left: data.left, right: data.right});
+			//set_score_history([...score_history, data.winner])
 		}
 		if (data.type == "hit") {
 			let dix = data.dx;
@@ -125,7 +129,10 @@ function Pong() {
 			}
 		}
 		if (data.type == "winner") {
-			setWinner(data.message + " WIN !");
+			set_longest_exchange(data.longest_exchange);
+			set_shortest_exchange(data.shortest_exchange);
+			setWinner(data.winner + " WIN !");
+			//set_score_history([...score_history, data.winner])
 			setTimeout(() => { navigate(returnPage, {state : { isAI : isAI, map : map_index, design : design_index, points : points - 2, players : players, winner : data.message, leftPlayerName : leftPlayerName, rightPlayerName : rightPlayerName, tourney_id : tourney_id, currentBattleIndex : currentBattleIndex
 			}}) }, 3000);
 		}
@@ -154,8 +161,11 @@ function Pong() {
 
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);
-
-		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time})
+		
+		if (isAI)
+			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange})
+		else
+			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange})
 	}
 
 	useEffect(() => {

@@ -42,6 +42,8 @@ function PongMulti() {
     const lastUpdateTimeRef = useRef(0);
     const [count, setCount]  = useState(0);
 	const [winner, setWinner] = useState("");
+	const [longest_exchange, set_longest_exchange] = useState(0);
+	const [shortest_exchange, set_shortest_exchange] = useState(0);
 	const hit_history = useRef([]);
 	const [time_start, set_time_start] = useState(0)
 
@@ -54,14 +56,11 @@ function PongMulti() {
 	const [map_index, set_map_index] = useState(data.state == null ? 0 : data.state.map);
 	const [design_index, set_design_index] = useState(data.state == null ? 0 : data.state.design);
 	const [points, set_points] = useState(data.state == null ? 5 : data.state.points + 2);
-	console.log("map : " + map_index)
-	console.log("design : " + design_index)
-	console.log("points : " + points)
 
 	const [countdown, setCountdown] = useState(-1);
 	
 	const navigate = useNavigate();
-	
+
 
 	useEffect(() => {
 
@@ -110,8 +109,10 @@ function PongMulti() {
 				audio.play();
 			}
 			if (data.type == "winner") {
-				setWinner(data.message + " WIN !");
-				setTimeout(() => { navigate('/selection', {state : {map : map_index, design : design_index, points : points - 2, winner : data.message
+				set_longest_exchange(data.longest_exchange);
+				set_shortest_exchange(data.shortest_exchange);
+				setWinner(data.winner + " WIN !");
+				setTimeout(() => { navigate('/selection', {state : {map : map_index, design : design_index, points : points - 2, winner : data.winner
 				}}) }, 3000);
 			}
 			if (data.type == "begin_countdown") {
@@ -148,7 +149,7 @@ function PongMulti() {
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);
 
-		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time})
+		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange})
 	}
 
 	useEffect(() => {

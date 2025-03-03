@@ -97,6 +97,10 @@
     height: 55.3vh;
     width: 51%;
     padding: 2%;
+
+    overflow: hidden;
+    overflow: scroll;
+    overflow-x: hidden;
 }
 
 #winrate {
@@ -220,4 +224,8 @@ hr {
 #stats_up div p {
     align-self: center;
     margin-bottom: 0;
+}
+
+.small_space {
+    height: 10px;
 }

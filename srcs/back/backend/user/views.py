@@ -227,7 +227,8 @@ class AddMatchStats(APIView):
         #create match
         match = Match(user=myUser, result=request.data['result'], date=request.data['date'],
                       score_left=request.data['score_left'], score_right=request.data['score_right'],
-                      time=request.data['time'])
+                      time=request.data['time'], type=request.data['type'], longest_exchange=request.data['longest_exchange'],
+                      shortest_exchange=request.data['shortest_exchange'])
         match.save()
 
         if (request.data['result'] == "VICTOIRE"):
