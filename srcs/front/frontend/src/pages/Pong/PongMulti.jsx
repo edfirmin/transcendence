@@ -7,11 +7,15 @@ import classic_paddle_design from '../../assets/img/classic_paddle_design.png'
 import classic_ball_design from '../../assets/img/classic_ball_design.png'
 import tennis_paddle_design from '../../assets/img/tennis_paddle_design.png'
 import tennis_ball_design from '../../assets/img/tennis_ball_design.png'
+import cool_paddle_design from '../../assets/img/cool_paddle_design.png'
+import cool_ball_design from '../../assets/img/cool_ball_design.png'
+import sick_paddle_design from '../../assets/img/sick_paddle_design.png'
+import sick_ball_design from '../../assets/img/sick_ball_design.png'
+import swag_paddle_design from '../../assets/img/swag_paddle_design.png'
+import swag_ball_design from '../../assets/img/swag_ball_design.png'
 import classic_map from '../../assets/img/classic_map.png'
 import tennis_map from '../../assets/img/tennis_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
-import classic_design from '../../assets/img/classic_design.png'
-import tennis_design from '../../assets/img/tennis_design.png'
 import useToken from 'antd/es/theme/useToken';
 import { ACCESS_TOKEN } from "../../constants";
 
@@ -38,28 +42,27 @@ function PongMulti() {
     const lastUpdateTimeRef = useRef(0);
     const [count, setCount]  = useState(0);
 	const [winner, setWinner] = useState("");
+	const [longest_exchange, set_longest_exchange] = useState(0);
+	const [shortest_exchange, set_shortest_exchange] = useState(0);
 	const hit_history = useRef([]);
+	const [time_start, set_time_start] = useState(0)
 
 
 	const map_design = [classic_map, tennis_map, table_tennis_map];
-	const ball_design = [classic_ball_design, tennis_ball_design];
-	const paddle_design = [classic_paddle_design, tennis_paddle_design];
+	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
+	const paddle_design = [classic_paddle_design, tennis_paddle_design, cool_paddle_design, sick_paddle_design, swag_paddle_design];
 
 	const data = useLocation();
-	const [map_index, set_map_index] = useState(0);
-	const [design_index, set_design_index] = useState(0); 
-	const [points, set_points] = useState(5);
-    
+	const [map_index, set_map_index] = useState(data.state == null ? 0 : data.state.map);
+	const [design_index, set_design_index] = useState(data.state == null ? 0 : data.state.design);
+	const [points, set_points] = useState(data.state == null ? 5 : data.state.points + 2);
+
 	const [countdown, setCountdown] = useState(-1);
+	
+	const navigate = useNavigate();
+
 
 	useEffect(() => {
-	  	
-		
-		if (data.state != null) {
-			set_map_index(data.state.map);
-			set_design_index(data.state.design);
-			set_points(data.state.points + 2);
-		}
 
 		ws.onopen = function(event) {
 			ws.send(JSON.stringify({
@@ -106,7 +109,11 @@ function PongMulti() {
 				audio.play();
 			}
 			if (data.type == "winner") {
-				setWinner(data.message + " WIN !");
+				set_longest_exchange(data.longest_exchange);
+				set_shortest_exchange(data.shortest_exchange);
+				setWinner(data.winner + " WIN !");
+				setTimeout(() => { navigate('/selection', {state : {map : map_index, design : design_index, points : points - 2, winner : data.winner
+				}}) }, 3000);
 			}
 			if (data.type == "begin_countdown") {
 				setCountdown(3);
@@ -119,8 +126,30 @@ function PongMulti() {
 		}
 	}, [])
 
-	const postMatchStats = async (e) => {
-		const res = await axios.post('api/user/addMatchStats/', {userToken})
+	async function postMatchStats() {
+		if (winner == "")
+			return
+
+		var result;
+		if (winner == 'LEFT WIN !') {
+			result = "VICTOIRE"
+			//score.left += 1;	
+		}
+		else {
+			result = "DEFAITE"
+			//score.right += 1;	
+		}
+		
+		const d = new Date();
+		const day = d.getDate();
+		const month = d.getMonth()+1;
+		const year = d.getFullYear();
+		const a = year + '-' + month + '-' + day;
+
+		const time = d.getTime() - time_start.getTime();
+		console.log(time);
+
+		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange})
 	}
 
 	useEffect(() => {
@@ -350,6 +379,8 @@ function PongMulti() {
 				'id':id,
 				'message':'begin_game'
 			}));
+
+			set_time_start(new Date())
 			console.log("begin_game");
 		}
 	}, [countdown]);

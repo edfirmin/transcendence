@@ -7,16 +7,22 @@ import classic_paddle_design from '../../assets/img/classic_paddle_design.png'
 import classic_ball_design from '../../assets/img/classic_ball_design.png'
 import tennis_paddle_design from '../../assets/img/tennis_paddle_design.png'
 import tennis_ball_design from '../../assets/img/tennis_ball_design.png'
+import cool_paddle_design from '../../assets/img/cool_paddle_design.png'
+import cool_ball_design from '../../assets/img/cool_ball_design.png'
+import sick_paddle_design from '../../assets/img/sick_paddle_design.png'
+import sick_ball_design from '../../assets/img/sick_ball_design.png'
+import swag_paddle_design from '../../assets/img/swag_paddle_design.png'
+import swag_ball_design from '../../assets/img/swag_ball_design.png'
 import classic_map from '../../assets/img/classic_map.png'
 import tennis_map from '../../assets/img/tennis_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
-import classic_design from '../../assets/img/classic_design.png'
-import tennis_design from '../../assets/img/tennis_design.png'
+import { ACCESS_TOKEN } from "../../constants";
 
 
 function Pong() {
 
     const { roomid } = useParams();
+	const userToken = localStorage.getItem(ACCESS_TOKEN);
 	var ws = useMemo(() => {return new WebSocket(`ws://localhost:8000/ws/pong/${roomid}`)}, [ws]);
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);
@@ -35,12 +41,16 @@ function Pong() {
     const lastUpdateTimeRef = useRef(0);
     const [count, setCount]  = useState(0);
 	const [winner, setWinner] = useState("");
+	const [longest_exchange, set_longest_exchange] = useState(0);
+	const [shortest_exchange, set_shortest_exchange] = useState(0);
 	const hit_history = useRef([]);
 	const [shake, set_shake] = useState(false);
+	const [time_start, set_time_start] = useState(0)
+	//const [score_history, set_score_history] = useState([])
 
 	const map_design = [classic_map, tennis_map, table_tennis_map];
-	const ball_design = [classic_ball_design, tennis_ball_design];
-	const paddle_design = [classic_paddle_design, tennis_paddle_design];
+	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
+	const paddle_design = [classic_paddle_design, tennis_paddle_design, cool_paddle_design, sick_paddle_design, swag_paddle_design];
 
 	const data = useLocation();
 	const isAI = data.state == null ? false : data.state.isAI;
@@ -48,6 +58,12 @@ function Pong() {
 	const map_index = data.state.map;
 	const design_index = data.state.design;
 	const points = data.state.points + 2;
+	const players = data.state.players;
+	const leftPlayerName = data.state.leftPlayerName;
+	const rightPlayerName = data.state.rightPlayerName;
+	const tourney_id = data.state.tourney_id;
+    const currentBattleIndex = data.state.currentBattleIndex;
+	const returnPage = data.state.returnPage == null ? '/selection' : data.state.returnPage;
 
 	const [countdown, setCountdown] = useState(-1);
 
@@ -95,6 +111,7 @@ function Pong() {
 			set_shake(true);
 			setTimeout(() => { set_shake(false); }, 200);
 			setScore({left: data.left, right: data.right});
+			//set_score_history([...score_history, data.winner])
 		}
 		if (data.type == "hit") {
 			let dix = data.dx;
@@ -112,10 +129,48 @@ function Pong() {
 			}
 		}
 		if (data.type == "winner") {
-			setWinner(data.message + " WIN !");
-			setTimeout(() => { navigate('/selection') }, 3000);
+			set_longest_exchange(data.longest_exchange);
+			set_shortest_exchange(data.shortest_exchange);
+			setWinner(data.winner + " WIN !");
+			//set_score_history([...score_history, data.winner])
+			setTimeout(() => { navigate(returnPage, {state : { isAI : isAI, map : map_index, design : design_index, points : points - 2, players : players, winner : data.winner, leftPlayerName : leftPlayerName, rightPlayerName : rightPlayerName, tourney_id : tourney_id, currentBattleIndex : currentBattleIndex
+			}}) }, 3000);
 		}
 	}
+
+
+	async function postMatchStats() {
+		if (winner == "")
+			return
+
+		var result;
+		if (winner == 'LEFT WIN !') {
+			result = "VICTOIRE"
+			score.left += 1;	
+		}
+		else {
+			result = "DEFAITE"
+			score.right += 1;	
+		}
+		
+		const d = new Date();
+		const day = d.getDate();
+		const month = d.getMonth()+1;
+		const year = d.getFullYear();
+		const a = year + '-' + month + '-' + day;
+
+		const time = d.getTime() - time_start.getTime();
+		console.log(time);
+		
+		if (isAI)
+			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange})
+		else
+			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange})
+	}
+
+	useEffect(() => {
+		postMatchStats();
+	}, [winner])
 
 	useEffect(() => {
 
@@ -341,10 +396,13 @@ function Pong() {
 
 	useEffect(() => {
 		countdown > 0 && setTimeout(() => setCountdown(countdown - 1), 1000);
-		if (countdown == 0)
+		if (countdown == 0) {
 			ws.send(JSON.stringify({
 				'message':'begin_game'
 			}));
+			
+			set_time_start(new Date())
+		}
 	}, [countdown]);
 
 
@@ -359,4 +417,3 @@ function Pong() {
 }
 
 export default Pong;
-

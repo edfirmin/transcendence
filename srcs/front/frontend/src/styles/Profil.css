@@ -97,6 +97,10 @@
     height: 55.3vh;
     width: 51%;
     padding: 2%;
+
+    overflow: hidden;
+    overflow: scroll;
+    overflow-x: hidden;
 }
 
 #winrate {
@@ -146,6 +150,7 @@
 .matchResult {
     display: flex;
     justify-content: space-evenly;
+    flex-direction: column;
 
     border-radius: 2em;
     border-width: 2px;
@@ -159,4 +164,68 @@
 
 .matchResult p {
     margin-bottom: 0;
+}
+
+.matchResult div {
+    justify-content: center;
+}
+
+.matchResultResult {
+    font-size: 30px;
+    font-style: italic;
+    font-weight: bolder;
+
+    margin-left: -20px;
+}
+
+.matchResultFirstRow {
+    display: flex;
+    justify-content: space-evenly;
+
+    align-content: center;
+    text-align: center;
+}
+
+.matchResultFirstRow span {
+    align-content: center;
+}
+
+.matchResultData {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.matchResultData span {
+    width: 100px;
+}
+
+hr {
+    display: block;
+    height: 2spx;
+    border: 0;
+    border-top: 4px solid #dbd8d8;
+    margin: 1em 0;
+    padding: 0;
+}
+
+#stats_up {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#stats_up div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#stats_up div p {
+    align-self: center;
+    margin-bottom: 0;
+}
+
+.small_space {
+    height: 10px;
 }

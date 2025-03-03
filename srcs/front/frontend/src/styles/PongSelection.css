@@ -142,3 +142,7 @@ opacity: 1; /* Fully shown on mouse-over */
 
     margin-right: 20px;
 }
+
+.space {
+    height: 50px;
+}

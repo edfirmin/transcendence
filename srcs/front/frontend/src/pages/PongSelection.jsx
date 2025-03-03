@@ -4,21 +4,29 @@ import {useNavigate, useLocation} from "react-router-dom"
 import {v4 as uuidv4} from 'uuid';
 import classic_design from '../assets/img/classic_design.png'
 import tennis_design from '../assets/img/tennis_design.png'
+import cool_design from '../assets/img/cool_design.png'
+import sick_design from '../assets/img/sick_design.png'
+import swag_design from '../assets/img/swag_design.png'
 import classic_map_design from '../assets/img/classic_map_design.png'
 import tennis_map_design from '../assets/img/tennis_map_design.png'
 import table_tennis_map_design from '../assets/img/table_tennis_map_design.png'
 import design_2 from '../assets/img/2.png'; import design_3 from '../assets/img/3.png'; import design_4 from '../assets/img/4.png';
 import design_5 from '../assets/img/5.png'; import design_6 from '../assets/img/6.png'; import design_7 from '../assets/img/7.png';
 import design_8 from '../assets/img/8.png'; import design_9 from '../assets/img/9.png'; 
+import easy_design from '../assets/img/easy.png';
+import medium_design from '../assets/img/medium.png';
+import hard_design from '../assets/img/hard.png';
+import Navbarr from '../components/Navbar';
 
 function PongSelection() {
 
-    const [difficulty, set_difficulty] = useState("medium");
-    const paddle_designs = [classic_design, tennis_design];
+    const paddle_designs = [classic_design, tennis_design, cool_design, sick_design, swag_design];
+    const difficulty_designs = [easy_design, medium_design, hard_design];
     const map_designs = [classic_map_design, tennis_map_design, table_tennis_map_design];
     const point_design = [design_2, design_3, design_4, design_5, design_6, design_7, design_8, design_9];
     const [index_design, set_index_design] = useState(0), [index_map_design, set_index_map_design] = useState(0);
     const [points, set_points] = useState(0);
+    const [difficulty_index, set_difficulty_index] = useState(0);
 
     const navigate = useNavigate();
 
@@ -29,7 +37,12 @@ function PongSelection() {
 
     function handleAIPong() {
       const roomId = uuidv4();
-      navigate(`/pong/${roomId}`, {state : { isAI : true, difficulty : "easy", map : index_map_design, design : index_design, points : points}});
+      if (difficulty_index == 0)
+        navigate(`/pong/${roomId}`, {state : { isAI : true, difficulty : "easy", map : index_map_design, design : index_design, points : points}});
+      if (difficulty_index == 1)
+        navigate(`/pong/${roomId}`, {state : { isAI : true, difficulty : "medium", map : index_map_design, design : index_design, points : points}});
+      if (difficulty_index == 2)
+        navigate(`/pong/${roomId}`, {state : { isAI : true, difficulty : "hard", map : index_map_design, design : index_design, points : points}});
     }
 
     function handleRemotePong() {
@@ -43,12 +56,18 @@ function PongSelection() {
 
     return (
         <>
+            <Navbarr></Navbarr>
+            <div className='space'></div>
             <div className='container'>
               <div></div>
               <Selector name={"Map"} designs={map_designs} index={index_map_design} setIndex={set_index_map_design} />
               <Selector name={"Points"} designs={point_design} index={points} setIndex={set_points} />
+              <Selector name={"AI Difficulty"} designs={difficulty_designs} index={difficulty_index} setIndex={set_difficulty_index} />
               <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} />
               <div></div>
+            </div>
+            <div className='container'>
+              <div className='space'></div>
             </div>
             <div className='container'>
               <div></div>
@@ -67,11 +86,7 @@ function PongSelection() {
 
 function Button({name, callback}) {
 	return (
-	  <tr>
-		<td>
 		  <button className='button' onClick={() => callback()}>{name} </button>
-		</td>
-	  </tr>
 	)
 }
 

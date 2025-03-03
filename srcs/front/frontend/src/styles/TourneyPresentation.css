@@ -21,9 +21,9 @@
     background-color: white;
   
     box-shadow:
-    0 0 50px #fff,
-    -10px 0 80px #f0f,
-    10px 0 80px #0ff;
+    0 0 50px #fff,            /* outer white */
+    -10px 0 80px #f0f,        /* outer left magenta */
+    10px 0 80px #0ff;         /* outer right cyan */
   
     width: 100%;
   
@@ -100,4 +100,103 @@
     margin-left: 10px;
 
     font-family: 'Futurama';
+}
+
+.player_defeated {
+    width: 250px;
+    height: 80px;
+
+    position: absolute;
+
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-right: 70px;
+    padding-bottom: 15px;
+
+    background-color: #3a4d54;
+    color: #fff;
+    font-size: 22px;
+    display: flex;
+    justify-content: space-between;
+
+    overflow: hidden;
+
+    border-radius: 2em;
+    border-width: 2px;
+    border-color: #aeaaaa;
+    border-style: solid;    
+}
+
+.player_highlight {
+    width: 250px;
+    height: 80px;
+
+    position: absolute;
+
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-right: 70px;
+    padding-bottom: 15px;
+
+    background-color: #0f9acc;
+    color: #fff;
+    font-size: 22px;
+    display: flex;
+    justify-content: space-between;
+
+    overflow: hidden;
+
+    border-radius: 2em;
+    border-width: 2px;
+    border-color: #ffffff;
+    border-style: solid;   
+    
+    box-shadow:
+    0 0 50px #fff,            /* outer white */
+    -10px 0 80px #f0f,        /* outer left magenta */
+    10px 0 80px #0ff;         /* outer right cyan */
+}
+
+.player_highlight p {
+    margin: 0px;
+    margin-top: 8px;
+    margin-left: 10px;
+
+    font-family: 'Futurama';
+}
+
+#victory {
+    position: absolute;
+
+    left: 37%;
+    top: 35%;
+
+    background-color: #3a4d54;
+
+    text-align: center;
+    color: white;
+    font-family: 'Futurama';
+    font-size: 30px;
+
+    padding: 20px;
+}
+
+#next_match {
+    position: absolute;
+
+    left: 37%;
+    top: 35%;
+
+    background-color: #3a4d54;
+
+    text-align: center;
+    color: white;
+    font-family: 'Futurama';
+    font-size: 30px;
+
+    padding: 40px;
+}
+
+#space {
+    padding: 50px;
 }

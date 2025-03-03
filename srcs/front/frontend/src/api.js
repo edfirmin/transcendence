@@ -15,6 +15,11 @@ export const getMatches = async () => {
     return (response.data)
 }
 
+export const getTourney = async (tourney_id) => {
+    const response = await axios.get("/api/user/getTourney/?" + tourney_id);
+    return (response.data)
+}
+
 export const getQR = async () => {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const oui = await axios.get("/api/user/qrcode/?" + userToken);
