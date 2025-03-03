@@ -43,15 +43,14 @@ function TourneyPresentation() {
     useEffect(() => {
         inituser();
         inittourney();
-        addwinnertourney();
     }, []);
-  
+    
     useEffect(() => {
         if (user) {
             set_user_icone(user.profil_pic);
         }
     }, [user]);
-  
+    
     const inituser = async () => {
         const TMPuser = await getUser()
         setUser(TMPuser);
@@ -60,6 +59,11 @@ function TourneyPresentation() {
         const TMPtourney = await getTourney(tourney_id)
         setTourney(TMPtourney);
     }
+    
+    useEffect(() => {
+        if (tourney)
+            addwinnertourney();
+    }, [tourney])
 
     const addwinnertourney = async () => {
         if (leftPlayerName) {
@@ -94,34 +98,14 @@ function TourneyPresentation() {
 
     useEffect(() => {
         async function addtourneywincount() {
-            if (winner == "LEFT"){
-                console.log("oui")
+
+            if (winner == "LEFT" && has_ended){
                 await axios.post('api/user/addTourneyWinCount/', {userToken})
             }
             }
         addtourneywincount();
     }, [has_ended])
 
-
-    function useInterval(callback, delay) {
-        const savedCallback = useRef();
-    
-        // Remember the latest callback.
-        useEffect(() => {
-        savedCallback.current = callback;
-        }, [callback]);
-    
-        // Set up the interval.
-        useEffect(() => {
-        function tick() {
-            savedCallback.current();
-        }
-        if (delay !== null) {
-            let id = setInterval(tick, delay);
-            return () => clearInterval(id);
-        }
-        }, [delay]);
-    }
 
     useEffect(() => {
         determineNextMatch();
@@ -227,7 +211,7 @@ function TourneyPresentation() {
                 else if (currentBattleIndex == 6)
                     nextMatch(tourney.winner_match5, tourney.winner_match6);
                 else
-                    set_has_ended(true);
+                    set_has_ended(true);home
                 break;  
 
         }

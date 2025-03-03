@@ -133,7 +133,7 @@ function Pong() {
 			set_shortest_exchange(data.shortest_exchange);
 			setWinner(data.winner + " WIN !");
 			//set_score_history([...score_history, data.winner])
-			setTimeout(() => { navigate(returnPage, {state : { isAI : isAI, map : map_index, design : design_index, points : points - 2, players : players, winner : data.message, leftPlayerName : leftPlayerName, rightPlayerName : rightPlayerName, tourney_id : tourney_id, currentBattleIndex : currentBattleIndex
+			setTimeout(() => { navigate(returnPage, {state : { isAI : isAI, map : map_index, design : design_index, points : points - 2, players : players, winner : data.winner, leftPlayerName : leftPlayerName, rightPlayerName : rightPlayerName, tourney_id : tourney_id, currentBattleIndex : currentBattleIndex
 			}}) }, 3000);
 		}
 	}
@@ -146,11 +146,11 @@ function Pong() {
 		var result;
 		if (winner == 'LEFT WIN !') {
 			result = "VICTOIRE"
-			//score.left += 1;	
+			score.left += 1;	
 		}
 		else {
 			result = "DEFAITE"
-			//score.right += 1;	
+			score.right += 1;	
 		}
 		
 		const d = new Date();
