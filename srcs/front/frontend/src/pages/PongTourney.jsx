@@ -27,6 +27,7 @@ function Tourney() {
     const [name6, set_name6] = useState("Player6")
     const [name7, set_name7] = useState("Player7")
     const [name8, set_name8] = useState("Player8")
+    const [allNameUnique,setAllNameUnique] = useState(true) 
     const navigate = useNavigate();
     
     const data = useLocation();
@@ -54,9 +55,98 @@ function Tourney() {
 
     async function handleLocalPong() {
       const tourney_id = uuidv4();
-		  await axios.post('api/user/addTourneyStats/', {userToken, name1, name2, name3, name4, name5, name6, name7, name8, tourney_id})
 
-      navigate(`/tourney/tourneyPresentation/`, {state : { isAI : isAI, map : map_index, design : design_index, points : p, players : players, tourney_id : tourney_id}});
+      if (areAllNameUnique()) {
+        setAllNameUnique(true);
+		    await axios.post('api/user/addTourneyStats/', {userToken, name1, name2, name3, name4, name5, name6, name7, name8, tourney_id})
+
+        navigate(`/tourney/tourneyPresentation/`, {state : { isAI : isAI, map : map_index, design : design_index, points : p, players : players, tourney_id : tourney_id}});
+      }
+      else
+        setAllNameUnique(false);
+    }
+
+    function areAllNameUnique() {
+      switch (players) {
+        case 0:
+          if (name1 == name2)
+            return false;
+          return true
+
+        case 1:
+          if (name1 == name2)
+            return false;
+          if (name2 == name3)
+            return false;
+          if (name1 == name3)
+            return false;
+          return true
+      
+        case 2:
+          if (name1 == name2 || name2 == name3 || name3 == name4)
+            return false;
+          if (name1 == name3 || name2 == name4)
+            return false;
+          if (name1 == name4)
+            return false;
+          return true
+
+        case 3:
+          if (name1 == name2 || name2 == name3 || name3 == name4 || name4 == name5)
+            return false;
+          if (name1 == name3 || name1 == name4 || name1 == name5)
+            return false;
+          if (name2 == name4 || name2 == name5)
+            return false;
+          if (name3 == name5)
+            return false;
+          return true
+
+        case 4:
+          if (name1 == name2 || name2 == name3 || name3 == name4 || name4 == name5 || name5 == name6)
+            return false;
+          if (name1 == name3 || name1 == name4 || name1 == name5 || name1 == name6)
+            return false;
+          if (name2 == name4 || name2 == name5 || name2 == name6)
+            return false;
+          if (name3 == name5 || name3 == name6)
+            return false;
+          if (name4 == name6)
+            return false;
+          return true
+
+        case 5:
+          if (name1 == name2 || name2 == name3 || name3 == name4 || name4 == name5 || name5 == name6 || name6 == name7)
+            return false;
+          if (name1 == name3 || name1 == name4 || name1 == name5 || name1 == name6 || name1 == name7)
+            return false;
+          if (name2 == name4 || name2 == name5 || name2 == name6 || name2 == name7)
+            return false;
+          if (name3 == name5 || name3 == name6 || name3 == name7)
+            return false;
+          if (name4 == name6 || name4 == name7)
+            return false;
+          if (name5 == name7)
+            return false;
+          return true
+        
+        case 6:
+          if (name1 == name2 || name2 == name3 || name3 == name4 || name4 == name5 || name5 == name6 || name6 == name7 || name7 == name8)
+            return false;
+          if (name1 == name3 || name1 == name4 || name1 == name5 || name1 == name6 || name1 == name7 || name1 == name8)
+            return false;
+          if (name2 == name4 || name2 == name5 || name2 == name6 || name2 == name7 || name2== name8)
+            return false;
+          if (name3 == name5 || name3 == name6 || name3 == name7 || name3 == name8)
+            return false;
+          if (name4 == name6 || name4 == name7 || name4 == name8)
+            return false;
+          if (name5 == name7 || name5 == name8)
+            return false;
+          if (name6 == name8)
+            return false;
+          return true
+      }
     }
 
     if (!user) {
@@ -87,6 +177,7 @@ function Tourney() {
             </div>
             <div className='container'>
               <div></div>
+              {allNameUnique ? <></> : <p className='username-register' style={{left: "29%", top: "76%"}} >Not all name are unique</p>}
               <Button name={'Play'} callback={handleLocalPong} />
               <div></div>
             </div>
