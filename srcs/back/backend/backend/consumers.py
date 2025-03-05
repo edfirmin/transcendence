@@ -5,6 +5,7 @@ import time
 import asyncio
 import logging
 import random
+import math
 
 logging.basicConfig(level=logging.DEBUG)  # Définir le niveau des logs
 logger = logging.getLogger(__name__)     # Créer un logger avec un nom unique
@@ -94,7 +95,7 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
         if self.room_name not in MultiPongConsumer.ball_pos:
             MultiPongConsumer.ball_pos[self.room_name] = [400, 250]
         if self.room_name not in MultiPongConsumer.ball_speed:
-            MultiPongConsumer.ball_speed[self.room_name] = 2
+            MultiPongConsumer.ball_speed[self.room_name] = 5
         if self.room_name not in MultiPongConsumer.ball_direction:
             MultiPongConsumer.ball_direction[self.room_name] = [1, 1]
         if self.room_name not in MultiPongConsumer.left_paddle_pos:
@@ -224,7 +225,14 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
             # right side
             if (MultiPongConsumer.ball_pos[self.room_name][0] + MultiPongConsumer.ball_direction[self.room_name][0] > 750):
                 if (MultiPongConsumer.ball_pos[self.room_name][1] < MultiPongConsumer.right_paddle_pos[self.room_name][1] + 60 and MultiPongConsumer.ball_pos[self.room_name][1] > MultiPongConsumer.right_paddle_pos[self.room_name][1] - 60):
-                    MultiPongConsumer.ball_direction[self.room_name][0] *= -1
+                    
+                    impact_pos = MultiPongConsumer.right_paddle_pos[self.room_name][1] - MultiPongConsumer.ball_pos[self.room_name][1] # between -60 and 60
+                    impact_pos *= -1
+                    radian_angle = math.radians(impact_pos)
+
+                    MultiPongConsumer.ball_direction[self.room_name][0] = -math.cos(radian_angle)
+                    MultiPongConsumer.ball_direction[self.room_name][1] = math.sin(radian_angle)
+                    
                     MultiPongConsumer.ball_speed[self.room_name] += 1
                     MultiPongConsumer.current_exchange[self.room_name] += 1
                 else:
@@ -254,12 +262,19 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                         MultiPongConsumer.game_task[self.room_name].cancel()
 
                     MultiPongConsumer.ball_pos[self.room_name] = [400, 250]
-                    MultiPongConsumer.ball_speed[self.room_name] = 3
+                    MultiPongConsumer.ball_speed[self.room_name] = 5
 
             # left side
             if (MultiPongConsumer.ball_pos[self.room_name][0] + MultiPongConsumer.ball_direction[self.room_name][0] < 50):
                 if (MultiPongConsumer.ball_pos[self.room_name][1] < MultiPongConsumer.left_paddle_pos[self.room_name][1] + 60 and MultiPongConsumer.ball_pos[self.room_name][1] > MultiPongConsumer.left_paddle_pos[self.room_name][1] - 60):
-                    MultiPongConsumer.ball_direction[self.room_name][0] *= -1
+
+                    impact_pos = MultiPongConsumer.left_paddle_pos[self.room_name][1] - MultiPongConsumer.ball_pos[self.room_name][1] # between -60 and 60
+                    impact_pos *= -1
+                    radian_angle = math.radians(impact_pos)
+
+                    MultiPongConsumer.ball_direction[self.room_name][0] = math.cos(radian_angle)
+                    MultiPongConsumer.ball_direction[self.room_name][1] = math.sin(radian_angle)
+                   
                     MultiPongConsumer.ball_speed[self.room_name] += 1
                     MultiPongConsumer.current_exchange[self.room_name] += 1
                 else:
@@ -290,7 +305,7 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
 
                     # re-init ball
                     MultiPongConsumer.ball_pos[self.room_name] = [400, 250]
-                    MultiPongConsumer.ball_speed[self.room_name] = 3
+                    MultiPongConsumer.ball_speed[self.room_name] = 5
 
 
             MultiPongConsumer.ball_pos[self.room_name][0] += MultiPongConsumer.ball_direction[self.room_name][0] * MultiPongConsumer.ball_speed[self.room_name]
@@ -460,7 +475,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         }))
 
         PongConsumer.ball_pos[self.room_name] = [400, 250]
-        PongConsumer.ball_speed[self.room_name] = 3
+        PongConsumer.ball_speed[self.room_name] = 5
         PongConsumer.ball_direction[self.room_name] = [1, 1]
         PongConsumer.left_paddle_pos[self.room_name] = [0, 250]
         PongConsumer.right_paddle_pos[self.room_name] = [0, 250]
@@ -577,8 +592,16 @@ class PongConsumer(AsyncWebsocketConsumer):
 
             # right side
             if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] > 750):
+                # check if paddle hit ball
                 if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] + 60 and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] - 60):
-                    PongConsumer.ball_direction[self.room_name][0] *= -1
+                    
+                    impact_pos = PongConsumer.right_paddle_pos[self.room_name][1] - PongConsumer.ball_pos[self.room_name][1] # between -60 and 60
+                    impact_pos *= -1
+                    radian_angle = math.radians(impact_pos)
+
+                    PongConsumer.ball_direction[self.room_name][0] = -math.cos(radian_angle)
+                    PongConsumer.ball_direction[self.room_name][1] = math.sin(radian_angle)
+
                     PongConsumer.ball_speed[self.room_name] += 1
                     PongConsumer.current_exchange[self.room_name] += 1
 
@@ -608,12 +631,21 @@ class PongConsumer(AsyncWebsocketConsumer):
                     }))
 
                     PongConsumer.ball_pos[self.room_name] = [400, 250]
-                    PongConsumer.ball_speed[self.room_name] = 3
+                    PongConsumer.ball_speed[self.room_name] = 5
+                    PongConsumer.ball_direction[self.room_name][0] = random.uniform(0.5, 1) if random.random() > 0.5 else random.uniform(-0.5, -1)
+                    PongConsumer.ball_direction[self.room_name][1] = random.uniform(-0.5, 0.5)
 
             # left side
             if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] < 50):
                 if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.left_paddle_pos[self.room_name][1] + 60 and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.left_paddle_pos[self.room_name][1] - 60):
-                    PongConsumer.ball_direction[self.room_name][0] *= -1
+                    
+                    impact_pos = PongConsumer.left_paddle_pos[self.room_name][1] - PongConsumer.ball_pos[self.room_name][1] # between -60 and 60
+                    impact_pos *= -1
+                    radian_angle = math.radians(impact_pos)
+
+                    PongConsumer.ball_direction[self.room_name][0] = math.cos(radian_angle)
+                    PongConsumer.ball_direction[self.room_name][1] = math.sin(radian_angle)
+
                     PongConsumer.ball_speed[self.room_name] += 1
                     PongConsumer.current_exchange[self.room_name] += 1
 
@@ -645,7 +677,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 
                     # re-init ball
                     PongConsumer.ball_pos[self.room_name] = [400, 250]
-                    PongConsumer.ball_speed[self.room_name] = 3
+                    PongConsumer.ball_speed[self.room_name] = 5
+                    PongConsumer.ball_direction[self.room_name][0] = random.uniform(0.5, 1) if random.random() > 0.5 else random.uniform(-0.5, -1)
+                    PongConsumer.ball_direction[self.room_name][1] = random.uniform(-0.5, 0.5)
 
 
             PongConsumer.ball_pos[self.room_name][0] += PongConsumer.ball_direction[self.room_name][0] * PongConsumer.ball_speed[self.room_name]
