@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import "../styles/PongSelection.css"
 import axios from 'axios';
 import {v4 as uuidv4} from 'uuid';
 import { useNavigate, useLocation } from "react-router-dom"
-import { getUser, getMatches } from "../api"
+import { getUser, getAllUserExceptLoggedOne } from "../api"
 import design_2 from '../assets/img/2.png'; import design_3 from '../assets/img/3.png'; import design_4 from '../assets/img/4.png';
 import design_5 from '../assets/img/5.png'; import design_6 from '../assets/img/6.png'; import design_7 from '../assets/img/7.png';
 import design_8 from '../assets/img/8.png';
@@ -14,21 +14,19 @@ import { ACCESS_TOKEN } from "../constants";
 import Navbarr from '../components/Navbar';
 
 function Tourney() {
-    const point_design = [design_2, design_3, design_4, design_5, design_6, design_7, design_8];
-	  const userToken = localStorage.getItem(ACCESS_TOKEN);
-    const [players, set_players] = useState(0);
-    const [user, setUser] = useState()
-    const [name1, set_name1] = useState()
-    const [user_icone, set_user_icone] = useState()
-    const [name2, set_name2] = useState("Player2")
-    const [name3, set_name3] = useState("Player3")
-    const [name4, set_name4] = useState("Player4")
-    const [name5, set_name5] = useState("Player5")
-    const [name6, set_name6] = useState("Player6")
-    const [name7, set_name7] = useState("Player7")
-    const [name8, set_name8] = useState("Player8")
-    const [allNameUnique,setAllNameUnique] = useState(true) 
     const navigate = useNavigate();
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    const point_design = [design_2, design_3, design_4, design_5, design_6, design_7, design_8];
+    const [nbPlayers, setNbPlayers] = useState(0);
+    const [user, setUser] = useState()
+    const [user_icone, set_user_icone] = useState()
+    const [tourneyPost, SetTourneyPost] = useState(false);
+    var tourney_id = useRef(null)
+    
+    const [names, setNames] = useState(["Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8"]);
+    const [isUsers, setIsUsers] = useState([false, false, false, false, false, false, false, false])
+    const profiles_pics = [icone_1, icone_2, icone_3, icone_4, icone_5, icone_6, icone_7, icone_8]
+    const [allNameUnique,setAllNameUnique] = useState(true) 
     
     const data = useLocation();
     const isAI = data.state == null ? false : data.state.isAI;
@@ -37,116 +35,124 @@ function Tourney() {
     const design_index = data.state.design;
     const p = data.state.points;
 
+    const [users, setUsers] = useState([])
+
     useEffect(() => {
       inituser()
+      initusers()
     }, []);
 
     useEffect(() => {
       if (user) {
-        set_name1(user.username);
+        setName(user.username, 0);
         set_user_icone(user.profil_pic);
       }
     }, [user]);
+
+    function setName(newName, index) {
+      const newNames = [...names];
+      newNames[index] = newName;
+      setNames(newNames);
+    }
+
+    function setIsUser(bool, index) {
+      const newU = [...isUsers];
+      newU[index] = bool;
+      setIsUsers(newU);
+    }
 
     const inituser = async () => {
         const TMPuser = await getUser()
         setUser(TMPuser);
     }
 
+    const initusers = async () => {
+      const TMPuser = await getAllUserExceptLoggedOne()
+      setUsers(TMPuser);
+    }
+
     async function handleLocalPong() {
-      const tourney_id = uuidv4();
+      tourney_id.current = uuidv4();
 
       if (areAllNameUnique()) {
         setAllNameUnique(true);
-		    await axios.post('api/user/addTourneyStats/', {userToken, name1, name2, name3, name4, name5, name6, name7, name8, tourney_id})
 
-        navigate(`/tourney/tourneyPresentation/`, {state : { isAI : isAI, map : map_index, design : design_index, points : p, players : players, tourney_id : tourney_id}});
+        await axios.post('api/user/addTourneyStats/', {userToken, tourney_id : tourney_id.current})
+
+        switch (nbPlayers) {
+          case 0:
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: user.username, isUser: true})    
+            console.log(names[1])
+            console.log(isUsers[1])
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[1], isUser: isUsers[1]})
+            break;
+          case 1:
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: user.username, isUser: true})    
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[1], isUser: isUsers[1]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[2], isUser: isUsers[2]})
+            break;
+
+          case 2:
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: user.username, isUser: true})    
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[1], isUser: isUsers[1]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[2], isUser: isUsers[2]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[3], isUser: isUsers[3]})
+            break;
+
+          case 3:
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: user.username, isUser: true})    
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[1], isUser: isUsers[1]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[2], isUser: isUsers[2]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[3], isUser: isUsers[3]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[4], isUser: isUsers[4]})
+            break;
+
+          case 4:
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: user.username, isUser: true})    
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[1], isUser: isUsers[1]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[2], isUser: isUsers[2]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[3], isUser: isUsers[3]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[4], isUser: isUsers[4]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[5], isUser: isUsers[5]})
+            break;
+
+          case 5:
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: user.username, isUser: true})    
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[1], isUser: isUsers[1]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[2], isUser: isUsers[2]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[3], isUser: isUsers[3]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[4], isUser: isUsers[4]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[5], isUser: isUsers[5]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[6], isUser: isUsers[6]})
+            break;
+
+          case 6:
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: user.username, isUser: true})    
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[1], isUser: isUsers[1]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[2], isUser: isUsers[2]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[3], isUser: isUsers[3]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[4], isUser: isUsers[4]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[5], isUser: isUsers[5]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[6], isUser: isUsers[6]})
+            await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[7], isUser: isUsers[7]})          
+            break;
+
+        }
+
+        navigate(`/tourney/tourneyPresentation/`, {state : { isAI : isAI, map : map_index, design : design_index, points : p, players : nbPlayers, tourney_id : tourney_id.current}});
       }
       else
-        setAllNameUnique(false);
+      setAllNameUnique(false);
     }
-
+    
     function areAllNameUnique() {
-      switch (players) {
-        case 0:
-          if (name1 == name2)
-            return false;
-          return true
-
-        case 1:
-          if (name1 == name2)
-            return false;
-          if (name2 == name3)
-            return false;
-          if (name1 == name3)
-            return false;
-          return true
-      
-        case 2:
-          if (name1 == name2 || name2 == name3 || name3 == name4)
-            return false;
-          if (name1 == name3 || name2 == name4)
-            return false;
-          if (name1 == name4)
-            return false;
-          return true
-
-        case 3:
-          if (name1 == name2 || name2 == name3 || name3 == name4 || name4 == name5)
-            return false;
-          if (name1 == name3 || name1 == name4 || name1 == name5)
-            return false;
-          if (name2 == name4 || name2 == name5)
-            return false;
-          if (name3 == name5)
-            return false;
-          return true
-
-        case 4:
-          if (name1 == name2 || name2 == name3 || name3 == name4 || name4 == name5 || name5 == name6)
-            return false;
-          if (name1 == name3 || name1 == name4 || name1 == name5 || name1 == name6)
-            return false;
-          if (name2 == name4 || name2 == name5 || name2 == name6)
-            return false;
-          if (name3 == name5 || name3 == name6)
-            return false;
-          if (name4 == name6)
-            return false;
-          return true
-
-        case 5:
-          if (name1 == name2 || name2 == name3 || name3 == name4 || name4 == name5 || name5 == name6 || name6 == name7)
-            return false;
-          if (name1 == name3 || name1 == name4 || name1 == name5 || name1 == name6 || name1 == name7)
-            return false;
-          if (name2 == name4 || name2 == name5 || name2 == name6 || name2 == name7)
-            return false;
-          if (name3 == name5 || name3 == name6 || name3 == name7)
-            return false;
-          if (name4 == name6 || name4 == name7)
-            return false;
-          if (name5 == name7)
-            return false;
-          return true
-        
-        case 6:
-          if (name1 == name2 || name2 == name3 || name3 == name4 || name4 == name5 || name5 == name6 || name6 == name7 || name7 == name8)
-            return false;
-          if (name1 == name3 || name1 == name4 || name1 == name5 || name1 == name6 || name1 == name7 || name1 == name8)
-            return false;
-          if (name2 == name4 || name2 == name5 || name2 == name6 || name2 == name7 || name2== name8)
-            return false;
-          if (name3 == name5 || name3 == name6 || name3 == name7 || name3 == name8)
-            return false;
-          if (name4 == name6 || name4 == name7 || name4 == name8)
-            return false;
-          if (name5 == name7 || name5 == name8)
-            return false;
-          if (name6 == name8)
-            return false;
-          return true
+      for (let i = 0; i < nbPlayers; i++) {
+        for (let j = i+1; j < nbPlayers; j++) {
+          if (names[i] == names[j])
+            return false;          
+        }        
       }
+      return true;
     }
 
     if (!user) {
@@ -158,20 +164,20 @@ function Tourney() {
             <Navbarr></Navbarr>
             <div className='container'>
                 <div></div>
-                <Selector name={"Nombre de joueurs"} designs={point_design} index={players} setIndex={set_players} />
+                <Selector name={"Nombre de joueurs"} designs={point_design} index={nbPlayers} setIndex={setNbPlayers} />
                 <div></div>
             </div>
             <div className='container'>
               <div></div>
             <div className='grid'>
-                <PlayerUser name={name1} image={user_icone} position={0} points={players} />
-                <Player name={name2} set_name={set_name2} image={icone_1} position={0} points={players} />
-                <Player name={name3} set_name={set_name3} image={icone_2} position={1} points={players} />
-                <Player name={name4} set_name={set_name4} image={icone_3} position={2} points={players} />
-                <Player name={name5} set_name={set_name5} image={icone_4} position={3} points={players} />
-                <Player name={name6} set_name={set_name6} image={icone_5} position={4} points={players} />
-                <Player name={name7} set_name={set_name7} image={icone_6} position={5} points={players} />
-                <Player name={name8} set_name={set_name8} image={icone_7} position={6} points={players} />
+                <PlayerUser name={user.username} image={user_icone} position={0} points={nbPlayers} />
+                <Player name={names[1]} set_name={setName} index={1} set_user={setIsUser} image={profiles_pics[0]} points={nbPlayers} users={users} />
+                <Player name={names[2]} set_name={setName} index={2} set_user={setIsUser} image={profiles_pics[1]} points={nbPlayers} users={users} />
+                <Player name={names[3]} set_name={setName} index={3} set_user={setIsUser} image={profiles_pics[2]} points={nbPlayers} users={users} />
+                <Player name={names[4]} set_name={setName} index={4} set_user={setIsUser} image={profiles_pics[3]} points={nbPlayers} users={users} />
+                <Player name={names[5]} set_name={setName} index={5} set_user={setIsUser} image={profiles_pics[4]} points={nbPlayers} users={users} />
+                <Player name={names[6]} set_name={setName} index={6} set_user={setIsUser} image={profiles_pics[5]} points={nbPlayers} users={users} />
+                <Player name={names[7]} set_name={setName} index={7} set_user={setIsUser} image={profiles_pics[6]} points={nbPlayers} users={users} />
             </div>
               <div></div>
             </div>
@@ -224,22 +230,83 @@ function Selector({name, designs, index, setIndex}) {
   )
 }
 
-function Player({name, set_name, image, position, points}) {
+function Player({name, set_name, index, set_user, image, points, users}) {
+    const [isShowingUsers, setIsShowingUSers] = useState(false);  
+    const userComponents = useRef([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [visibleName, setVisibleName] = useState(name);
 
+    function setName(newName) {
+      set_name(newName, index);
+      setVisibleName(newName);
+    }
 
-    if (position <= points)  
+    function userClick(_user, i) {
+      setSelectedUser(_user);
+      set_name(_user.username, i)
+      set_user(true, i)
+      setIsShowingUSers(false);
+    }
+
+    useEffect(() => {
+      if (selectedUser == null)
+        set_user(false, index)
+
+    }, [selectedUser])
+
+    useEffect(() => {
+      for (let i = 0; i < users.length; i++) {
+        userComponents.current.push(<User key={i} _user={users[i]} callback={userClick} index={index}/>)
+        console.log(users[i])
+      }
+    }, [])
+    
+    function showUsers() {
+      setIsShowingUSers(!isShowingUsers);
+    
+      for (let i = 0; i < userComponents.current.length; i++) {
+        const element = userComponents.current[i];
+        console.log(element)
+      }
+    }
+
+    if (index - 1 <= points)  
     {
       return (
+        <div className='player_container'>
             <div className='player'>
-                <img src={image} />
-                <input type="text" required minLength="1" maxLength="10" size="10"  value={name} onChange={e => set_name(e.target.value)} />
+                {selectedUser == null ?
+                  <>
+                  <button onClick={showUsers}>a</button>
+                  <img src={image} />
+                  <input type="text" required minLength="1" maxLength="10" size="10"  value={visibleName} onChange={e => setName(e.target.value)} />
+                  </>
+                  :
+                  <>
+                  <button onClick={() => {setSelectedUser(null)}}>a</button>
+                  <img src={selectedUser.profil_pic} />
+                  <p>{selectedUser.username}</p>
+                  </>
+                }
             </div>
-        )
+              {isShowingUsers == true && <div className='scrollUsers'>
+                {userComponents.current.map(input=>input)}
+            </div>}
+        </div>
+      )
     }
     else {
       return (<></>)
     }
 
+}
+
+function User({_user, callback, index}) {
+  return(
+    <button className='userTourney' onClick={() => {callback(_user, index) }}>
+      {_user.username}
+    </button>
+  )
 }
 
 function PlayerUser({name, image, position, points}) {

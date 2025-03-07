@@ -125,7 +125,9 @@ opacity: 1; /* Fully shown on mouse-over */
     border-radius: 2em;
     border-width: 2px;
     border-color: #ffffff;
-    border-style: solid;    
+    border-style: solid;  
+    
+    clear: left;
 }
 
 .player p {
@@ -145,4 +147,36 @@ opacity: 1; /* Fully shown on mouse-over */
 
 .space {
     height: 50px;
+}
+
+.userTourney {
+    color: #f0f;
+
+    position: relative;
+
+}
+
+.scrollUsers {
+
+    height: 80px;
+    width: 250px;
+
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-right: 70px;
+    padding-bottom: 15px;
+
+    background-color: #0ff;
+
+    overflow: scroll;
+    overflow-x: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.player_container {
+    display: flex;
+    flex-direction: column;
+
 }

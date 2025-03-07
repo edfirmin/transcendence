@@ -14,7 +14,7 @@ function Profil() {
     const [matches, setMatches] = useState([])
     const [edit, setEdit] = useState(false)
     const [preferAIDifficulty, setPreferAIDifficulty] = useState("none")
-    const [averageTime, setAverageTime] = useState()
+    const [averageTime, setAverageTime] = useState(null)
 
     useEffect(() => {
         inituser()
@@ -149,7 +149,7 @@ function Profil() {
                         </div>
                         <div className="small_space"></div>
                         <h4 className="center">Average Match Duration</h4>
-                        {averageTime == true ? <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p> : <p className="center">No Match Play</p>}
+                        {averageTime != null ? <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p> : <p className="center">No Match Play</p>}
                         <div className="small_space"></div>
                         <h4 className="center">Match History</h4>
                         <MatchArray matches={matches} />
