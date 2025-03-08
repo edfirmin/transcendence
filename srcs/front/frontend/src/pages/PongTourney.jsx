@@ -24,7 +24,7 @@ function Tourney() {
     var tourney_id = useRef(null)
     
     const [names, setNames] = useState(["Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8"]);
-    const [isUsers, setIsUsers] = useState([false, false, false, false, false, false, false, false])
+    const [isUsers, setIsUsers] = useState([true, false, false, false, false, false, false, false])
     const profiles_pics = [icone_1, icone_2, icone_3, icone_4, icone_5, icone_6, icone_7, icone_8]
     const [allNameUnique,setAllNameUnique] = useState(true) 
     
@@ -79,11 +79,12 @@ function Tourney() {
 
         await axios.post('api/user/addTourneyStats/', {userToken, tourney_id : tourney_id.current})
 
+        console.log("name 1 " + names[1])
+        console.log("name 2 " + names[2])
+
         switch (nbPlayers) {
           case 0:
             await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: user.username, isUser: true})    
-            console.log(names[1])
-            console.log(isUsers[1])
             await axios.post('api/user/addTourneyPlayer/', {tourney_id: tourney_id.current, name: names[1], isUser: isUsers[1]})
             break;
           case 1:
@@ -155,7 +156,7 @@ function Tourney() {
       return true;
     }
 
-    if (!user) {
+    if (!user || users.length == 0) {
       return(<></>);
     }
 
@@ -233,41 +234,34 @@ function Selector({name, designs, index, setIndex}) {
 function Player({name, set_name, index, set_user, image, points, users}) {
     const [isShowingUsers, setIsShowingUSers] = useState(false);  
     const userComponents = useRef([]);
-    const [selectedUser, setSelectedUser] = useState(null);
     const [visibleName, setVisibleName] = useState(name);
+    const [selectedUserIndex, setSelectedUserIndex] = useState(-1);
 
     function setName(newName) {
       set_name(newName, index);
       setVisibleName(newName);
-    }
-
-    function userClick(_user, i) {
-      setSelectedUser(_user);
-      set_name(_user.username, i)
-      set_user(true, i)
-      setIsShowingUSers(false);
+      console.log(name);
     }
 
     useEffect(() => {
-      if (selectedUser == null)
-        set_user(false, index)
+      if (selectedUserIndex == -1)
+        return;
 
-    }, [selectedUser])
+      setName(users[selectedUserIndex].username);
+      set_user(true, index);
+      setIsShowingUSers(false);
+    }
+    , [selectedUserIndex])
 
     useEffect(() => {
       for (let i = 0; i < users.length; i++) {
-        userComponents.current.push(<User key={i} _user={users[i]} callback={userClick} index={index}/>)
-        console.log(users[i])
+        userComponents.current.push(<User key={i} _user={users[i]} callback={setSelectedUserIndex} index={i}/>)
       }
     }, [])
     
     function showUsers() {
       setIsShowingUSers(!isShowingUsers);
-    
-      for (let i = 0; i < userComponents.current.length; i++) {
-        const element = userComponents.current[i];
-        console.log(element)
-      }
+
     }
 
     if (index - 1 <= points)  
@@ -275,7 +269,7 @@ function Player({name, set_name, index, set_user, image, points, users}) {
       return (
         <div className='player_container'>
             <div className='player'>
-                {selectedUser == null ?
+                {selectedUserIndex == -1 ?
                   <>
                   <button onClick={showUsers}>a</button>
                   <img src={image} />
@@ -283,9 +277,9 @@ function Player({name, set_name, index, set_user, image, points, users}) {
                   </>
                   :
                   <>
-                  <button onClick={() => {setSelectedUser(null)}}>a</button>
-                  <img src={selectedUser.profil_pic} />
-                  <p>{selectedUser.username}</p>
+                  <button onClick={() => {setSelectedUserIndex(-1)}}>a</button>
+                  <img src={users[selectedUserIndex].profil_pic} />
+                  <p>{users[selectedUserIndex].username}</p>
                   </>
                 }
             </div>
@@ -303,7 +297,7 @@ function Player({name, set_name, index, set_user, image, points, users}) {
 
 function User({_user, callback, index}) {
   return(
-    <button className='userTourney' onClick={() => {callback(_user, index) }}>
+    <button className='userTourney' onClick={() => {callback(index) }}>
       {_user.username}
     </button>
   )

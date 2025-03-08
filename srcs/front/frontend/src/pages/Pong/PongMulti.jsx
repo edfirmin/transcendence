@@ -153,7 +153,7 @@ function PongMulti() {
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);
 
-		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange})
+		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index})
 	}
 
 	useEffect(() => {

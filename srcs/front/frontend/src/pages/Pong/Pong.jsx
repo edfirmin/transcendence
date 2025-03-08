@@ -66,6 +66,8 @@ function Pong() {
 	const tourney_id = data.state.tourney_id;
     const currentBattleIndex = data.state.currentBattleIndex;
 	const returnPage = data.state.returnPage == null ? '/selection' : data.state.returnPage;
+	const leftPlayerIsUser = data.state.leftPlayerIsUser;
+	const rightPlayerIsUser = data.state.rightPlayerIsUser;
 
 	const [countdown, setCountdown] = useState(-1);
 
@@ -264,9 +266,28 @@ function Pong() {
 		console.log(time);
 		
 		if (isAI)
-			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange})
+			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange, map_index, design_index})
 		else
-			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange})
+			if (tourney_id != null) {
+				console.log("tourney")
+				if (leftPlayerIsUser) {
+					console.log("left")
+
+					if (winner == 'LEFT WIN !') 
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+					else
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+				}
+				if (rightPlayerIsUser) {
+					console.log("right")
+					if (winner == 'LEFT WIN !')
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+					else
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+				}
+			}
+			else
+				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
 	}
 
 	useEffect(() => {
