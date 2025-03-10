@@ -17,6 +17,7 @@ import easy_design from '../assets/img/easy.png';
 import medium_design from '../assets/img/medium.png';
 import hard_design from '../assets/img/hard.png';
 import Navbarr from '../components/Navbar';
+import { getUser, getUserWithUsername } from "../api"
 
 function PongSelection() {
 
@@ -50,6 +51,14 @@ function PongSelection() {
       navigate(`/multipong/${roomId}`,  {state : {map : index_map_design, design : index_design, points : points}});
     }
 
+    async function handleTestRemotePong() {
+      const roomId = uuidv4();
+      const left_user = await getUser();
+      const right_user = await getUserWithUsername("w");
+
+      navigate(`/multipong/${roomId}`,  {state : {map : index_map_design, design : index_design, points : points, left_user: left_user, right_user: right_user}});
+    }
+
     function handleTourneyPong() {
       navigate(`/tourney/`,  {state : {map : index_map_design, design : index_design, points : points}});
     }
@@ -74,6 +83,7 @@ function PongSelection() {
               <Button name={'Local'} callback={handleLocalPong} />
               <Button name={'IA'} callback={handleAIPong} />
               <Button name={'En ligne'} callback={handleRemotePong} />
+              <Button name={'Test En ligne'} callback={handleTestRemotePong} />
               <Button name={'Tournoi'} callback={handleTourneyPong} />
               <div></div>
             </div>

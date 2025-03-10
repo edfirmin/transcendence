@@ -102,6 +102,15 @@
     font-family: 'Futurama';
 }
 
+.player2 img {
+  border-radius: 100px
+}
+
+.player_highlight img {
+  border-radius: 100px
+}
+
+
 .player_defeated {
     width: 250px;
     height: 80px;

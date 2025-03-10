@@ -262,7 +262,8 @@ class AddMatchStats(APIView):
         match = Match(user=myUser, result=request.data['result'], date=request.data['date'],
                       score_left=request.data['score_left'], score_right=request.data['score_right'],
                       time=request.data['time'], type=request.data['type'], longest_exchange=request.data['longest_exchange'],
-                      shortest_exchange=request.data['shortest_exchange'], map_index=request.data['map_index'], design_index=request.data['design_index'])
+                      shortest_exchange=request.data['shortest_exchange'], map_index=request.data['map_index'], design_index=request.data['design_index'],
+                      is_tourney=request.data['is_tourney'])
         match.save()
 
         if (request.data['result'] == "VICTOIRE"):
@@ -281,7 +282,8 @@ class AddMatchStatsWithUsername(APIView):
         match = Match(user=user, result=request.data['result'], date=request.data['date'],
                       score_left=request.data['score_left'], score_right=request.data['score_right'],
                       time=request.data['time'], type=request.data['type'], longest_exchange=request.data['longest_exchange'],
-                      shortest_exchange=request.data['shortest_exchange'], map_index=request.data['map_index'], design_index=request.data['design_index'])
+                      shortest_exchange=request.data['shortest_exchange'], map_index=request.data['map_index'], design_index=request.data['design_index'],
+                      is_tourney=request.data['is_tourney'], opponent=request.data['opponent'])
         match.save()
 
         if (request.data['result'] == "VICTOIRE"):

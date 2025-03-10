@@ -28,7 +28,7 @@ class CreatUserSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
-        fields = ["result", "date", "score_left", "score_right", "user", "time", "type", "longest_exchange", "shortest_exchange", "map_index", "design_index"]
+        fields = ["result", "date", "score_left", "score_right", "user", "time", "type", "longest_exchange", "shortest_exchange", "map_index", "design_index", "is_tourney", "opponent"]
 
 
 class TourneySerializer(serializers.ModelSerializer):

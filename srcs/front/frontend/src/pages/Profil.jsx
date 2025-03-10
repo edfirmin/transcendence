@@ -219,7 +219,7 @@ function WinrateBar({loses, wins}) {
     )
 }
 
-function MatchResult({result, date, score_left, score_right, time, type, longest_exchange, shortest_exchange, map_index}) {
+function MatchResult({result, date, score_left, score_right, time, type, longest_exchange, shortest_exchange, map_index, is_tourney, opponent}) {
     const [isClicked, setIsClicked] = useState(false)
     const map_design = [classic_map_design, tennis_map_design, table_tennis_map_design];
 
@@ -233,7 +233,23 @@ function MatchResult({result, date, score_left, score_right, time, type, longest
                     <span><p>{date}</p></span>
             </span>
             <hr/>
-            <div>    
+            <div>   
+                { is_tourney ?  
+               <div className="matchResultData">
+                    <p>match de tournoi</p>
+                </div>
+                :
+                <></>
+                }
+                { opponent != "null" ?  
+               <div className="matchResultData">
+                    <p>adversaire</p>
+                    <span></span>
+                    <p>{opponent}</p>
+                </div>
+                :
+                <></>
+                }
                 <div className="matchResultData">
                     <p>time</p>
                     <span></span>
@@ -278,7 +294,7 @@ function MatchArray({matches}) {
     let matchesResults = []
     
     for (let i = 0; i < matches.length; i++) {
-        matchesResults.push(<MatchResult key={i} result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} time={String(matches[i].time).substring(0, String(matches[i].time).length - 3)} type={matches[i].type} longest_exchange={matches[i].longest_exchange} shortest_exchange={matches[i].shortest_exchange} map_index={matches[i].map_index}/>)
+        matchesResults.push(<MatchResult key={i} result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} time={String(matches[i].time).substring(0, String(matches[i].time).length - 3)} type={matches[i].type} longest_exchange={matches[i].longest_exchange} shortest_exchange={matches[i].shortest_exchange} map_index={matches[i].map_index} is_tourney={matches[i].is_tourney} opponent={matches[i].opponent}/>)
     }
    
     return(<div id="matchHistory">

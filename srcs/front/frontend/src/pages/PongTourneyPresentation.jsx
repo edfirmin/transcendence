@@ -127,7 +127,7 @@ function TourneyPresentation() {
                         }  
                     }
                 } else
-                    return profiles_pics[i];
+                    return profiles_pics[i -1];
             }
         }
         return icone_1;

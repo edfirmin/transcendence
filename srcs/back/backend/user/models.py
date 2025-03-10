@@ -29,6 +29,8 @@ class Match(models.Model):
     shortest_exchange = models.BigIntegerField(default=0)
     map_index = models.IntegerField(default=0)
     design_index = models.IntegerField(default=0)
+    is_tourney = models.BooleanField(default=False)
+    opponent = models.CharField(default="null")
     #score_history = ArrayField(models.CharField())
 
 class Tourney(models.Model):

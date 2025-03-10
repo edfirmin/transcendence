@@ -16,8 +16,8 @@ import swag_ball_design from '../../assets/img/swag_ball_design.png'
 import classic_map from '../../assets/img/classic_map.png'
 import tennis_map from '../../assets/img/tennis_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
-import useToken from 'antd/es/theme/useToken';
 import { ACCESS_TOKEN } from "../../constants";
+import { getUser } from '../../api';
 
 function PongMulti() {
 
@@ -56,6 +56,8 @@ function PongMulti() {
 	const [map_index, set_map_index] = useState(data.state == null ? 0 : data.state.map);
 	const [design_index, set_design_index] = useState(data.state == null ? 0 : data.state.design);
 	const [points, set_points] = useState(data.state == null ? 5 : data.state.points + 2);
+	const [left_user, set_left_user] = useState(data.state == null ? null : data.state.left_user);
+	const [right_user, set_right_user] = useState(data.state == null ? null : data.state.right_user);
 
 	const [countdown, setCountdown] = useState(-1);
 	
@@ -76,7 +78,9 @@ function PongMulti() {
 					'message':'game_custom_options',
 					'map':map_index,
 					'design':design_index,
-					'points':points		
+					'points':points,
+					'left_user':left_user,
+					'right_user':right_user
 				}))
 			}
 		}
@@ -122,6 +126,8 @@ function PongMulti() {
 				set_design_index(data.design_index);
 				set_map_index(data.map_index);
 				set_points(data.points);
+				set_left_user(data.left_user);
+				set_right_user(data.right_user);
 			}
 		}
 	}, [])
@@ -133,11 +139,11 @@ function PongMulti() {
 		var result;
 		if (winner == 'LEFT WIN !') {
 			result = "VICTOIRE"
-			score.left += 1;	
+			//score.left += 1;	
 		}
 		else {
 			result = "DEFAITE"
-			score.right += 1;	
+			//score.right += 1;	
 		}
 		
 		const d = new Date();
@@ -153,7 +159,19 @@ function PongMulti() {
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);
 
-		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index})
+		if (left_user == null)
+			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
+		else {
+			const user = await getUser();
+			if (winner == "LEFT WIN !" && user.username == left_user.username)
+				await axios.post('api/user/addMatchStatsWithUsername/', {username: left_user.username, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false, opponent: right_user.username});
+			if (winner == "LEFT WIN !" && user.username == right_user.username)
+				await axios.post('api/user/addMatchStatsWithUsername/', {username: right_user.username, result: "DEFAITE", date: a, score_left: score.right, score_right: score.left, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false, opponent: left_user.username});
+			if (winner != "LEFT WIN !" && user.username == left_user.username)
+				await axios.post('api/user/addMatchStatsWithUsername/', {username: left_user.username, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false, opponent: right_user.username});
+			if (winner != "LEFT WIN !" && user.username == right_user.username)
+				await axios.post('api/user/addMatchStatsWithUsername/', {username: right_user.username, result: "VICTOIRE", date: a, score_left: score.right, score_right: score.left, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false, opponent: left_user.username});
+		}
 	}
 
 	useEffect(() => {
@@ -169,36 +187,40 @@ function PongMulti() {
                 case 'ArrowUp':
 					keys.current.right_up = true;
 					break;
-                    case 'ArrowDown':
-                        keys.current.right_down = true;
-                        break;
-                        case 'e':
-                            keys.current.left_up = true;
-                            break;
-                            case 'd':
-                                keys.current.left_down = true;
-                                break;
-                            }
-                        };
+				case 'ArrowDown':
+					keys.current.right_down = true;
+					break;
+				case 'E':
+				case 'e':
+					keys.current.left_up = true;
+					break;
+				case 'D':
+				case 'd':
+					keys.current.left_down = true;
+					break;
+				}
+				};
                         
-                        // Listens for KeyUp event
-                        const handleKeyUp = (event) => {
-                            switch (event.key)
+		// Listens for KeyUp event
+		const handleKeyUp = (event) => {
+			switch (event.key)
 			{
 				case 'ArrowUp':
                     keys.current.right_up = false;
 					break;
-                    case 'ArrowDown':
-                        keys.current.right_down = false;
-                        break;
-                        case 'e':
-                            keys.current.left_up = false;
-                        break;
-                        case 'd':
-                            keys.current.left_down = false;
-                            break;
-                        }
-                    };
+				case 'ArrowDown':
+					keys.current.right_down = false;
+					break;
+				case 'E':
+				case 'e':
+					keys.current.left_up = false;
+					break;
+				case 'D':
+				case 'd':
+					keys.current.left_down = false;
+					break;
+				}
+				};
                     window.addEventListener('keydown', handleKeyDown);
                     window.addEventListener('keyup', handleKeyUp);
 
@@ -251,10 +273,10 @@ function PongMulti() {
 	const drawWinner = (ctx) => {
 		if (winner != "") {
 			ctx.textAlign = "center";
-			ctx.fillStyle = "grey";
+			ctx.fillStyle = "#0f9acc";
 			ctx.fillRect(ctx.canvas.width / 2 - ctx.canvas.width / 4 ,ctx.canvas.height / 2 - ctx.canvas.height / 4, ctx.canvas.width / 2, ctx.canvas.height / 2);
 
-			ctx.font = "40px Arial ";
+			ctx.font = "40px Futurama ";
 			ctx.fillStyle = "white";
 			ctx.textAlign = "center";
 			ctx.fillText(winner, ctx.canvas.width / 2,ctx.canvas.height / 2);
@@ -264,10 +286,10 @@ function PongMulti() {
 	const drawCountdown = (ctx) => {
 		if (countdown != -1) {
 			ctx.textAlign = "center";
-			ctx.fillStyle = "grey";
+			ctx.fillStyle = "#0f9acc";
 			ctx.fillRect(ctx.canvas.width / 2 - ctx.canvas.width / 4 ,ctx.canvas.height / 2 - ctx.canvas.height / 4, ctx.canvas.width / 2, ctx.canvas.height / 2);
 
-			ctx.font = "40px Arial ";
+			ctx.font = "40px Futurama ";
 			ctx.fillStyle = "white";
 			ctx.textAlign = "center";
 			ctx.fillText(countdown, ctx.canvas.width / 2,ctx.canvas.height / 2);
@@ -277,7 +299,7 @@ function PongMulti() {
 	const drawHits = (ctx) => {
 		for (let i = 0; i < hit_history.current.length; i++) {
 		//	ctx.globalAlpha = hit_history.current[i].a;
-			ctx.fillStyle = "grey";
+			ctx.fillStyle = "#bdbaba";
 			ctx.fillRect(hit_history.current[i].x , hit_history.current[i].y, 16, 16);	
 			hit_history.current[i].x += hit_history.current[i].dx;
 			hit_history.current[i].y += hit_history.current[i].dy;
@@ -391,12 +413,23 @@ function PongMulti() {
 
     return (
 		<>
+		{ left_user != null && <PlayerUser name={left_user.username} image={left_user.profil_pic} left={560} top={70} /> }
+		{ right_user != null && <PlayerUser name={right_user.username} image={right_user.profil_pic} left={1120} top={70} />}
         <div className={styles.MovingBall}>
 			<canvas ref={canvasRef2} width={800} height={50} style={{ border: '5px solid white', borderRadius: '5px', marginBottom: '5px' }}></canvas>
             <canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white' }}></canvas>
         </div>
 		</>
 	);
+}
+
+function PlayerUser({name, image, left, top}) {
+	return (
+			<div className='player' style={{left: left+"px", top: top+"px", position: "absolute"}} >
+				<img src={image} />
+				<p>{name}</p>
+			</div>
+		)
 }
 
 
