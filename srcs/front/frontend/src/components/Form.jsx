@@ -16,9 +16,9 @@ function From({route, method}) {
     const [ffa, setis2fa] = useState(false)
     const [code2fa, set2fa] = useState("")
     const navigate = useNavigate()
-    const name = method === "login" ? "Login" : "Register";
+    const name = method === "login" ? "Se connecter" : "S'enregistrer";
     var logo = method === "login" ? "src/assets/login.png" : "src/assets/register.png" ;
-    const button_text = method === "login" ? "Create an account" : "Already have an account ?";
+    const button_text = method === "login" ? "Créer un compte" : "Vous avez déjà un compte ?";
     const [goodlogin, setGoodlogin] = useState(null)
     const [goodregister, setGoodregister] = useState(null)
 
@@ -88,10 +88,10 @@ function From({route, method}) {
             <Snowfall />
             <form onSubmit={handleSubmit} className="form-container">
                 <img src={logo} alt="logo"/>
-                <input className="form-imput" type="text" maxLength={11} value={username} onChange={(f) => setUsername(f.target.value)} placeholder="Username"></input>
-                <input className="form-imput" type="password" value={password} onChange={(f) => setPassword(f.target.value)} placeholder="Password"></input>
+                <input className="form-imput" type="text" maxLength={11} value={username} onChange={(f) => setUsername(f.target.value)} placeholder="Nom d'utilisateur"></input>
+                <input className="form-imput" type="password" value={password} onChange={(f) => setPassword(f.target.value)} placeholder="Mot de passe"></input>
                 {method === "register" && (
-                    <input className="form-imput" type="password" value={password2} onChange={(f) => setPassword2(f.target.value)} placeholder="Confirme password"></input>
+                    <input className="form-imput" type="password" value={password2} onChange={(f) => setPassword2(f.target.value)} placeholder="Confirmer mot de passe"></input>
                     )}
                 {ffa && (<div>
                     <h2>2FA Authentication</h2>
@@ -105,8 +105,8 @@ function From({route, method}) {
             {goodlogin == false && (<p className="login-false">Identifiant ou mot de passe incorrect</p>)}
             {goodpass == true && (<p className="pass-false">Mot de passe pas identique/Champ vide</p>)}
             <button className="go-to-register-button" onClick={() => handleGoToRegisterOrLoginButton()}>{button_text}</button>
-                {!ffa && method === "login" && (<div>
-                    <h2>━━━━━━━━ Or continue with ━━━━━━━━</h2>
+                {!ffa && method === "login" && (<div className="div-login42">
+                    <h2>━━━━━━━━ Étudiant 42 ? ━━━━━━━━</h2>
                     <button className="login-with-42-button" onClick={handleLoginWith42}><img className="logo42" src={logo42} alt="42 Authentication"/></button>
                 </div>)}
         </div>

@@ -4,7 +4,6 @@ import "../styles/Home.css"
 import {useNavigate} from "react-router-dom"
 import Navbarr from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.css';
-import logoutLogo from "../assets/logout_logo.png"
 
 function Home() {
     const navigate = useNavigate();
@@ -22,7 +21,7 @@ function Home() {
 		<div>
       <Navbarr></Navbarr>
       <button className='pong-button' onClick={() => handlePong()}></button>
-			<button className="logout-button" onClick={() => handleLogout()}><img className='logout-logo' src={logoutLogo} alt="logoutLogo" /></button>
+			<button className="logout-button" onClick={() => handleLogout()}>deconextion</button>
 		</div>
     );
 }

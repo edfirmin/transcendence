@@ -24,10 +24,10 @@ div {
   
 .go-to-register-button {
 	display: flex;
-	width: 25vh;
+	width: 26vh;
 	justify-content: center;
 	background-color: #aee8fd;
-	margin: 10px auto;
+	margin: -20px auto;
 	color: #0f9acc;
 	padding: 10px 15px;
 	border-radius: 100px;
@@ -38,7 +38,7 @@ div {
   
 .go-to-register-button:hover {
 	background-color: #8addfc;
-	width: 25vh;
+	width: 26vh;
   	color: #ffffff;
 }
   

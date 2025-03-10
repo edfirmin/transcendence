@@ -19,6 +19,12 @@
 	margin-bottom: 20px;
 } */
 	
+
+.div-login42 {
+	margin: 25px 48px;
+	width: 850px;
+}
+
 .form-container h2 {
 	color: #333;
 	width: 40vh;
@@ -82,7 +88,7 @@ form textarea {
 }
 
 .login-with-42-button{
-	margin: 0% 40%;
+	margin: 1% 38%;
 	background: none;
 }
 

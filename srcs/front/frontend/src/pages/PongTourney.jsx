@@ -22,8 +22,9 @@ function Tourney() {
     const [user_icone, set_user_icone] = useState()
     const [tourneyPost, SetTourneyPost] = useState(false);
     var tourney_id = useRef(null)
-    
-    const [names, setNames] = useState(["Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8"]);
+    const [noOtherUsers, setNoOtherUsers] = useState(false)
+
+    const [names, setNames] = useState(["Joueur1", "Joueur2", "Joueur3", "Joueur4", "Joueur5", "Joueur6", "Joueur7", "Joueur8"]);
     const [isUsers, setIsUsers] = useState([true, false, false, false, false, false, false, false])
     const profiles_pics = [icone_1, icone_2, icone_3, icone_4, icone_5, icone_6, icone_7, icone_8]
     const [allNameUnique,setAllNameUnique] = useState(true) 
@@ -69,6 +70,8 @@ function Tourney() {
     const initusers = async () => {
       const TMPuser = await getAllUserExceptLoggedOne()
       setUsers(TMPuser);
+      if (TMPuser.length == 0)
+        setNoOtherUsers(true)
     }
 
     async function handleLocalPong() {
@@ -156,7 +159,7 @@ function Tourney() {
       return true;
     }
 
-    if (!user || users.length == 0) {
+    if (!user || (users.length == 0 && !noOtherUsers)) {
       return(<></>);
     }
 
@@ -185,7 +188,7 @@ function Tourney() {
             <div className='container'>
               <div></div>
               {allNameUnique ? <></> : <p className='username-register' style={{left: "29%", top: "76%"}} >Not all name are unique</p>}
-              <Button name={'Play'} callback={handleLocalPong} />
+              <Button name={'Commencer'} callback={handleLocalPong} />
               <div></div>
             </div>
         </>
