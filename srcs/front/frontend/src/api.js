@@ -9,6 +9,22 @@ export const getUser = async () => {
     return (response.data)
 }
 
+export const getUserWithUsername = async (username) => {
+    const response = await axios.get("/api/user/getUserWithUsername/?" + username);
+    return (response.data)
+}
+
+export const getUserWithId = async (id) => {
+    const response = await axios.get("/api/user/getUserWithId/?" + id);
+    return (response.data)
+}
+
+export const getAllUserExceptLoggedOne = async () => {
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    const response = await axios.get("/api/user/getAllUserExceptLoggedOne/?" + userToken);
+    return (response.data)
+}
+
 export const getMatches = async () => {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const response = await axios.get("/api/user/getMatches/?" + userToken);
@@ -17,6 +33,11 @@ export const getMatches = async () => {
 
 export const getTourney = async (tourney_id) => {
     const response = await axios.get("/api/user/getTourney/?" + tourney_id);
+    return (response.data)
+}
+
+export const getTourneyPlayers = async (tourney_id) => {
+    const response = await axios.get("/api/user/getTourneyPlayers/?" + tourney_id);
     return (response.data)
 }
 

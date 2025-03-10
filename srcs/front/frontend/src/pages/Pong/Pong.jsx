@@ -30,7 +30,6 @@ function Pong() {
 	const LPaddle = useRef({ x: 50, y: 250});
 	const RPaddle = useRef({ x: 750, y: 250});
 	const [score, setScore] = useState({left: 0, right: 0});
-	const gameStarted = useRef(false);
 	const ball_history = useRef([]);
 	const ball_history_max_size = 10;
     const ball = useRef({ x: 400, y: 250 });
@@ -46,6 +45,9 @@ function Pong() {
 	const hit_history = useRef([]);
 	const [shake, set_shake] = useState(false);
 	const [time_start, set_time_start] = useState(0)
+	const AIGoUp = useRef(null);
+	const timeoutAI = useRef(null);
+	const AIBallPos = useRef({ x: 400, y: 250})
 	//const [score_history, set_score_history] = useState([])
 
 	const map_design = [classic_map, tennis_map, table_tennis_map];
@@ -64,6 +66,8 @@ function Pong() {
 	const tourney_id = data.state.tourney_id;
     const currentBattleIndex = data.state.currentBattleIndex;
 	const returnPage = data.state.returnPage == null ? '/selection' : data.state.returnPage;
+	const leftPlayerIsUser = data.state.leftPlayerIsUser;
+	const rightPlayerIsUser = data.state.rightPlayerIsUser;
 
 	const [countdown, setCountdown] = useState(-1);
 
@@ -79,7 +83,7 @@ function Pong() {
 				'message':'points',
 				'value': points
 			}));
-			ws.send(JSON.stringify({
+			/*ws.send(JSON.stringify({
 				'message':'isAi',
 				'value': isAI
 			}));
@@ -88,7 +92,7 @@ function Pong() {
 					'message':'difficulty',
 					'value': difficulty
 				}));
-			}
+			}*/
 			setCountdown(3);	
 		}
 
@@ -138,6 +142,101 @@ function Pong() {
 		}
 	}
 
+	useInterval(() => {AIBallPos.current.y = ball.current.y;}, 1000)
+	
+	function EasyAIBehaviour() {
+		let proba = Math.random();
+		let duration_movement = Math.random() * (500 - 300) + 300;
+		let duration_pause = Math.random() * (200 - 100) + 100;
+
+		if (timeoutAI.current != null)
+			clearTimeout(timeoutAI.current);
+
+		if (proba < 0.45)
+			AIGoUp.current = true;
+		else if (proba < 0.90)
+			AIGoUp.current = false;
+		else 
+			AIGoUp.current = null;
+
+			timeoutAI.current = setTimeout(AIPause, duration_movement, duration_pause, EasyAIBehaviour);
+	}
+
+	function MediumAIBehaviour() {
+		let proba = Math.random();
+		let duration_movement = Math.random() * (500 - 300) + 300;
+		let duration_pause = Math.random() * (500 - 300) + 300;
+
+		if (timeoutAI.current != null)
+			clearTimeout(timeoutAI.current);
+
+		console.log("paddle " + RPaddle.current.y);
+		console.log("ball " + AIBallPos.current.y);
+		if (RPaddle.current.y > AIBallPos.current.y) {
+			if (proba < 0.95)
+				AIGoUp.current = true;
+			else if (proba < 0.95)
+				AIGoUp.current = false;
+			else 
+				AIGoUp.current = null;
+		}
+		else {
+			if (proba < 0.95)
+				AIGoUp.current = false;
+			else if (proba < 0.95)
+				AIGoUp.current = true;
+			else 
+				AIGoUp.current = null;
+		}
+
+		timeoutAI.current = setTimeout(AIPause, duration_movement, duration_pause, MediumAIBehaviour);
+	}
+
+	function AIPause(new_duration, callback) {		
+		AIGoUp.current = null;
+		
+		if (timeoutAI.current != null)
+			clearTimeout(timeoutAI.current);
+
+		timeoutAI.current = setTimeout(callback, new_duration);
+	}
+
+	function HardAIBehaviour() {
+		let proba = Math.random();
+		let new_duration = Math.random() * (1800 - 1000) + 1000;
+
+		if (timeoutAI.current != null)
+			clearTimeout(timeoutAI.current);
+
+		if (proba < 0.45)
+			AIGoUp.current = true;
+		else if (proba < 0.90)
+			AIGoUp.current = false;
+		else 
+			AIGoUp.current = null;
+
+		timeoutAI.current = setTimeout(HardAIBehaviour, new_duration);
+	}
+
+	function useInterval(callback, delay) {
+		const savedCallback = useRef();
+	   
+		// Remember the latest callback.
+		useEffect(() => {
+		  savedCallback.current = callback;
+		}, [callback]);
+	   
+		// Set up the interval.
+		useEffect(() => {
+		  function tick() {
+			savedCallback.current();
+		  }
+		  if (delay !== null) {
+			let id = setInterval(tick, delay);
+			return () => clearInterval(id);
+		  }
+		}, [delay]);
+	}
 
 	async function postMatchStats() {
 		if (winner == "")
@@ -154,18 +253,41 @@ function Pong() {
 		}
 		
 		const d = new Date();
-		const day = d.getDate();
-		const month = d.getMonth()+1;
+		var day = d.getDate();
+		if (day.toString().length == 1)
+			day = '0' + day;
+		var month = d.getMonth()+1;
+		if (month.toString().length == 1)
+			month = '0' + month;
 		const year = d.getFullYear();
-		const a = year + '-' + month + '-' + day;
+		const a = + d.getHours() + ':' + d.getMinutes() + '  ' + year + '-' + month + '-' + day;
 
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);
 		
 		if (isAI)
-			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange})
+			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange, map_index, design_index})
 		else
-			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange})
+			if (tourney_id != null) {
+				console.log("tourney")
+				if (leftPlayerIsUser) {
+					console.log("left")
+
+					if (winner == 'LEFT WIN !') 
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+					else
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+				}
+				if (rightPlayerIsUser) {
+					console.log("right")
+					if (winner == 'LEFT WIN !')
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+					else
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+				}
+			}
+			else
+				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
 	}
 
 	useEffect(() => {
@@ -377,7 +499,7 @@ function Pong() {
 			${Math.floor(255 / points * score.right)}
 			0
 			${Math.floor(255 / points * score.right)})`;
-		ctx.fillRect(ctx.canvas.width - score.right * ctx.canvas.width / 2 / points, 2, score.right * ctx.canvas.width / 2 / points - 2, ctx.canvas.height - 6);
+		ctx.fillRect(ctx.canvas.width - score.right * ctx.canvas.wiintervalAIMovementdth / 2 / points, 2, score.right * ctx.canvas.width / 2 / points - 2, ctx.canvas.height - 6);
 
 		ctx.fillStyle = 'white';
 		let dist = ctx.canvas.width / (points * 2);
@@ -402,9 +524,28 @@ function Pong() {
 			}));
 			
 			set_time_start(new Date())
+
+			if (isAI) {
+				if (difficulty == "easy")
+					EasyAIBehaviour();
+				else if (difficulty == "medium")
+					MediumAIBehaviour();
+				else
+					HardAIBehaviour();	
+			}
 		}
 	}, [countdown]);
-
+	
+	useInterval(() => {
+		if (AIGoUp.current == true) 
+			ws.send(JSON.stringify({
+				'message':'right_paddle_up'
+			}))
+		else if (AIGoUp.current == false)
+			ws.send(JSON.stringify({
+				'message':'right_paddle_down'
+			}))
+	}, 1);
 
 	return (
 		<>
@@ -414,6 +555,7 @@ function Pong() {
 		</div>
 		</>
 	);
+
 }
 
 export default Pong;

@@ -8,13 +8,19 @@ import profile_logo from "../assets/profile_logo.png"
 import { useNavigate } from "react-router-dom";
 import Snowfall from 'react-snowfall'
 import victory_cup from '../assets/img/victory_cup.png'
+import classic_map_design from '../assets/img/classic_map_design.png'
+import tennis_map_design from '../assets/img/tennis_map_design.png'
+import table_tennis_map_design from '../assets/img/table_tennis_map_design.png'
 
 function Profil() {
     const [user, setUser] = useState([])
     const [matches, setMatches] = useState([])
     const [edit, setEdit] = useState(false)
     const [preferAIDifficulty, setPreferAIDifficulty] = useState("none")
-    const [averageTime, setAverageTime] = useState()
+    const [preferMap, setPreferMap] = useState(-1)
+    const [averageTime, setAverageTime] = useState(null)
+    const map_design = [classic_map_design, tennis_map_design, table_tennis_map_design];
+    
 
     useEffect(() => {
         inituser()
@@ -23,6 +29,7 @@ function Profil() {
     
     useEffect(() => {
         PreferAIDifficulty();
+        PreferMap();
         AverageTime();
     }, [matches])
 
@@ -97,6 +104,39 @@ function Profil() {
         }
     }
 
+    function PreferMap()
+    {
+        let first = 0;
+        let second = 0;
+        let third = 0;
+
+        for (let i = 0; i < matches.length; i++) {
+            if (matches[i].map_index == 0)
+                first++;
+            if (matches[i].map_index == 1)
+                second++;
+            if (matches[i].map_index == 2)
+                third++;
+        }
+        
+        // EASY
+        if (first > second && first > third) {
+            setPreferMap(0);
+            return;
+        }
+        // MEDIUM
+        if (second > first && second > third) {
+            setPreferMap(1);
+            return;
+        }
+        // HARD
+        if (third > second && third > first) {
+            setPreferMap(2);
+            return;
+        }
+        
+    }
+
     function AverageTime()
     {
         let time = 0;
@@ -143,13 +183,18 @@ function Profil() {
                         <div style={{display: "flex", justifyContent: "space-between"}}>
                             <p>Defaites : {user.lose_count}</p><p></p><p> Victoires : {user.win_count}</p>
                         </div>
-                        <div className="small_space"></div>
-                        <h4 className="center">Prefer AI Difficulty</h4>
-                        <p className="center">{preferAIDifficulty}</p>
                         </div>
                         <div className="small_space"></div>
+                        <h4 className="center">Prefer AI Difficulty</h4>
+                        <p className="center">{preferAIDifficulty}</p>                       
+                        <div className="small_space"></div>
+                        <h4 className="center">Prefer Map</h4>
+                        {preferMap == -1 ? <p className="center">None</p> : <img className="center" style={{width: "75px", height: "75px"}} src={map_design[preferMap]} />}
+                        <div className="small_space"></div>
+                        <div className="small_space"></div>
+
                         <h4 className="center">Average Match Duration</h4>
-                        <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p>
+                        {averageTime != null ? <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p> : <p className="center">No Match Play</p>}
                         <div className="small_space"></div>
                         <h4 className="center">Match History</h4>
                         <MatchArray matches={matches} />
@@ -174,8 +219,9 @@ function WinrateBar({loses, wins}) {
     )
 }
 
-function MatchResult({result, date, score_left, score_right, time, type, longest_exchange, shortest_exchange}) {
+function MatchResult({result, date, score_left, score_right, time, type, longest_exchange, shortest_exchange, map_index}) {
     const [isClicked, setIsClicked] = useState(false)
+    const map_design = [classic_map_design, tennis_map_design, table_tennis_map_design];
 
     return (
         <div onClick={() => {if (isClicked) {setIsClicked(false);} else {setIsClicked(true);} console.log(isClicked)}} className="matchResult" style={{backgroundColor: result == "VICTOIRE" ? "#0f9acc" : "#cc0f38"}}>
@@ -208,6 +254,11 @@ function MatchResult({result, date, score_left, score_right, time, type, longest
                     <span></span>
                     <p>{shortest_exchange}</p>
                 </div>
+                <div className="matchResultData">
+                    <p>map</p>
+                    <span></span>
+                    <img style={{width: "50px", height: "50px"}} src={map_design[map_index]} alt="" />
+                </div>
             </div>
             </div>)
             :  (
@@ -227,7 +278,7 @@ function MatchArray({matches}) {
     let matchesResults = []
     
     for (let i = 0; i < matches.length; i++) {
-        matchesResults.push(<MatchResult key={i} result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} time={String(matches[i].time).substring(0, String(matches[i].time).length - 3)} type={matches[i].type} longest_exchange={matches[i].longest_exchange} shortest_exchange={matches[i].shortest_exchange} />)
+        matchesResults.push(<MatchResult key={i} result={matches[i].result} date={matches[i].date} score_left={matches[i].score_left} score_right={matches[i].score_right} time={String(matches[i].time).substring(0, String(matches[i].time).length - 3)} type={matches[i].type} longest_exchange={matches[i].longest_exchange} shortest_exchange={matches[i].shortest_exchange} map_index={matches[i].map_index}/>)
     }
    
     return(<div id="matchHistory">

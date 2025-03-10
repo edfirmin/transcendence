@@ -133,23 +133,27 @@ function PongMulti() {
 		var result;
 		if (winner == 'LEFT WIN !') {
 			result = "VICTOIRE"
-			//score.left += 1;	
+			score.left += 1;	
 		}
 		else {
 			result = "DEFAITE"
-			//score.right += 1;	
+			score.right += 1;	
 		}
 		
 		const d = new Date();
-		const day = d.getDate();
-		const month = d.getMonth()+1;
+		var day = d.getDate();
+		if (day.toString().length == 1)
+			day = '0' + day;
+		var month = d.getMonth()+1;
+		if (month.toString().length == 1)
+			month = '0' + month;
 		const year = d.getFullYear();
-		const a = year + '-' + month + '-' + day;
+		const a = + d.getHours() + ':' + d.getMinutes() + '  ' + year + '-' + month + '-' + day;
 
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);
 
-		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange})
+		await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index})
 	}
 
 	useEffect(() => {

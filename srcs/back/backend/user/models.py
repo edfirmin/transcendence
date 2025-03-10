@@ -22,23 +22,18 @@ class Match(models.Model):
     result = models.CharField(max_length=15)
     score_left = models.IntegerField(default=0)
     score_right = models.IntegerField(default=0)
-    date = models.DateField()
+    date = models.CharField()
     time = models.BigIntegerField(default=0)
     type = models.CharField(default="Undefined")
     longest_exchange = models.BigIntegerField(default=0)
     shortest_exchange = models.BigIntegerField(default=0)
+    map_index = models.IntegerField(default=0)
+    design_index = models.IntegerField(default=0)
     #score_history = ArrayField(models.CharField())
 
 class Tourney(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name1 = models.CharField(unique=(False))
-    name2 = models.CharField(unique=(False))
-    name3 = models.CharField(unique=(False))
-    name4 = models.CharField(unique=(False))
-    name5 = models.CharField(unique=(False))
-    name6 = models.CharField(unique=(False))
-    name7 = models.CharField(unique=(False))
-    name8 = models.CharField(unique=(False))
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    
     winner_match1 = models.CharField(unique=(False))
     winner_match2 = models.CharField(unique=(False))
     winner_match3 = models.CharField(unique=(False))
@@ -48,3 +43,8 @@ class Tourney(models.Model):
     winner_match7 = models.CharField(unique=(False))
 
     tourney_id = models.CharField(unique=(True))
+
+class TourneyPlayer(models.Model):
+    name = models.CharField(unique=(False))
+    tourney = models.CharField()
+    isUser = models.BooleanField(default=False)

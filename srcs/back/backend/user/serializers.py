@@ -1,6 +1,7 @@
 from .models import User
 from .models import Match
 from .models import Tourney
+from .models import TourneyPlayer
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,10 +28,16 @@ class CreatUserSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
-        fields = ["result", "date", "score_left", "score_right", "user", "time", "type", "longest_exchange", "shortest_exchange"]
+        fields = ["result", "date", "score_left", "score_right", "user", "time", "type", "longest_exchange", "shortest_exchange", "map_index", "design_index"]
 
 
 class TourneySerializer(serializers.ModelSerializer):
     class Meta:
         model = Tourney
-        fields = ["name1", "name2", "name3", "name4", "name5", "name6", "name7", "name8", "winner_match1", "winner_match2", "winner_match3", "winner_match4", "winner_match5", "winner_match6", "winner_match7", "user", "tourney_id"]
+        fields = ["winner_match1", "winner_match2", "winner_match3", "winner_match4", "winner_match5", "winner_match6", "winner_match7", "user", "tourney_id"]
+
+
+class TourneyPlayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TourneyPlayer
+        fields = ["tourney", "name", "isUser"]
