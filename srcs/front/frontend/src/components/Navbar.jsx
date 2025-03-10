@@ -24,15 +24,6 @@ function Navbarr() {
       <Snowfall snowflakeCount={30} radius={[0.5,0.5]}/>
         <Navbar.Brand href="/home"><img className="logo" src={logo}/></Navbar.Brand>
           <Nav.Link href="/profil"><img className="pp_nav" src={user_pp}/></Nav.Link>
-          <Nav className="language">
-            <NavDropdown title="Language">
-              <NavDropdown.Item className="language-item" href="">FR</NavDropdown.Item>
-              <NavDropdown.Item className="language-item" href="">EN</NavDropdown.Item>
-              <NavDropdown.Item className="language-item" href="">JP</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item className="language-item" href="/profil">Set def. language</NavDropdown.Item>
-            </NavDropdown>
-          </Nav>
     </Navbar>
   );
 }

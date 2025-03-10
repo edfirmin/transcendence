@@ -69,37 +69,37 @@ function Profil() {
         
         // EASY
         if (easy > medium && easy > hard) {
-            setPreferAIDifficulty("EASY");
+            setPreferAIDifficulty("FACILE");
             return;
         }
         // MEDIUM
         if (medium > easy && medium > hard) {
-            setPreferAIDifficulty("MEDIUM");
+            setPreferAIDifficulty("MOYEN");
             return;
         }
         // HARD
         if (hard > medium && hard > easy) {
-            setPreferAIDifficulty("HARD");
+            setPreferAIDifficulty("DIFFICILE");
             return;
         }
         // ALL
         if (easy == medium && medium == hard) {
-            setPreferAIDifficulty("NONE IN PARTICULAR");
+            setPreferAIDifficulty("AUCUNE EN PARTICULIER");
             return;
         }
         // EASY - MEDIUM
         if (easy == medium) {
-            setPreferAIDifficulty("EASY - MEDIUM");
+            setPreferAIDifficulty("FACILE - MOYEN");
             return;
         }
         // MEDIUM - HARD
         if (medium == hard) {
-            setPreferAIDifficulty("MEDIUM - HARD");
+            setPreferAIDifficulty("MOYEN - DIFFICILE");
             return;
         }
         // EASY - HARD
         if (easy == hard) {
-            setPreferAIDifficulty("EASY - HARD");
+            setPreferAIDifficulty("FACILE - DIFFICILE");
             return;
         }
     }
@@ -181,22 +181,22 @@ function Profil() {
                         <WinrateBar loses={user.lose_count} wins={user.win_count} />
                         <div>
                         <div style={{display: "flex", justifyContent: "space-between"}}>
-                            <p>Defaites : {user.lose_count}</p><p></p><p> Victoires : {user.win_count}</p>
+                            <p>Défaites : {user.lose_count}</p><p></p><p> Victoires : {user.win_count}</p>
                         </div>
                         </div>
                         <div className="small_space"></div>
-                        <h4 className="center">Prefer AI Difficulty</h4>
+                        <h4 className="center">Préférence de difficulté IA</h4>
                         <p className="center">{preferAIDifficulty}</p>                       
                         <div className="small_space"></div>
-                        <h4 className="center">Prefer Map</h4>
-                        {preferMap == -1 ? <p className="center">None</p> : <img className="center" style={{width: "75px", height: "75px"}} src={map_design[preferMap]} />}
+                        <h4 className="center">Préférence de Map</h4>
+                        {preferMap == -1 ? <p className="center">Aucune</p> : <img className="center" style={{width: "75px", height: "75px"}} src={map_design[preferMap]} />}
                         <div className="small_space"></div>
                         <div className="small_space"></div>
 
-                        <h4 className="center">Average Match Duration</h4>
+                        <h4 className="center">Durée moyenne match</h4>
                         {averageTime != null ? <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p> : <p className="center">No Match Play</p>}
                         <div className="small_space"></div>
-                        <h4 className="center">Match History</h4>
+                        <h4 className="center">Historique de Match</h4>
                         <MatchArray matches={matches} />
                     </div>
                 </div> :
