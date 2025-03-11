@@ -16,6 +16,8 @@ import design_8 from '../assets/img/8.png'; import design_9 from '../assets/img/
 import easy_design from '../assets/img/easy.png';
 import medium_design from '../assets/img/medium.png';
 import hard_design from '../assets/img/hard.png';
+import no_design from '../assets/img/no.png';
+import yes_design from '../assets/img/yes.png';
 import Navbarr from '../components/Navbar';
 import { getUser, getUserWithUsername } from "../api"
 
@@ -25,15 +27,18 @@ function PongSelection() {
     const difficulty_designs = [easy_design, medium_design, hard_design];
     const map_designs = [classic_map_design, tennis_map_design, table_tennis_map_design];
     const point_design = [design_2, design_3, design_4, design_5, design_6, design_7, design_8, design_9];
-    const [index_design, set_index_design] = useState(0), [index_map_design, set_index_map_design] = useState(0);
+    const power_up_design = [no_design, yes_design];
+    const [index_design, set_index_design] = useState(0);
+    const [index_map_design, set_index_map_design] = useState(0);
     const [points, set_points] = useState(0);
     const [difficulty_index, set_difficulty_index] = useState(0);
+    const [power_up_index, set_power_up_index] = useState(0);
 
     const navigate = useNavigate();
 
     function handleLocalPong() {
       const roomId = uuidv4();
-      navigate(`/pong/${roomId}`, {state : { isAI : false, map : index_map_design, design : index_design, points : points}});
+      navigate(`/pong/${roomId}`, {state : { isAI : false, map : index_map_design, design : index_design, points : points, power_up_on : power_up_index}});
     }
 
     function handleAIPong() {
@@ -73,6 +78,7 @@ function PongSelection() {
               <Selector name={"Points"} designs={point_design} index={points} setIndex={set_points} />
               <Selector name={"Difficulté IA"} designs={difficulty_designs} index={difficulty_index} setIndex={set_difficulty_index} />
               <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} />
+              <Selector name={'Power Up'} designs={power_up_design} index={power_up_index} setIndex={set_power_up_index} />
               <div></div>
             </div>
             <div className='container'>

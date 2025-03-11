@@ -425,6 +425,7 @@ class PongConsumer(AsyncWebsocketConsumer):
     up_limit = 60
     down_limit = 440
     score_to_win = {}
+    power_up = {}
     is_ai = {}
     difficulty = {}
     ai_direction_go_up = {}
@@ -522,6 +523,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if (message == "points"):
             PongConsumer.score_to_win[self.room_name] = data_json['value']
+        if (message == "power_up"):
+            PongConsumer.power_up[self.room_name] = data_json['value']
 
         if (message == "left_paddle_down"):
             if PongConsumer.left_paddle_pos[self.room_name][1] > self.down_limit:

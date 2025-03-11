@@ -68,6 +68,7 @@ function Pong() {
 	const returnPage = data.state.returnPage == null ? '/selection' : data.state.returnPage;
 	const leftPlayerIsUser = data.state.leftPlayerIsUser;
 	const rightPlayerIsUser = data.state.rightPlayerIsUser;
+	const power_up = data.state.power_up_on;
 
 	const [countdown, setCountdown] = useState(-1);
 
@@ -82,6 +83,10 @@ function Pong() {
 			ws.send(JSON.stringify({
 				'message':'points',
 				'value': points
+			}));
+			ws.send(JSON.stringify({
+				'message':'power_up',
+				'value':power_up
 			}));
 			/*ws.send(JSON.stringify({
 				'message':'isAi',
