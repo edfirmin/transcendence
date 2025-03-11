@@ -61,6 +61,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
     map_index = {}
     design_index = {}
     points = {}
+    left_user = {}
+    right_user = {}
     longest_exchange = {}
     shortest_exchange = {}
     current_exchange = {}
@@ -110,6 +112,10 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
             MultiPongConsumer.design_index[self.room_name] = -1
         if self.room_name not in MultiPongConsumer.points:
             MultiPongConsumer.points[self.room_name] = -1
+        if self.room_name not in MultiPongConsumer.left_user:
+            MultiPongConsumer.left_user[self.room_name] = -1
+        if self.room_name not in MultiPongConsumer.right_user:
+            MultiPongConsumer.right_user[self.room_name] = -1
         if self.room_name not in MultiPongConsumer.longest_exchange:
             MultiPongConsumer.longest_exchange[self.room_name] = 0
         if self.room_name not in MultiPongConsumer.shortest_exchange:
@@ -144,7 +150,9 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                         'type':'game_custom_options_type',
                         'design_index': MultiPongConsumer.design_index[self.room_name],
                         'map_index': MultiPongConsumer.map_index[self.room_name],
-                        'points': MultiPongConsumer.points[self.room_name]
+                        'points': MultiPongConsumer.points[self.room_name],
+                        'left_user': MultiPongConsumer.left_user[self.room_name],
+                        'right_user': MultiPongConsumer.right_user[self.room_name]
                     })
 
         if (message == "begin_game" and MultiPongConsumer.game_task[self.room_name] == None):
@@ -158,6 +166,10 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 MultiPongConsumer.design_index[self.room_name] = data_json['design']
             if (MultiPongConsumer.points[self.room_name] == -1):
                 MultiPongConsumer.points[self.room_name] = data_json['points']
+            if (MultiPongConsumer.left_user[self.room_name] == -1):
+                MultiPongConsumer.left_user[self.room_name] = data_json['left_user']
+            if (MultiPongConsumer.right_user[self.room_name] == -1):
+                MultiPongConsumer.right_user[self.room_name] = data_json['right_user']
 
         if (message == "paddle_down"):
             # Left
@@ -263,6 +275,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
 
                     MultiPongConsumer.ball_pos[self.room_name] = [400, 250]
                     MultiPongConsumer.ball_speed[self.room_name] = 5
+                    if MultiPongConsumer.ball_direction[self.room_name][0] < 0 :
+                        MultiPongConsumer.ball_direction[self.room_name][0] *= -1
 
             # left side
             if (MultiPongConsumer.ball_pos[self.room_name][0] + MultiPongConsumer.ball_direction[self.room_name][0] < 50):
@@ -306,6 +320,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                     # re-init ball
                     MultiPongConsumer.ball_pos[self.room_name] = [400, 250]
                     MultiPongConsumer.ball_speed[self.room_name] = 5
+                    if MultiPongConsumer.ball_direction[self.room_name][0] > 0 :
+                        MultiPongConsumer.ball_direction[self.room_name][0] *= -1
 
 
             MultiPongConsumer.ball_pos[self.room_name][0] += MultiPongConsumer.ball_direction[self.room_name][0] * MultiPongConsumer.ball_speed[self.room_name]
@@ -383,7 +399,9 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 'type': "game_custom_options",
                 'design_index': event['design_index'],
                 'map_index': event['map_index'],
-                'points': event['points']
+                'points': event['points'],
+                'left_user': event['left_user'],
+                'right_user': event['right_user']
             })
 
     async def send_message(self, _type, message):
@@ -407,6 +425,7 @@ class PongConsumer(AsyncWebsocketConsumer):
     up_limit = 60
     down_limit = 440
     score_to_win = {}
+    power_up = {}
     is_ai = {}
     difficulty = {}
     ai_direction_go_up = {}
@@ -504,6 +523,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if (message == "points"):
             PongConsumer.score_to_win[self.room_name] = data_json['value']
+        if (message == "power_up"):
+            PongConsumer.power_up[self.room_name] = data_json['value']
 
         if (message == "left_paddle_down"):
             if PongConsumer.left_paddle_pos[self.room_name][1] > self.down_limit:
@@ -634,6 +655,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                     PongConsumer.ball_speed[self.room_name] = 5
                     PongConsumer.ball_direction[self.room_name][0] = random.uniform(0.5, 1) if random.random() > 0.5 else random.uniform(-0.5, -1)
                     PongConsumer.ball_direction[self.room_name][1] = random.uniform(-0.5, 0.5)
+                    if PongConsumer.ball_direction[self.room_name][0] < 0 :
+                        PongConsumer.ball_direction[self.room_name][0] *= -1
 
             # left side
             if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] < 50):
@@ -680,6 +703,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                     PongConsumer.ball_speed[self.room_name] = 5
                     PongConsumer.ball_direction[self.room_name][0] = random.uniform(0.5, 1) if random.random() > 0.5 else random.uniform(-0.5, -1)
                     PongConsumer.ball_direction[self.room_name][1] = random.uniform(-0.5, 0.5)
+                    if PongConsumer.ball_direction[self.room_name][0] > 0 :
+                        PongConsumer.ball_direction[self.room_name][0] *= -1
 
 
             PongConsumer.ball_pos[self.room_name][0] += PongConsumer.ball_direction[self.room_name][0] * PongConsumer.ball_speed[self.room_name]

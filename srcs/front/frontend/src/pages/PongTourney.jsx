@@ -274,13 +274,13 @@ function Player({name, set_name, index, set_user, image, points, users}) {
             <div className='player'>
                 {selectedUserIndex == -1 ?
                   <>
-                  <button onClick={showUsers}>a</button>
+                  <button onClick={showUsers}> </button>
                   <img src={image} />
                   <input type="text" required minLength="1" maxLength="10" size="10"  value={visibleName} onChange={e => setName(e.target.value)} />
                   </>
                   :
                   <>
-                  <button onClick={() => {setSelectedUserIndex(-1)}}>a</button>
+                  <button onClick={() => {setSelectedUserIndex(-1)}}> </button>
                   <img src={users[selectedUserIndex].profil_pic} />
                   <p>{users[selectedUserIndex].username}</p>
                   </>

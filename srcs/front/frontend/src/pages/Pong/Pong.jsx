@@ -68,6 +68,7 @@ function Pong() {
 	const returnPage = data.state.returnPage == null ? '/selection' : data.state.returnPage;
 	const leftPlayerIsUser = data.state.leftPlayerIsUser;
 	const rightPlayerIsUser = data.state.rightPlayerIsUser;
+	const power_up = data.state.power_up_on;
 
 	const [countdown, setCountdown] = useState(-1);
 
@@ -82,6 +83,10 @@ function Pong() {
 			ws.send(JSON.stringify({
 				'message':'points',
 				'value': points
+			}));
+			ws.send(JSON.stringify({
+				'message':'power_up',
+				'value':power_up
 			}));
 			/*ws.send(JSON.stringify({
 				'message':'isAi',
@@ -266,28 +271,24 @@ function Pong() {
 		console.log(time);
 		
 		if (isAI)
-			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange, map_index, design_index})
+			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
 		else
 			if (tourney_id != null) {
-				console.log("tourney")
 				if (leftPlayerIsUser) {
-					console.log("left")
-
 					if (winner == 'LEFT WIN !') 
-						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true})
 					else
-						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true})
 				}
 				if (rightPlayerIsUser) {
-					console.log("right")
 					if (winner == 'LEFT WIN !')
-						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true})
 					else
-						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true})
 				}
 			}
 			else
-				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index})
+				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
 	}
 
 	useEffect(() => {
@@ -306,9 +307,11 @@ function Pong() {
 				case 'ArrowDown':
 					keys.current.right_down = true;
 					break;
+				case 'E':
 				case 'e':
 					keys.current.left_up = true;
 					break;
+				case 'D':
 				case 'd':
 					keys.current.left_down = true;
 					break;
@@ -325,9 +328,11 @@ function Pong() {
 				case 'ArrowDown':
 					keys.current.right_down = false;
 					break;
+				case 'E':
 				case 'e':
 					keys.current.left_up = false;
 					break;
+				case 'D':
 				case 'd':
 					keys.current.left_down = false;
 					break;
@@ -383,17 +388,17 @@ function Pong() {
 	const drawPaddle = (ctx, x, y, img) => {
 		// Drawing a paddle centered at the given position
 		ctx.beginPath();
-		ctx.drawImage(img, x, y - 60, 10, 120);
+		ctx.drawImage(img, x, y - 60, 18, 120);
 		ctx.fill();
 	}
 
 	const drawWinner = (ctx) => {
 		if (winner != "") {
 			ctx.textAlign = "center";
-			ctx.fillStyle = "grey";
+			ctx.fillStyle = "#0f9acc";
 			ctx.fillRect(ctx.canvas.width / 2 - ctx.canvas.width / 4 ,ctx.canvas.height / 2 - ctx.canvas.height / 4, ctx.canvas.width / 2, ctx.canvas.height / 2);
 
-			ctx.font = "40px Arial ";
+			ctx.font = "40px Futurama ";
 			ctx.fillStyle = "white";
 			ctx.textAlign = "center";
 			ctx.fillText(winner, ctx.canvas.width / 2,ctx.canvas.height / 2);
@@ -403,10 +408,10 @@ function Pong() {
 	const drawCountdown = (ctx) => {
 		if (countdown != -1) {
 			ctx.textAlign = "center";
-			ctx.fillStyle = "grey";
+			ctx.fillStyle = "#0f9acc";
 			ctx.fillRect(ctx.canvas.width / 2 - ctx.canvas.width / 4 ,ctx.canvas.height / 2 - ctx.canvas.height / 4, ctx.canvas.width / 2, ctx.canvas.height / 2);
 
-			ctx.font = "40px Arial ";
+			ctx.font = "40px Futurama ";
 			ctx.fillStyle = "white";
 			ctx.textAlign = "center";
 			ctx.fillText(countdown, ctx.canvas.width / 2,ctx.canvas.height / 2);
@@ -416,7 +421,7 @@ function Pong() {
 	const drawHits = (ctx) => {
 		for (let i = 0; i < hit_history.current.length; i++) {
 		//	ctx.globalAlpha = hit_history.current[i].a;
-			ctx.fillStyle = "grey";
+			ctx.fillStyle = "#bdbaba";
 			ctx.fillRect(hit_history.current[i].x , hit_history.current[i].y, 16, 16);	
 			hit_history.current[i].x += hit_history.current[i].dx;
 			hit_history.current[i].y += hit_history.current[i].dy;
@@ -499,7 +504,7 @@ function Pong() {
 			${Math.floor(255 / points * score.right)}
 			0
 			${Math.floor(255 / points * score.right)})`;
-		ctx.fillRect(ctx.canvas.width - score.right * ctx.canvas.wiintervalAIMovementdth / 2 / points, 2, score.right * ctx.canvas.width / 2 / points - 2, ctx.canvas.height - 6);
+		ctx.fillRect(ctx.canvas.width - score.right * ctx.canvas.width / 2 / points, 2, score.right * ctx.canvas.width / 2 / points - 2, ctx.canvas.height - 6);
 
 		ctx.fillStyle = 'white';
 		let dist = ctx.canvas.width / (points * 2);
