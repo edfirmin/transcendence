@@ -350,3 +350,15 @@ class AddTourneyPlayer(APIView):
         player.save()
 
         return Response(True)
+
+class AddScoreHangman(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        myUser.hangman_score = myUser.hangman_score + request.data['score']
+
+        myUser.save()
+        return Response(True)

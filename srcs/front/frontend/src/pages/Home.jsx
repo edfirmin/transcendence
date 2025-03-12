@@ -6,21 +6,26 @@ import Navbarr from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.css';
 
 function Home() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.clear();
-        navigate("/login")
-    }
+  const handleLogout = () => {
+      localStorage.clear();
+      navigate("/login")
+  }
 
-    const handlePong = () => {
-        navigate("/selection")
-    }
+  const handlePong = () => {
+      navigate("/selection")
+  }
+
+  const handleHangman = () => {
+    navigate("/hangman")
+  }
 
 	return (
 		<div>
       <Navbarr></Navbarr>
       <button className='pong-button' onClick={() => handlePong()}></button>
+      <button className='hangman-button' onClick={() => handleHangman()}>fdsfsfdfjkfhkjasf</button>
 			<button className="logout-button" onClick={() => handleLogout()}>deconextion</button>
 		</div>
     );
