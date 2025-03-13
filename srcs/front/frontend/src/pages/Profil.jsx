@@ -229,6 +229,10 @@ function Profil() {
                                     <p>Non trouvés : {user.hangman_lose_count}</p><p></p><p> Trouvés : {user.hangman_win_count}</p>
                                 </div>
                             </div>
+                            <div className="small_space"></div>
+                            <h4 className="center">Précision</h4>
+                            <p className="center">{Number.parseInt((user.hangman_find_letter / (user.hangman_miss_letter + user.hangman_find_letter)) * 100)} % lettres justes !</p>                       
+                            <div className="small_space"></div>
                             <h4 className="center">Historique des Parties</h4>
                             <HangmanArray hangman_games={hangman_games} />
                             </>
@@ -337,7 +341,7 @@ function HangmanResult({finded, word, date, word_group, skin}) {
                 <div>
                     <p>{word}</p>
                     <p>{word_group}</p>
-                    <p>{skin}</p>
+                    <img style={{width: "50px", height: "50px"}} src={skin} alt="" />
                 </div>
             </div>
             </div>)

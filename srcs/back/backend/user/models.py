@@ -27,7 +27,7 @@ class Hangman(models.Model):
     finded = models.BooleanField(default=False)
     date = models.CharField()
     word_group = models.CharField(default="Normal")
-    skin = models.CharField(default="Normal")
+    skin = models.URLField(default="Normal")
 
 class Match(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

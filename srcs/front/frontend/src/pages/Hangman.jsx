@@ -25,6 +25,7 @@ function Hangman() {
   const [selectedWordGroup, setSelectedWordGroup] = useState(null);
   const [miss_letter, set_miss_letter] = useState(0);
   const [find_letter, set_find_letter] = useState(0);
+  const [selectedWordGroupName, setSelectedWordGroupName] = useState("Default");
 
   const defaultWords = ["python", "flask", "react", "javascript", "html", "css", "django", "shell", "programmation", "code"];
   const midWords = ["final fantasy", "grand theft auto", "red dead redemption", "super smash bros", "animal crossing", "uncharted", "far cry", "assassin creed", "call of duty", "five nights at freddy"];
@@ -153,12 +154,12 @@ function Hangman() {
       if (updatedGame.status === "won") {
         setMessage(`Félicitations ! Vous avez trouvé le mot : ${updatedGame.word}`);
         await axios.post('api/user/addScoreHangman/', {userToken, score, result: "VICTOIRE", find_letter, miss_letter});
-        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 1, date: getDate(), word_group: "Normal", skin: "Normal"});
+        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 1, date: getDate(), word_group: selectedWordGroupName, skin: selectedAvatar});
 
       } else if (updatedGame.status === "lost") {
         setMessage(`Dommage ! Le mot était : ${updatedGame.word}`);
         await axios.post('api/user/addScoreHangman/', {userToken, score, result: "DEFAITE", find_letter, miss_letter});
-        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 0, date: getDate(), word_group: "Normal", skin: "Normal"});
+        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 0, date: getDate(), word_group: selectedWordGroupName, skin: selectedAvatar});
       } else if (updatedGame.word.includes(lowerLetter)) {
         setMessage(`Bonne devinette ! +${pointsEarned} points !`);
       } else {
@@ -336,6 +337,7 @@ function Hangman() {
     <h2>Choisissez votre avatar</h2>
     <div className="avatar-selection">
       <button 
+        style={{backgroundColor: selectedAvatar == avatar1 ? "gray" : "white" }}
         onClick={() => setSelectedAvatar(avatar1)} 
         className="avatar-button"
       >
@@ -344,6 +346,7 @@ function Hangman() {
       </button>
       
       <button 
+        style={{backgroundColor: selectedAvatar == avatar2 ? "gray" : "white" }}
         onClick={() => score >= 100 ? setSelectedAvatar(avatar2) : null} 
         className={`avatar-button ${score < 100 ? 'locked' : ''}`}
         disabled={score < 100}
@@ -358,6 +361,7 @@ function Hangman() {
       </button>
       
       <button 
+        style={{backgroundColor: selectedAvatar == avatar3 ? "gray" : "white" }}
         onClick={() => score >= 200 ? setSelectedAvatar(avatar3) : null} 
         className={`avatar-button ${score < 200 ? 'locked' : ''}`}
         disabled={score < 200}
@@ -372,6 +376,7 @@ function Hangman() {
       </button>
       
       <button 
+        style={{backgroundColor: selectedAvatar == avatar4 ? "gray" : "white" }}
         onClick={() => score >= 300 ? setSelectedAvatar(avatar4) : null} 
         className={`avatar-button ${score < 300 ? 'locked' : ''}`}
         disabled={score < 300}
@@ -390,17 +395,19 @@ function Hangman() {
     <h2>Choisissez le thème</h2>
     <div className="word-selection">
       <button 
-        onClick={() => setSelectedWordGroup(defaultWords)} 
+        onClick={() => {setSelectedWordGroup(defaultWords); setSelectedWordGroupName('Informatique');}} 
         className="word-button"
+        style={{backgroundColor: selectedWordGroupName == 'Informatique' ? "gray" : "white" }}
       >
         <div className="theme-icon">📝</div>
         <span>Easy Informatique</span>
       </button>
         
       <button 
-        onClick={() => score >= 100 ? setSelectedWordGroup(midWords) : null} 
+        onClick={() => score >= 100 ? () => {setSelectedWordGroup(midWords); setSelectedWordGroupName('Gaming');} : null} 
         className={`word-button ${score < 100 ? 'locked' : ''}`}
         disabled={score < 100}
+        style={{backgroundColor: selectedWordGroupName == 'Gaming' ? "gray" : "white" }}
       >
         <div className="theme-icon">🎮</div>
         <span>Mid Gaming</span>
@@ -408,9 +415,10 @@ function Hangman() {
       </button>
         
       <button 
-        onClick={() => score >= 300 ? setSelectedWordGroup(hardWords) : null} 
+        onClick={() => score >= 300 ?  () => {setSelectedWordGroup(hardWords); setSelectedWordGroupName('Orthographe');} : null} 
         className={`word-button ${score < 300 ? 'locked' : ''}`}
         disabled={score < 300}
+        style={{backgroundColor: selectedWordGroupName == 'Orthographe' ? "gray" : "white" }}
       >
         <div className="theme-icon">📚</div>
         <span>Hard Orthographe</span>
