@@ -422,6 +422,7 @@ class PongConsumer(AsyncWebsocketConsumer):
     right_paddle_pos = {}
     score = {}
     game_task = {}
+    power_up_task = {}
     up_limit = 60
     down_limit = 440
     score_to_win = {}
@@ -566,6 +567,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if (message == "begin_game"):
             PongConsumer.game_task[self.room_name] = asyncio.create_task(self.main_loop())
+            if (PongConsumer.power_up[self.room_name] == 1):
+                logger.info("ui")
+                PongConsumer.power_up_task[self.room_name] = asyncio.create_task(self.power_up_loop())
 
 
     async def disconnect(self, close_code):
@@ -715,5 +719,11 @@ class PongConsumer(AsyncWebsocketConsumer):
                 'x': PongConsumer.ball_pos[self.room_name][0],
                 'y': PongConsumer.ball_pos[self.room_name][1]
             }))
+            logger.info(PongConsumer.ball_pos[self.room_name])
             await asyncio.sleep(1 / 30)
-        
+
+    async def power_up_loop(self):
+        while True:
+            await asyncio.sleep(1 / 30)
+
+            
