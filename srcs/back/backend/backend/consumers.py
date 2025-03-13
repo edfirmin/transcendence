@@ -422,6 +422,7 @@ class PongConsumer(AsyncWebsocketConsumer):
     right_paddle_pos = {}
     score = {}
     game_task = {}
+    power_up_task = {}
     up_limit = 60
     down_limit = 440
     score_to_win = {}
@@ -432,6 +433,9 @@ class PongConsumer(AsyncWebsocketConsumer):
     longest_exchange = {}
     shortest_exchange = {}
     current_exchange = {}
+    
+    power_up_list = ["long_paddle"]
+    paddle_size = {}
 
     async def change_ai_direction_easy(self, time): 
         await asyncio.sleep(time)
@@ -502,13 +506,12 @@ class PongConsumer(AsyncWebsocketConsumer):
         PongConsumer.longest_exchange[self.room_name] = 0
         PongConsumer.shortest_exchange[self.room_name] = 10000
         PongConsumer.current_exchange[self.room_name] = 0
+        PongConsumer.paddle_size[self.room_name] = 60
         
 
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message = data_json['message']
-
-        logger.info(self.ball_pos)
 
         #if (message == "isAi"):
         #    PongConsumer.is_ai[self.room_name] = data_json['value']
@@ -566,7 +569,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if (message == "begin_game"):
             PongConsumer.game_task[self.room_name] = asyncio.create_task(self.main_loop())
-
+            if (PongConsumer.power_up[self.room_name] == 1):
+                self.wait_until_power_up(2)
 
     async def disconnect(self, close_code):
         logger.info("salut mon pote")
@@ -614,7 +618,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             # right side
             if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] > 750):
                 # check if paddle hit ball
-                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] + 60 and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] - 60):
+                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] + PongConsumer.paddle_size[self.room_name] 
+                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]):
                     
                     impact_pos = PongConsumer.right_paddle_pos[self.room_name][1] - PongConsumer.ball_pos[self.room_name][1] # between -60 and 60
                     impact_pos *= -1
@@ -660,7 +665,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 
             # left side
             if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] < 50):
-                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.left_paddle_pos[self.room_name][1] + 60 and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.left_paddle_pos[self.room_name][1] - 60):
+                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.left_paddle_pos[self.room_name][1] + PongConsumer.paddle_size[self.room_name] 
+                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.left_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]):
                     
                     impact_pos = PongConsumer.left_paddle_pos[self.room_name][1] - PongConsumer.ball_pos[self.room_name][1] # between -60 and 60
                     impact_pos *= -1
@@ -716,4 +722,39 @@ class PongConsumer(AsyncWebsocketConsumer):
                 'y': PongConsumer.ball_pos[self.room_name][1]
             }))
             await asyncio.sleep(1 / 30)
-        
+
+    async def wait_until_power_up(self, wait_time):
+        await asyncio.sleep(wait_time)
+
+        PongConsumer.paddle_size[self.room_name] = 60
+        await self.send(text_data=json.dumps({
+            'type':'paddle_size',
+            'message': PongConsumer.paddle_size[self.room_name]
+        }))
+
+        self.spawn_power_up()
+
+    async def spawn_power_up(self):
+        logger.info("POWER_UP")
+
+        choosed_power_up = random.choice(self.power_up_list)
+
+        #await self.send(text_data=json.dumps({
+        #    'type':'power_up',
+        #    'message':choosed_power_up 
+        #}))
+
+
+        if (choosed_power_up == 'long_paddle'):
+            PongConsumer.paddle_size[self.room_name] = 80
+            await self.send(text_data=json.dumps({
+                'type':'paddle_size',
+                'message': PongConsumer.paddle_size[self.room_name]
+            }))
+        logger.info(PongConsumer.paddle_size[self.room_name])
+
+        self.wait_until_power_up(6)
+
+
+
+            
