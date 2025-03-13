@@ -141,7 +141,7 @@
     overflow: scroll;
     overflow-x: hidden;
 
-    height: 50%;
+    height: 80%;
 
     border-radius: 2em;
     border-width: 3px;
@@ -244,4 +244,15 @@ hr {
     flex: 1 1 0;
     text-align: center;
     min-height: 40px;
+}
+
+.matchResultDataHolder {
+    display: flex;
+}
+
+.matchResultDataHolder div {
+    flex: 1 1 0;
+    display: flexbox;
+    flex-direction: row;
+    padding-left: 50px;
 }

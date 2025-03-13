@@ -5,7 +5,7 @@ from .models import Tourney
 from .models import TourneyPlayer
 from .models import Hangman
 from rest_framework.views import APIView
-from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer, TourneySerializer, TourneyPlayerSerializer
+from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer, TourneySerializer, TourneyPlayerSerializer, HangmanSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from django.http import JsonResponse
@@ -180,6 +180,16 @@ def getMatches(request):
     matches = Match.objects.filter(user=user_id)
 
     matchesSer = MatchSerializer(matches, many=True)
+    return JsonResponse(matchesSer.data, safe=False)
+
+def getHangmanGames(request):
+    myPath = request.build_absolute_uri()
+    token_string = myPath.split("?")[1]
+    token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+    user_id = token.get('id')
+    matches = Hangman.objects.filter(user=user_id)
+
+    matchesSer = HangmanSerializer(matches, many=True)
     return JsonResponse(matchesSer.data, safe=False)
 
 def getTourney(request):
@@ -379,7 +389,7 @@ class AddHangmanStats(APIView):
         user_id = token.get('id')
         myUser = User.objects.get(id=user_id)
 
-        hangman = Hangman(user=myUser, word=request.data['word'], finded=request.data['finded'], date=request.data['date'])
+        hangman = Hangman(user=myUser, word=request.data['word'], finded=request.data['finded'], date=request.data['date'], word_group=request.data['word_group'], skin=request.data['skin'])
 
         hangman.save()
         return Response(True)
