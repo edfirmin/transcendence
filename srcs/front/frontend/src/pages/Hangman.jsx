@@ -126,11 +126,11 @@ function Hangman() {
       if (updatedGame.status === "won") {
         setMessage(`Félicitations ! Vous avez trouvé le mot : ${updatedGame.word}`);
         await axios.post('api/user/addScoreHangman/', {userToken, score, result: "VICTOIRE"});
-        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 1, date: getDate()});
+        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 1, date: getDate(), word_group: "Normal", skin: "Normal"});
       } else if (updatedGame.status === "lost") {
         setMessage(`Dommage ! Le mot était : ${updatedGame.word}`);
         await axios.post('api/user/addScoreHangman/', {userToken, score, result: "DEFAITE"});
-        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 0, date: getDate()});
+        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 0, date: getDate(), word_group: "Normal", skin: "Normal"});
       } else if (updatedGame.word.includes(lowerLetter)) {
         setMessage(`Bonne devinette ! +${pointsEarned} points !`);
       } else {

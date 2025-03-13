@@ -46,4 +46,4 @@ class TourneyPlayerSerializer(serializers.ModelSerializer):
 class HangmanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hangman
-        fields = ["user", "word", "finded", "date"]
+        fields = ["user", "word", "finded", "date", "word_group", "skin"]
