@@ -2,6 +2,7 @@ from .models import User
 from .models import Match
 from .models import Tourney
 from .models import TourneyPlayer
+from .models import Hangman
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,3 +42,8 @@ class TourneyPlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = TourneyPlayer
         fields = ["tourney", "name", "isUser"]
+
+class HangmanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hangman
+        fields = ["user", "word", "finded", "date"]

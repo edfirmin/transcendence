@@ -20,8 +20,9 @@ class User(AbstractUser):
     hangman_lose_count = models.BigIntegerField(default=0)
 
 class Hangman(models.Model):
+    user = models.ForeignKey(User, default=None, on_delete=models.CASCADE)
     word = models.CharField()
-    finded = models.BooleanField()
+    finded = models.BooleanField(default=False)
     date = models.CharField()
 
 

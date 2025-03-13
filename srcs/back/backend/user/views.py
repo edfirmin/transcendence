@@ -3,6 +3,7 @@ from .models import User
 from .models import Match
 from .models import Tourney
 from .models import TourneyPlayer
+from .models import Hangman
 from rest_framework.views import APIView
 from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer, TourneySerializer, TourneyPlayerSerializer
 from rest_framework.response import Response
@@ -359,7 +360,11 @@ class AddScoreHangman(APIView):
         myUser = User.objects.get(id=user_id)
 
         myUser.hangman_score = myUser.hangman_score + request.data['score']
-
+        if (request.data['result'] == "VICTOIRE"):
+            myUser.hangman_win_count = myUser.hangman_win_count + 1
+        else:
+            myUser.hangman_lose_count = myUser.hangman_lose_count + 1
+        
         myUser.save()
         return Response(True)
     
@@ -371,10 +376,7 @@ class AddHangmanStats(APIView):
         user_id = token.get('id')
         myUser = User.objects.get(id=user_id)
 
-        if (request.data['result'] == "VICTOIRE"):
-            myUser.hangman_win_count = myUser.hangman_win_count + 1
-        else:
-            myUser.hangman_lose_count = myUser.hangman_lose_count + 1
+        hangman = Hangman(user=myUser, word=request.data['word'], finded=request.data['finded'], date=request.data['date'])
 
-        myUser.save()
+        hangman.save()
         return Response(True)

@@ -268,7 +268,6 @@ function Pong() {
 		const a = + d.getHours() + ':' + d.getMinutes() + '  ' + year + '-' + month + '-' + day;
 
 		const time = d.getTime() - time_start.getTime();
-		console.log(time);
 		
 		if (isAI)
 			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
@@ -289,6 +288,10 @@ function Pong() {
 			}
 			else
 				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
+	}
+
+	function getDate() {
+		
 	}
 
 	useEffect(() => {

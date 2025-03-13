@@ -21,5 +21,6 @@ urlpatterns = [
     path('addWinnerToTourney/', AddWinnerToTourney.as_view() ,name="addWinnerToTourney"),
     path('addTourneyWinCount/', AddTourneyWinCount.as_view() ,name="addTourneyWinCount"),
     path('addTourneyPlayer/', AddTourneyPlayer.as_view() ,name="addTourneyPlayer"),
-    path('addScoreHangman/', AddScoreHangman.as_view() ,name="addScoreHangman")
+    path('addScoreHangman/', AddScoreHangman.as_view() ,name="addScoreHangman"),
+    path('addHangmanStats/', AddHangmanStats.as_view() ,name="addHangmanStats")
 ]

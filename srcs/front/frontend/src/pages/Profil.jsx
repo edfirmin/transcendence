@@ -248,9 +248,9 @@ function MatchResult({result, date, score_left, score_right, time, type, longest
             { isClicked ? (
             <div>
             <span className="matchResultFirstRow">    
-                    <p className="matchResultResult">{score_left}-{score_right}</p>
-                    <p className="matchResultResult">{result}</p>
-                    <span><p>{date}</p></span>
+                <p className="matchResultResult">{score_left}-{score_right}</p>
+                <p className="matchResultResult">{result}</p>
+                <span><p>{date}</p></span>
             </span>
             <hr/>
             <div>   

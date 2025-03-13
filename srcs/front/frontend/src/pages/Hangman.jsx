@@ -125,10 +125,12 @@ function Hangman() {
       // Définir le message en fonction du résultat
       if (updatedGame.status === "won") {
         setMessage(`Félicitations ! Vous avez trouvé le mot : ${updatedGame.word}`);
-        await axios.post('api/user/addScoreHangman/', {userToken, score});
+        await axios.post('api/user/addScoreHangman/', {userToken, score, result: "VICTOIRE"});
+        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 1, date: getDate()});
       } else if (updatedGame.status === "lost") {
         setMessage(`Dommage ! Le mot était : ${updatedGame.word}`);
-        await axios.post('api/user/addScoreHangman/', {userToken, score});
+        await axios.post('api/user/addScoreHangman/', {userToken, score, result: "DEFAITE"});
+        await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 0, date: getDate()});
       } else if (updatedGame.word.includes(lowerLetter)) {
         setMessage(`Bonne devinette ! +${pointsEarned} points !`);
       } else {
@@ -212,6 +214,19 @@ function Hangman() {
         </div>
       );
     };
+
+  function getDate() {
+    const d = new Date();
+		var day = d.getDate();
+		if (day.toString().length == 1)
+			day = '0' + day;
+		var month = d.getMonth()+1;
+		if (month.toString().length == 1)
+			month = '0' + month;
+		const year = d.getFullYear();
+		const a = + d.getHours() + ':' + d.getMinutes() + '  ' + year + '-' + month + '-' + day;
+    return a
+  }
 
   return (
     <>
