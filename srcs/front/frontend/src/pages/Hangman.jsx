@@ -5,8 +5,14 @@ import { ACCESS_TOKEN } from "../constants";
 import {useNavigate} from "react-router-dom"
 import Navbarr from '../components/Navbar';
 import { getUser } from "../api"
+import avatar1 from './avatars/edfirmi.jpeg';
+import avatar2 from './avatars/jfazi.jpeg';
+import avatar3 from './avatars/ychirouz.jpeg';
+import avatar4 from './avatars/tpenalba.jpeg';
 
 function Hangman() {
+  const navigate = useNavigate();
+
   // États du jeu
   const userToken = localStorage.getItem(ACCESS_TOKEN);
   const [currentGame, setCurrentGame] = useState(null);
@@ -15,9 +21,14 @@ function Hangman() {
   const [message, setMessage] = useState("");
   const [score, setScore] = useState(0);
   const [user, setUser] = useState();
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [selectedWordGroup, setSelectedWordGroup] = useState(null);
+  const [miss_letter, set_miss_letter] = useState(0);
+  const [find_letter, set_find_letter] = useState(0);
 
-  const defaultWords = ["python", "flask", "react", "javascript", "html", "css", "pendu", "jeu", "programmation", "code"];
-
+  const defaultWords = ["python", "flask", "react", "javascript", "html", "css", "django", "shell", "programmation", "code"];
+  const midWords = ["final fantasy", "grand theft auto", "red dead redemption", "super smash bros", "animal crossing", "uncharted", "far cry", "assassin creed", "call of duty", "five nights at freddy"];
+  const hardWords = ["otorhinolaryngologiste", "anticonstitutionnellement", "cacochyme", "chlorhydrique", "dyslexie", "dithyrambe", "obnubilation", "syllogisme", "misanthrope", "philanthrope"];
   useEffect(() => {
     async function inituser() {
       const TMPuser = await getUser()
@@ -35,12 +46,21 @@ function Hangman() {
     // Simuler un délai de chargement pour une meilleure expérience utilisateur
     setTimeout(() => {
       // Choisir un mot aléatoire
-      const randomWord = defaultWords[Math.floor(Math.random() * defaultWords.length)];
+      let randomWord;
+      if (score < 150) {
+        randomWord = selectedWordGroup[Math.floor(Math.random() * selectedWordGroup.length)];
+      } else if (score >= 150 && score < 250) {
+        randomWord = selectedWordGroup[Math.floor(Math.random() * selectedWordGroup.length)];
+      } else {
+        randomWord = selectedWordGroup[Math.floor(Math.random() * selectedWordGroup.length)];
+      }
+    
+      //const randomWord = defaultWords[Math.floor(Math.random() * defaultWords.length)];
       
       // Créer un nouveau jeu avec les mêmes propriétés que le backend
       const newGame = {
         id: Date.now(), // Identifiant unique
-        maskedWord: "_".repeat(randomWord.length),
+        maskedWord: randomWord.split('').map(letter => letter === ' ' ? ' ' : '_').join(''),
         guessedLetters: "",
         attemptsLeft: 6,
         status: "ongoing",
@@ -55,16 +75,21 @@ function Hangman() {
     }, 500);
   };
 
-  // Fonction pour obtenir le mot masqué
   const getMaskedWord = (word, guessedLetters) => {
+    return word.split('').map(letter => 
+      letter === ' ' ? ' ' : guessedLetters.includes(letter) ? letter : "_"
+    ).join('');
+  };
+  /*const getMaskedWord = (word, guessedLetters) => {
     return word.split('').map(letter => 
       guessedLetters.includes(letter) ? letter : "_"
     ).join('');
-  };
+  };*/
 
   // Fonction pour deviner une lettre
   const guessLetter = (e) => {
     e.preventDefault();
+  
     
     if (!letter || letter.length !== 1 || !letter.match(/[a-z]/i)) {
       setMessage("Veuillez entrer une seule lettre");
@@ -99,8 +124,10 @@ function Hangman() {
         const letterCount = updatedGame.word.split('').filter(char => char === lowerLetter).length;
         // Attribuer 10 points par occurrence de la lettre
         pointsEarned = letterCount * 10;
+        set_find_letter(find_letter + 1);
       } else {
         updatedGame.attemptsLeft -= 1;
+        set_miss_letter(miss_letter + 1);
       }
       
       // Vérifier si la partie est gagnée
@@ -109,7 +136,7 @@ function Hangman() {
       if (isWordGuessed) {
         updatedGame.status = "won";
         // Bonus pour avoir complété le mot
-        pointsEarned += 50;
+        pointsEarned += 10;
       } else if (updatedGame.attemptsLeft <= 0) {
         updatedGame.status = "lost";
       }
@@ -125,11 +152,11 @@ function Hangman() {
       // Définir le message en fonction du résultat
       if (updatedGame.status === "won") {
         setMessage(`Félicitations ! Vous avez trouvé le mot : ${updatedGame.word}`);
-        await axios.post('api/user/addScoreHangman/', {userToken, score, result: "VICTOIRE"});
+        await axios.post('api/user/addScoreHangman/', {userToken, score, result: "VICTOIRE", find_letter, miss_letter});
         await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 1, date: getDate()});
       } else if (updatedGame.status === "lost") {
         setMessage(`Dommage ! Le mot était : ${updatedGame.word}`);
-        await axios.post('api/user/addScoreHangman/', {userToken, score, result: "DEFAITE"});
+        await axios.post('api/user/addScoreHangman/', {userToken, score, result: "DEFAITE", find_letter, miss_letter});
         await axios.post('api/user/addHangmanStats/', {userToken, word: currentGame.word, finded: 0, date: getDate()});
       } else if (updatedGame.word.includes(lowerLetter)) {
         setMessage(`Bonne devinette ! +${pointsEarned} points !`);
@@ -161,9 +188,21 @@ function Hangman() {
           <line x1="140" y1="20" x2="140" y2="50" stroke="black" strokeWidth="3" 
                 opacity={attemptsLeft < 6 ? "1" : "0"} />
           
-          {/* Tête */}
-          <circle cx="140" cy="70" r="20" stroke="black" strokeWidth="3" fill="transparent" 
-                 opacity={attemptsLeft < 5 ? "1" : "0"} />
+          {/* Tête (conditionnelle selon si un avatar est sélectionné) */}
+          {selectedAvatar && attemptsLeft < 5 ? (
+            <image 
+              href={selectedAvatar} 
+              x="120" 
+              y="50" 
+              height="40" 
+              width="40" 
+              className="avatar-head"
+              opacity={attemptsLeft < 5 ? "1" : "0"}
+            />
+          ) : (
+            <circle cx="140" cy="70" r="20" stroke="black" strokeWidth="3" fill="transparent" 
+                    opacity={attemptsLeft < 5 ? "1" : "0"} />
+          )}
           
           {/* Corps */}
           <line x1="140" y1="90" x2="140" y2="150" stroke="black" strokeWidth="3" 
@@ -275,15 +314,16 @@ function Hangman() {
             </button>
           </form>
           
-          {/* Clavier virtuel */}
           {renderKeyboard()}
           
-          {/* Affichage du statut final */}
           {currentGame.status !== "ongoing" && (
             <div className={`game-over ${currentGame.status}`}>
               <p>{message}</p>
               <button onClick={startNewGame} className="new-game-button">
                 Nouvelle partie
+              </button>
+              <button onClick={() => { window.location.reload(); }} className="new-game-button">
+                Changer Options
               </button>
             </div>
           )}
@@ -291,10 +331,100 @@ function Hangman() {
       )}
       
       {!currentGame && !loading && (
-        <button onClick={startNewGame} className="new-game-button">
-          Commencer une partie
-        </button>
-      )}
+  <div className="avatar-selection-container">
+    <h2>Choisissez votre avatar</h2>
+    <div className="avatar-selection">
+      <button 
+        onClick={() => setSelectedAvatar(avatar1)} 
+        className="avatar-button"
+      >
+        <img src={avatar1} alt="Avatar 1" className="avatar-preview" />
+        <span>Empereur des merdeux</span>
+      </button>
+      
+      <button 
+        onClick={() => score >= 100 ? setSelectedAvatar(avatar2) : null} 
+        className={`avatar-button ${score < 100 ? 'locked' : ''}`}
+        disabled={score < 100}
+      >
+        <img 
+          src={avatar2} 
+          alt="Avatar 2" 
+          className={`avatar-preview ${score < 100 ? 'locked-img' : ''}`} 
+        />
+        <span>Lutin Radin</span>
+        {score < 100 && <div className="lock-overlay">Débloqué à 100 points</div>}
+      </button>
+      
+      <button 
+        onClick={() => score >= 200 ? setSelectedAvatar(avatar3) : null} 
+        className={`avatar-button ${score < 200 ? 'locked' : ''}`}
+        disabled={score < 200}
+      >
+        <img 
+          src={avatar3} 
+          alt="Avatar 3" 
+          className={`avatar-preview ${score < 200 ? 'locked-img' : ''}`} 
+        />
+        <span>Leche motte</span>
+        {score < 200 && <div className="lock-overlay">Débloqué à 200 points</div>}
+      </button>
+      
+      <button 
+        onClick={() => score >= 300 ? setSelectedAvatar(avatar4) : null} 
+        className={`avatar-button ${score < 300 ? 'locked' : ''}`}
+        disabled={score < 300}
+      >
+        <img 
+          src={avatar4} 
+          alt="Avatar 4" 
+          className={`avatar-preview ${score < 300 ? 'locked-img' : ''}`} 
+        />
+        <span>Leche berde</span>
+        {score < 300 && <div className="lock-overlay">Débloqué à 300 points</div>}
+      </button>
+    </div>
+
+      <div className="word-selection-container">
+    <h2>Choisissez le thème</h2>
+    <div className="word-selection">
+      <button 
+        onClick={() => setSelectedWordGroup(defaultWords)} 
+        className="word-button"
+      >
+        <div className="theme-icon">📝</div>
+        <span>Easy Informatique</span>
+      </button>
+        
+      <button 
+        onClick={() => score >= 100 ? setSelectedWordGroup(midWords) : null} 
+        className={`word-button ${score < 100 ? 'locked' : ''}`}
+        disabled={score < 100}
+      >
+        <div className="theme-icon">🎮</div>
+        <span>Mid Gaming</span>
+        {score < 100 && <div className="lock-overlay">Débloqué à 100 points</div>}
+      </button>
+        
+      <button 
+        onClick={() => score >= 300 ? setSelectedWordGroup(hardWords) : null} 
+        className={`word-button ${score < 300 ? 'locked' : ''}`}
+        disabled={score < 300}
+      >
+        <div className="theme-icon">📚</div>
+        <span>Hard Orthographe</span>
+        {score < 300 && <div className="lock-overlay">Débloqué à 300 points</div>}
+      </button>
+    </div>
+  </div>
+    
+    {selectedAvatar && selectedWordGroup && (
+      <button onClick={startNewGame} className="new-game-button">
+        Commencer une partie
+      </button>
+    )}
+  </div>
+)}
       
       {loading && <div className="loading">Chargement...</div>}
     </div>

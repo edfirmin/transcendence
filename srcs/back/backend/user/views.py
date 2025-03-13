@@ -360,6 +360,9 @@ class AddScoreHangman(APIView):
         myUser = User.objects.get(id=user_id)
 
         myUser.hangman_score = myUser.hangman_score + request.data['score']
+        myUser.hangman_find_letter = myUser.hangman_find_letter + request.data['find_letter']
+        myUser.hangman_miss_letter = myUser.hangman_miss_letter + request.data['miss_letter']
+        
         if (request.data['result'] == "VICTOIRE"):
             myUser.hangman_win_count = myUser.hangman_win_count + 1
         else:
