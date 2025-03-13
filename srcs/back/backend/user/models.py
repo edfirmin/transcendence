@@ -16,6 +16,13 @@ class User(AbstractUser):
     lose_count = models.BigIntegerField(default=0)
     tourney_win_count = models.BigIntegerField(default=0)
     hangman_score = models.BigIntegerField(default=0)
+    hangman_win_count = models.BigIntegerField(default=0)
+    hangman_lose_count = models.BigIntegerField(default=0)
+
+class Hangman(models.Model):
+    word = models.CharField()
+    finded = models.BooleanField()
+    date = models.CharField()
 
 
 class Match(models.Model):

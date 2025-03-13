@@ -115,3 +115,7 @@ div {
 	height: 45%;
 	width: 30%;
 }
+
+.center {
+	display: flex;
+}

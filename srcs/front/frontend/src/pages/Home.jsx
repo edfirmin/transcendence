@@ -24,20 +24,16 @@ function Home() {
 	return (
 		<div>
       <Navbarr></Navbarr>
-      <button className='pong-button' onClick={() => handlePong()}></button>
-      <button className='hangman-button' onClick={() => handleHangman()}>fdsfsfdfjkfhkjasf</button>
+      <button style={{height: "150px", width:"300px", position: "absolute", left:"500px", top:"400px"}} className='button' onClick={() => handlePong()}>Pong</button>
+      <button style={{height: "150px", width:"350px", position: "absolute", left:"1000px", top:"400px"}} className='button' onClick={() => handleHangman()}>Hangman</button>
 			<button className="logout-button" onClick={() => handleLogout()}>deconextion</button>
 		</div>
-    );
+  );
 }
 
 function Button({name, callback}) {
 	return (
-	  <tr>
-		<td>
 		  <button className='button' onClick={() => callback()}>{name} </button>
-		</td>
-	  </tr>
 	)
 }
 

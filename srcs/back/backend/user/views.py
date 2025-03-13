@@ -362,3 +362,19 @@ class AddScoreHangman(APIView):
 
         myUser.save()
         return Response(True)
+    
+
+class AddHangmanStats(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        if (request.data['result'] == "VICTOIRE"):
+            myUser.hangman_win_count = myUser.hangman_win_count + 1
+        else:
+            myUser.hangman_lose_count = myUser.hangman_lose_count + 1
+
+        myUser.save()
+        return Response(True)

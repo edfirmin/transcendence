@@ -18,10 +18,14 @@ function Hangman() {
 
   const defaultWords = ["python", "flask", "react", "javascript", "html", "css", "pendu", "jeu", "programmation", "code"];
 
-  useEffect(async () => {
-    const TMPuser = await getUser()
-    setUser(TMPuser);
-    setScore(TMPuser.hangman_score)
+  useEffect(() => {
+    async function inituser() {
+      const TMPuser = await getUser()
+      setUser(TMPuser);
+      setScore(TMPuser.hangman_score)
+    }
+
+    inituser();
   }, [])
   
   // Fonction pour démarrer une nouvelle partie

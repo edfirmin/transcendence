@@ -8,6 +8,7 @@ import profile_logo from "../assets/profile_logo.png"
 import { useNavigate } from "react-router-dom";
 import Snowfall from 'react-snowfall'
 import victory_cup from '../assets/img/victory_cup.png'
+import star_icon from '../assets/img/star_icon.webp'
 import classic_map_design from '../assets/img/classic_map_design.png'
 import tennis_map_design from '../assets/img/tennis_map_design.png'
 import table_tennis_map_design from '../assets/img/table_tennis_map_design.png'
@@ -20,7 +21,7 @@ function Profil() {
     const [preferMap, setPreferMap] = useState(-1)
     const [averageTime, setAverageTime] = useState(null)
     const map_design = [classic_map_design, tennis_map_design, table_tennis_map_design];
-    
+    const [selectedPong, setSelectedPong] = useState(true);
 
     useEffect(() => {
         inituser()
@@ -169,35 +170,54 @@ function Profil() {
                         <button onClick={handleButton} className="rb">Activer la 2FA</button>
                     </div>
                     <div className="rigth">
-                        <div id="stats_up">
-                            <h2>Stats</h2>
-                            <div>
-                                <p>{user.tourney_win_count}</p>
-                                <img src={victory_cup} style={{height: "50px", width: "50px"}} />
+                        <div id="choose_game">
+                            <button style={{borderRadius: "10px 0 0 10px", backgroundColor: selectedPong ? "gray" : "white"}} onClick={() => {setSelectedPong(true)}}>Pong</button>
+                            <button style={{borderRadius: "0 10px 10px 0", backgroundColor: selectedPong ? "white" : "gray"}} onClick={() => {setSelectedPong(false)}}>Hangman</button>
+                        </div>
+                        { selectedPong ? 
+                            <>
+                            <div id="stats_up">
+                                <h2>Stats</h2>
+                                <div>
+                                    <p>{user.tourney_win_count}</p>
+                                    <img src={victory_cup} style={{height: "50px", width: "50px"}} />
+                                </div>
+                                
                             </div>
-                            
-                        </div>
-                        <h4 className="center">Winrate</h4>
-                        <WinrateBar loses={user.lose_count} wins={user.win_count} />
-                        <div>
-                        <div style={{display: "flex", justifyContent: "space-between"}}>
-                            <p>Défaites : {user.lose_count}</p><p></p><p> Victoires : {user.win_count}</p>
-                        </div>
-                        </div>
-                        <div className="small_space"></div>
-                        <h4 className="center">Préférence de difficulté IA</h4>
-                        <p className="center">{preferAIDifficulty}</p>                       
-                        <div className="small_space"></div>
-                        <h4 className="center">Préférence de Map</h4>
-                        {preferMap == -1 ? <p className="center">Aucune</p> : <img className="center" style={{width: "75px", height: "75px"}} src={map_design[preferMap]} />}
-                        <div className="small_space"></div>
-                        <div className="small_space"></div>
+                            <h4 className="center">Winrate</h4>
+                            <WinrateBar loses={user.lose_count} wins={user.win_count} />
+                            <div>
+                            <div style={{display: "flex", justifyContent: "space-between"}}>
+                                <p>Défaites : {user.lose_count}</p><p></p><p> Victoires : {user.win_count}</p>
+                            </div>
+                            </div>
+                            <div className="small_space"></div>
+                            <h4 className="center">Préférence de difficulté IA</h4>
+                            <p className="center">{preferAIDifficulty}</p>                       
+                            <div className="small_space"></div>
+                            <h4 className="center">Préférence de Map</h4>
+                            {preferMap == -1 ? <p className="center">Aucune</p> : <img className="center" style={{width: "75px", height: "75px"}} src={map_design[preferMap]} />}
+                            <div className="small_space"></div>
+                            <div className="small_space"></div>
 
-                        <h4 className="center">Durée moyenne match</h4>
-                        {averageTime != null ? <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p> : <p className="center">No Match Play</p>}
-                        <div className="small_space"></div>
-                        <h4 className="center">Historique de Match</h4>
-                        <MatchArray matches={matches} />
+                            <h4 className="center">Durée moyenne match</h4>
+                            {averageTime != null ? <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p> : <p className="center">No Match Play</p>}
+                            <div className="small_space"></div>
+                            <h4 className="center">Historique de Match</h4>
+                            <MatchArray matches={matches} />
+                            </>
+                        :
+                            <>
+                            <div id="stats_up">
+                                <h2>Stats</h2>
+                                <div>
+                                    <p>{user.hangman_score}</p>
+                                    <img src={star_icon} style={{height: "50px", width: "50px"}} />
+                                </div>
+                                
+                            </div>
+                            </>
+                        }
                     </div>
                 </div> :
             <EditProfil></EditProfil>}

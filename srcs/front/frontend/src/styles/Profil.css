@@ -233,3 +233,15 @@ hr {
 .small_space {
     height: 10px;
 }
+
+#choose_game {
+    display: flex;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+
+#choose_game button {
+    flex: 1 1 0;
+    text-align: center;
+    min-height: 40px;
+}
