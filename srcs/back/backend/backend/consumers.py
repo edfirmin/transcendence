@@ -147,6 +147,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             
             elif message_type == 'game_invite':
                 recipient_id = data.get('recipient')
+                room_id = data.get('room_id')
                 if recipient_id:
                     recipient = await self.get_user_by_id(recipient_id)
                     if recipient and not await self.is_blocked(self.user.id, recipient_id):
@@ -157,7 +158,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 'invite': {
                                     'from_user': self.user.username,
                                     'from_user_id': self.user.id,
-                                    'game_type': 'pong'
+                                    'game_type': 'pong',
+                                    'room_id': room_id
                                 }
                             }
                         )
