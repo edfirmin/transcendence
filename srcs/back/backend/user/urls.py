@@ -23,5 +23,9 @@ urlpatterns = [
     path('addTourneyWinCount/', AddTourneyWinCount.as_view() ,name="addTourneyWinCount"),
     path('addTourneyPlayer/', AddTourneyPlayer.as_view() ,name="addTourneyPlayer"),
     path('addScoreHangman/', AddScoreHangman.as_view() ,name="addScoreHangman"),
-    path('addHangmanStats/', AddHangmanStats.as_view() ,name="addHangmanStats")
+    path('addHangmanStats/', AddHangmanStats.as_view() ,name="addHangmanStats"),
+    path('blocked/', BlockedUsersView.as_view(), name="blocked_users"),
+    path('blocked/<int:user_id>/', BlockedUsersView.as_view(), name="unblock_user"),
+    path('friends/', FriendView.as_view(), name='friends'),
+    path('friends/<str:username>/', FriendView.as_view(), name='remove_friend')
 ]

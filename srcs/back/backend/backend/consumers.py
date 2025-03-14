@@ -6,9 +6,232 @@ import asyncio
 import logging
 import random
 import math
+from user.models import User, BlockedUser
+from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
+from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 logging.basicConfig(level=logging.DEBUG)  # Définir le niveau des logs
 logger = logging.getLogger(__name__)     # Créer un logger avec un nom unique
+
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        self.room_group_name = 'chat_global'
+        
+        # Join global chat room
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        
+        # Join personal room for direct messages
+        self.personal_room = f'user_{self.user.id}'
+        await self.channel_layer.group_add(
+            self.personal_room,
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.channel_layer.group_discard(
+            self.personal_room,
+            self.channel_name
+        )
+
+    @database_sync_to_async
+    def is_blocked(self, sender_id, recipient_id):
+        return BlockedUser.objects.filter(
+            user_id=recipient_id,
+            blocked_user_id=sender_id
+        ).exists()
+
+    @database_sync_to_async
+    def get_user_by_id(self, user_id):
+        try:
+            return User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return None
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+            message_type = data.get('type', 'chat_message')
+            
+            if message_type == 'chat_message':
+                message = data.get('message', '')
+                recipient_id = data.get('recipient')
+                
+                # Check if this is a direct message
+                if recipient_id:
+                    recipient = await self.get_user_by_id(recipient_id)
+                    if not recipient:
+                        return
+                    
+                    # Check if recipient has blocked the sender
+                    if await self.is_blocked(self.user.id, recipient_id):
+                        return
+                    
+                    # Send to recipient's personal room
+                    await self.channel_layer.group_send(
+                        f'user_{recipient_id}',
+                        {
+                            'type': 'chat_message',
+                            'message': {
+                                'text': message,
+                                'username': self.user.username,
+                                'profil_pic': self.user.profil_pic,
+                                'isSelf': False,
+                                'isDirect': True
+                            }
+                        }
+                    )
+                    
+                    # Send confirmation to sender
+                    await self.channel_layer.group_send(
+                        self.personal_room,
+                        {
+                            'type': 'chat_message',
+                            'message': {
+                                'text': message,
+                                'username': self.user.username,
+                                'profil_pic': self.user.profil_pic,
+                                'isSelf': True,
+                                'isDirect': True,
+                                'recipient': recipient.username
+                            }
+                        }
+                    )
+                else:
+                    # Global chat message
+                    # First send to all other users
+                    await self.channel_layer.group_send(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_message',
+                            'message': {
+                                'text': message,
+                                'username': self.user.username,
+                                'profil_pic': self.user.profil_pic,
+                                'userId': self.user.id,
+                                'isSelf': False
+                            }
+                        }
+                    )
+                    
+                    # Then send a copy to the sender with isSelf: true
+                    await self.send(text_data=json.dumps({
+                        'type': 'chat_message',
+                        'message': {
+                            'text': message,
+                            'username': self.user.username,
+                            'profil_pic': self.user.profil_pic,
+                            'userId': self.user.id,
+                            'isSelf': True
+                        }
+                    }))
+            
+            elif message_type == 'block_user':
+                blocked_user_id = data.get('user_id')
+                if blocked_user_id:
+                    await database_sync_to_async(BlockedUser.objects.create)(
+                        user=self.user,
+                        blocked_user_id=blocked_user_id
+                    )
+            
+            elif message_type == 'game_invite':
+                recipient_id = data.get('recipient')
+                if recipient_id:
+                    recipient = await self.get_user_by_id(recipient_id)
+                    if recipient and not await self.is_blocked(self.user.id, recipient_id):
+                        await self.channel_layer.group_send(
+                            f'user_{recipient_id}',
+                            {
+                                'type': 'game_invite',
+                                'invite': {
+                                    'from_user': self.user.username,
+                                    'from_user_id': self.user.id,
+                                    'game_type': 'pong'
+                                }
+                            }
+                        )
+
+        except json.JSONDecodeError:
+            pass
+        except Exception as e:
+            logger.error(f"Error in chat consumer: {str(e)}")
+
+    async def chat_message(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'type': 'chat_message',
+            'message': message
+        }))
+
+    async def game_invite(self, event):
+        invite = event['invite']
+        await self.send(text_data=json.dumps({
+            'type': 'game_invite',
+            'invite': invite
+        }))
+
+class OnlineUsersConsumer(AsyncWebsocketConsumer):
+    connected_users = {}  # Class variable to track connected users
+
+    @classmethod
+    def is_user_online(cls, user_id):
+        return user_id in cls.connected_users
+
+    async def connect(self):
+        self.user = self.scope["user"]
+        OnlineUsersConsumer.connected_users[self.user.id] = self.channel_name
+
+        # Join online users group
+        await self.channel_layer.group_add(
+            'online_users',
+            self.channel_name
+        )
+
+        await self.accept()
+        await self.update_online_users()
+
+    async def disconnect(self, close_code):
+        if self.user.id in OnlineUsersConsumer.connected_users:
+            del OnlineUsersConsumer.connected_users[self.user.id]
+
+        await self.channel_layer.group_discard(
+            'online_users',
+            self.channel_name
+        )
+        await self.update_online_users()
+
+    @database_sync_to_async
+    def get_online_users(self):
+        from user.serializers import UserSerializer
+        users = User.objects.filter(id__in=OnlineUsersConsumer.connected_users.keys())
+        return UserSerializer(users, many=True).data
+
+    async def update_online_users(self):
+        online_users = await self.get_online_users()
+        await self.channel_layer.group_send(
+            'online_users',
+            {
+                'type': 'online_users_update',
+                'users': online_users
+            }
+        )
+
+    async def online_users_update(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'online_users',
+            'users': event['users']
+        }))
 
 class GlobalConsumer(AsyncWebsocketConsumer):
     

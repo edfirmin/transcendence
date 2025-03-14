@@ -1,9 +1,28 @@
+from django.http import JsonResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import User, Friend, Match, UserSession, BlockedUser
+from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer, FriendSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from django.shortcuts import render
+import jwt
+import logging
+import pyotp
+import qrcode
+import io
+import base64
+import datetime
+
+
 from django.shortcuts import render
 from .models import User
 from .models import Match
 from .models import Tourney
 from .models import TourneyPlayer
 from .models import Hangman
+from .models import UserSession, BlockedUser
 from rest_framework.views import APIView
 from .serializers import UserSerializer, CreatUserSerializer, MatchSerializer, TourneySerializer, TourneyPlayerSerializer, HangmanSerializer
 from rest_framework.response import Response
@@ -145,6 +164,47 @@ def getUser(request):
     # logger.info("myUserFinal ---> %s", myUserFinal)
 
     return JsonResponse(myUserFinal, safe=False)
+
+def getUser2(request):
+    try:
+        # Try getting token from query parameters first
+        token = request.GET.get('token')
+        
+        if not token:
+            # Try getting token from cookies
+            token = request.COOKIES.get('jwt')
+            
+            if not token:
+                # Try getting token from Authorization header
+                auth_header = request.headers.get('Authorization')
+                if auth_header and auth_header.startswith('Token '):
+                    token = auth_header.split(' ')[1]
+                else:
+                    return JsonResponse({'error': 'Unauthenticated!'}, status=401)
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({'error': 'Token expired!'}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({'error': 'Invalid token!'}, status=401)
+
+        # Get username from query parameters if provided
+        username = request.GET.get('username')
+        if username:
+            user = User.objects.filter(username=username).first()
+            if not user:
+                return JsonResponse({'error': 'User not found!'}, status=404)
+        else:
+            user = User.objects.filter(id=payload['id']).first()
+            if not user:
+                return JsonResponse({'error': 'User not found!'}, status=404)
+            
+        serializer = UserSerializer(user)
+        return JsonResponse(serializer.data, safe=False)
+    except Exception as e:
+        logger.error(f"Error in getUser: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
 
 def getUserWithUsername(request):
     myPath = request.build_absolute_uri()
@@ -393,3 +453,164 @@ class AddHangmanStats(APIView):
 
         hangman.save()
         return Response(True)
+
+class BlockedUsersView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    
+    def get(self, request):
+        """Get list of users blocked by the current user"""
+        try:
+            user = request.user
+            logger.debug(f"Fetching blocked users for user: {user.username} (ID: {user.id})")
+            
+            blocked_users = BlockedUser.objects.filter(user=user).select_related('blocked_user')
+            logger.info(f"Found {blocked_users.count()} blocked users for {user.username}")
+            
+            blocked_list = [{
+                'id': block.blocked_user.id,
+                'username': block.blocked_user.username,
+                'profil_pic': block.blocked_user.profil_pic if block.blocked_user.profil_pic else None
+            } for block in blocked_users]
+            
+            logger.debug(f"Returning blocked users list: {blocked_list}")
+            return Response(blocked_list, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error getting blocked users: {str(e)}", exc_info=True)
+            return Response({'error': 'Failed to get blocked users'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request):
+        """Block a user"""
+        try:
+            user_id = request.data.get('user_id')
+            logger.debug(f"Blocking user request received. User ID to block: {user_id}")
+            
+            if not user_id:
+                logger.warning("Block user request missing user_id parameter")
+                return Response({'error': 'user_id is required'}, status=400)
+
+            # Don't allow self-blocking
+            if int(user_id) == request.user.id:
+                logger.warning(f"User {request.user.username} attempted to block themselves")
+                return Response({'error': 'Cannot block yourself'}, status=400)
+
+            # Check if user exists
+            try:
+                blocked_user = User.objects.get(id=user_id)
+                logger.debug(f"Found user to block: {blocked_user.username}")
+            except User.DoesNotExist:
+                logger.warning(f"Attempted to block non-existent user ID: {user_id}")
+                return Response({'error': 'User not found'}, status=404)
+
+            # Create block if it doesn't exist
+            block, created = BlockedUser.objects.get_or_create(
+                user=request.user,
+                blocked_user=blocked_user
+            )
+            
+            if created:
+                logger.info(f"User {request.user.username} blocked {blocked_user.username}")
+            else:
+                logger.info(f"User {request.user.username} already had {blocked_user.username} blocked")
+
+            return Response({'message': f'User {blocked_user.username} blocked successfully'})
+        except Exception as e:
+            logger.error(f"Error blocking user: {str(e)}", exc_info=True)
+            return Response({'error': 'Failed to block user'}, status=500)
+
+    def delete(self, request, user_id):
+        """Unblock a user"""
+        try:
+            logger.debug(f"Unblock request received for user ID: {user_id}")
+            
+            # Try to find and delete the block
+            try:
+                block = BlockedUser.objects.get(
+                    user=request.user,
+                    blocked_user_id=user_id
+                )
+                username = block.blocked_user.username
+                logger.info(f"Found block record: {request.user.username} -> {username}")
+                
+                block.delete()
+                logger.info(f"User {request.user.username} unblocked {username}")
+                
+                return Response({'message': f'User {username} unblocked successfully'})
+            except BlockedUser.DoesNotExist:
+                logger.warning(f"No block found for user ID {user_id} by {request.user.username}")
+                return Response({'error': 'Block not found'}, status=404)
+        except Exception as e:
+            logger.error(f"Error unblocking user: {str(e)}", exc_info=True)
+            return Response({'error': 'Failed to unblock user'}, status=500)
+
+class FriendView(APIView):
+    def get(self, request):
+        try:
+            token = request.GET.get('token')
+            if not token:
+                return JsonResponse({'error': 'Token required'}, status=401)
+
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            user = User.objects.get(id=payload['id'])
+            
+            friends = Friend.objects.filter(user=user)
+            serializer = FriendSerializer(friends, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        except Exception as e:
+            logger.error(f"Error in FriendView.get: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+
+    def post(self, request):
+        try:
+            token = request.GET.get('token')
+            if not token:
+                return JsonResponse({'error': 'Token required'}, status=401)
+
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            user = User.objects.get(id=payload['id'])
+            
+            # Try to get username from both URL params and request body
+            friend_username = request.GET.get('username') or request.data.get('username')
+            if not friend_username:
+                return JsonResponse({'error': 'Username required'}, status=400)
+
+            # Prevent adding self as friend
+            if user.username == friend_username:
+                return JsonResponse({'error': 'Cannot add yourself as a friend'}, status=400)
+
+            friend = User.objects.filter(username=friend_username).first()
+            if not friend:
+                return JsonResponse({'error': 'User not found'}, status=404)
+
+            if Friend.objects.filter(user=user, friend=friend).exists():
+                return JsonResponse({'error': 'Already friends'}, status=400)
+
+            friendship = Friend.objects.create(user=user, friend=friend)
+            serializer = FriendSerializer(friendship)
+            return JsonResponse(serializer.data, safe=False)
+        except Exception as e:
+            logger.error(f"Error in FriendView.post: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+
+    def delete(self, request, username):
+        try:
+            token = request.GET.get('token')
+            if not token:
+                return JsonResponse({'error': 'Token required'}, status=401)
+
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            user = User.objects.get(id=payload['id'])
+            
+            friend = User.objects.filter(username=username).first()
+            if not friend:
+                return JsonResponse({'error': 'User not found'}, status=404)
+
+            friendship = Friend.objects.filter(user=user, friend=friend)
+            if not friendship.exists():
+                return JsonResponse({'error': 'Not friends'}, status=404)
+
+            friendship.delete()
+            return JsonResponse({'message': 'Friend removed successfully'})
+        except Exception as e:
+            logger.error(f"Error in FriendView.delete: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
