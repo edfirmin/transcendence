@@ -15,6 +15,8 @@ import RounoHome from "./pages/RounoHome"
 import Config2FA from "./components/Config2FA"
 import Tourney from "./pages/PongTourney"
 import TourneyPresentation from "./pages/PongTourneyPresentation"
+import ChatWrapper from "./components/ChatWrapper"
+import FriendList from './components/FriendList';
 import React, {useMemo} from 'react';
 
 
@@ -40,7 +42,9 @@ function App() {
         <Route path="/rounohome" element={<ProtectedRoute> <RounoHome/> </ProtectedRoute>}></Route>
         <Route path="/tourney" element={<ProtectedRoute> <Tourney/> </ProtectedRoute>}></Route>
         <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <TourneyPresentation/> </ProtectedRoute>}></Route>
+        <Route path="/friends" element={<ProtectedRoute> <FriendList /> </ProtectedRoute>}></Route>
       </Routes>
+      <ChatWrapper />
     </BrowserRouter>
 	)
 }
