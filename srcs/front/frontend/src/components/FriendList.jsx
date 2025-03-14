@@ -83,7 +83,7 @@ const FriendList = ({ onStartPrivateChat }) => {
     };
 
     const goToProfile = (username) => {
-        navigate(`/profil/${username}`);
+        navigate(`/profil/`, {state : { username : username }});
     };
 
     const startChat = (friend) => {

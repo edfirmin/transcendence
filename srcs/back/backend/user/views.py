@@ -454,6 +454,42 @@ class AddHangmanStats(APIView):
         hangman.save()
         return Response(True)
 
+class SetDefaultMapIndex(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        myUser.default_map_index = request.data['default_map_index']
+
+        myUser.save()
+        return Response(True)    
+
+class SetDefaultPaddleIndex(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        myUser.default_paddle_index = request.data['default_paddle_index']
+
+        myUser.save()
+        return Response(True)  
+
+class SetDefaultPointsIndex(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        myUser.default_points_index = request.data['default_points_index']
+
+        myUser.save()
+        return Response(True)  
+
 class BlockedUsersView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]

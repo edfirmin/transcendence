@@ -1,11 +1,11 @@
 import "../styles/Profil.css"
 import EditProfil from "../components/EditProfil";
 import { useState, useEffect } from "react";
-import { getUser, getMatches, getHangmanGames } from "../api"
+import { getUser, getUserWithUsername, getMatches, getHangmanGames } from "../api"
 import Navbarr from "../components/Navbar";
 import tas from "../assets/tas-de-neige.png"
 import profile_logo from "../assets/profile_logo.png"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Snowfall from 'react-snowfall'
 import victory_cup from '../assets/img/victory_cup.png'
 import star_icon from '../assets/img/star_icon.webp'
@@ -24,12 +24,15 @@ function Profil() {
     const map_design = [classic_map_design, tennis_map_design, table_tennis_map_design];
     const [selectedPong, setSelectedPong] = useState(true);
 
+    const data = useLocation();
+    const username = data.state == null ? null : data.state.username;
+
     useEffect(() => {
         inituser()
         initmatches()
         inithangmangames()
-    }, []);
-    
+    }, [username]);
+
     useEffect(() => {
         PreferAIDifficulty();
         PreferMap();
@@ -37,7 +40,11 @@ function Profil() {
     }, [matches])
 
     const inituser = async () => {
-        const TMPuser = await getUser()
+        var TMPuser;
+        if (username != null)
+            TMPuser = await getUserWithUsername(username);
+        else
+            TMPuser = await getUser();
         setUser(TMPuser);
     }
 

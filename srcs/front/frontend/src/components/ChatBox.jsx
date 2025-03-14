@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../constants';
 import '../styles/ChatBox.css';
+import {v4 as uuidv4} from 'uuid';
+import { getUser, getUserWithUsername, getUserWithId } from "../api"
 
 function ChatBox({ privateChat, onClosePrivateChat }) {
   const [messages, setMessages] = useState([]);
@@ -12,6 +14,17 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
+
+  const navigateRemotePong = async (roomId, opponent_id) => {
+    
+    const left_user = await getUser();
+
+    if (opponent_id != null) {
+      const right_user = await getUserWithId(opponent_id);
+      navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index, left_user: left_user, right_user: right_user}});
+    } else 
+      navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index}});
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,7 +104,8 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
             const accept = window.confirm(`${from_user} has invited you to play Pong! Accept?`);
             if (accept) {
               // Navigate to game page or start game
-              navigate(`/game?opponent=${from_user_id}`);
+              console.log(data.invite.room_id)
+              navigateRemotePong(data.invite.room_id, null)
             }
           }
         } catch (error) {
@@ -154,10 +168,15 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
 
   const handleInviteToGame = (userId) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      const roomId = uuidv4();
+
       ws.current.send(JSON.stringify({
         type: 'game_invite',
-        recipient: userId
+        recipient: userId,
+        room_id: roomId
       }));
+
+      navigateRemotePong(roomId, userId);
     }
   };
 
