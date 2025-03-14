@@ -20,9 +20,11 @@ import no_design from '../assets/img/no.png';
 import yes_design from '../assets/img/yes.png';
 import Navbarr from '../components/Navbar';
 import { getUser, getUserWithUsername } from "../api"
+import { ACCESS_TOKEN } from "../constants";
+import axios from 'axios';
 
 function PongSelection() {
-
+    const [user, setUser] = useState([])
     const paddle_designs = [classic_design, tennis_design, cool_design, sick_design, swag_design];
     const difficulty_designs = [easy_design, medium_design, hard_design];
     const map_designs = [classic_map_design, tennis_map_design, table_tennis_map_design];
@@ -33,8 +35,20 @@ function PongSelection() {
     const [points, set_points] = useState(0);
     const [difficulty_index, set_difficulty_index] = useState(0);
     const [power_up_index, set_power_up_index] = useState(0);
-
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
     const navigate = useNavigate();
+
+    useEffect(() => {
+      inituser();
+    }, [])
+
+    const inituser = async () => {
+      const TMPuser = await getUser();
+      setUser(TMPuser);
+      set_index_map_design(TMPuser.default_map_index);
+      set_index_design(TMPuser.default_paddle_index);
+      set_points(TMPuser.default_points_index);
+    }
 
     function handleLocalPong() {
       const roomId = uuidv4();
@@ -74,10 +88,10 @@ function PongSelection() {
             <div className='space'></div>
             <div className='container'>
               <div></div>
-              <Selector name={"Map"} designs={map_designs} index={index_map_design} setIndex={set_index_map_design} />
-              <Selector name={"Points"} designs={point_design} index={points} setIndex={set_points} />
+              <Selector name={"Map"} designs={map_designs} index={index_map_design} setIndex={set_index_map_design} userToken={userToken}/>
+              <Selector name={"Points"} designs={point_design} index={points} setIndex={set_points} userToken={userToken} />
               <Selector name={"Difficulté IA"} designs={difficulty_designs} index={difficulty_index} setIndex={set_difficulty_index} />
-              <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} />
+              <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} userToken={userToken} />
               <Selector name={'Power Up'} designs={power_up_design} index={power_up_index} setIndex={set_power_up_index} />
               <div></div>
             </div>
@@ -106,9 +120,23 @@ function Button({name, callback}) {
 	)
 }
 
-function Selector({name, designs, index, setIndex}) {
+function Selector({name, designs, index, setIndex, userToken = null}) {
   const [imgDesign, setImgDesign] = useState(designs[0]);
   
+  useEffect(() => {setImgDesign(designs[index])}, [index])
+
+  async function postSetDefaultMapIndex() {
+    await axios.post('api/user/setDefaultMapIndex/', {userToken, default_map_index: index});
+  }
+
+  async function postSetDefaultPointsIndex() {
+    await axios.post('api/user/setDefaultPointsIndex/', {userToken, default_points_index: index})
+  }
+
+  async function postSetDefaultPaddleIndex() {
+    await axios.post('api/user/setDefaultPaddleIndex/', {userToken, default_paddle_index: index})
+  }
+
   function handleOnClickLeftArrow()
   {
     setIndex(index + 1);
@@ -118,7 +146,12 @@ function Selector({name, designs, index, setIndex}) {
       index = 0;
     }
 
-    setImgDesign(designs[index]);
+    if (name == "Map")
+      postSetDefaultMapIndex();
+    if (name == "Points")
+      postSetDefaultPointsIndex();
+    if (name == "Design")
+      postSetDefaultPaddleIndex();
   }
 
   function handleOnClickRightArrow()
@@ -130,7 +163,12 @@ function Selector({name, designs, index, setIndex}) {
       index = designs.length - 1;
     }
 
-    setImgDesign(designs[index]);
+    if (name == "Map")
+      postSetDefaultMapIndex();
+    if (name == "Points")
+      postSetDefaultPointsIndex();
+    if (name == "Design")
+      postSetDefaultPaddleIndex();
   }
 
 	return (

@@ -21,9 +21,9 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
 
     if (opponent_id != null) {
       const right_user = await getUserWithId(opponent_id);
-      navigate(`/multipong/${roomId}`,  {state : {map : 0, design : 0, points : 2, left_user: left_user, right_user: right_user}});
+      navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index, left_user: left_user, right_user: right_user}});
     } else 
-      navigate(`/multipong/${roomId}`,  {state : {map : 0, design : 0, points : 2}});
+      navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index}});
   }
 
   const scrollToBottom = () => {

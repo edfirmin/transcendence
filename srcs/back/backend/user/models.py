@@ -20,6 +20,9 @@ class User(AbstractUser):
     hangman_lose_count = models.BigIntegerField(default=0)
     hangman_find_letter = models.BigIntegerField(default=0)
     hangman_miss_letter = models.BigIntegerField(default=0)
+    default_map_index = models.IntegerField(default=0)
+    default_paddle_index = models.IntegerField(default=0)
+    default_points_index = models.IntegerField(default=0)
 
 class Hangman(models.Model):
     user = models.ForeignKey(User, default=None, on_delete=models.CASCADE)
