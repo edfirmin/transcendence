@@ -27,7 +27,7 @@ function PongSelection() {
     const [user, setUser] = useState([])
     const paddle_designs = [classic_design, tennis_design, cool_design, sick_design, swag_design];
     const difficulty_designs = [easy_design, medium_design, hard_design];
-    const map_designs = [classic_map_design, tennis_map_design, table_tennis_map_design];
+    const map_designs = [classic_map_design, tennis_map_design, table_tennis_map_design, table_tennis_map_design];
     const point_design = [design_2, design_3, design_4, design_5, design_6, design_7, design_8, design_9];
     const power_up_design = [no_design, yes_design];
     const [index_design, set_index_design] = useState(0);
@@ -103,7 +103,6 @@ function PongSelection() {
               <Button name={'Local'} callback={handleLocalPong} />
               <Button name={'IA'} callback={handleAIPong} />
               <Button name={'En ligne'} callback={handleRemotePong} />
-              <Button name={'Test En ligne'} callback={handleTestRemotePong} />
               <Button name={'Tournoi'} callback={handleTourneyPong} />
               <div></div>
             </div>

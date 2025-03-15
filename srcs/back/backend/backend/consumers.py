@@ -658,7 +658,10 @@ class PongConsumer(AsyncWebsocketConsumer):
     longest_exchange = {}
     shortest_exchange = {}
     current_exchange = {}
-    
+    map = {}
+    middle_paddle_pos = {}
+    middle_paddle_dir = {}
+
     power_up_list = ["long_paddle"]
     paddle_size = {}
 
@@ -722,11 +725,11 @@ class PongConsumer(AsyncWebsocketConsumer):
             'message':'You are now connected!'
         }))
 
-        PongConsumer.ball_pos[self.room_name] = [400, 250]
-        PongConsumer.ball_speed[self.room_name] = 5
+        PongConsumer.ball_pos[self.room_name] = [450, 250]
+        PongConsumer.ball_speed[self.room_name] = 7
         PongConsumer.ball_direction[self.room_name] = [1, 1]
-        PongConsumer.left_paddle_pos[self.room_name] = [0, 250]
-        PongConsumer.right_paddle_pos[self.room_name] = [0, 250]
+        PongConsumer.left_paddle_pos[self.room_name] = [50, 250]
+        PongConsumer.right_paddle_pos[self.room_name] = [750, 250]
         PongConsumer.score[self.room_name] = [0, 0]
         PongConsumer.longest_exchange[self.room_name] = 0
         PongConsumer.shortest_exchange[self.room_name] = 10000
@@ -753,6 +756,11 @@ class PongConsumer(AsyncWebsocketConsumer):
             PongConsumer.score_to_win[self.room_name] = data_json['value']
         if (message == "power_up"):
             PongConsumer.power_up[self.room_name] = data_json['value']
+        if (message == "map"):
+            PongConsumer.map[self.room_name] = data_json['value']
+            if (data_json['value'] == 2):
+                PongConsumer.middle_paddle_pos[self.room_name] = [391, 250]
+                PongConsumer.middle_paddle_dir[self.room_name] = 1
 
         if (message == "left_paddle_down"):
             if PongConsumer.left_paddle_pos[self.room_name][1] > self.down_limit:
@@ -833,6 +841,33 @@ class PongConsumer(AsyncWebsocketConsumer):
 
             # Ceilling and Floor Ball Detection
             if (PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] > 490 or PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] < 10):
+                
+                # map 3
+                if (PongConsumer.map[self.room_name] == 3):
+                    if (PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] > 490
+                        and PongConsumer.ball_pos[self.room_name][0] > 100 and PongConsumer.ball_pos[self.room_name][0] < 220 
+                        and PongConsumer.ball_direction[self.room_name][1] > 0):
+                        PongConsumer.ball_pos[self.room_name][0] += 500
+                        PongConsumer.ball_direction[self.room_name][0] *= -1
+                    elif (PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] > 490
+                        and PongConsumer.ball_pos[self.room_name][0] > 600 and PongConsumer.ball_pos[self.room_name][0] < 720 
+                        and PongConsumer.ball_direction[self.room_name][1] > 0):
+                        PongConsumer.ball_pos[self.room_name][0] -= 500
+                        PongConsumer.ball_direction[self.room_name][0] *= -1
+
+                    elif (PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] < 10
+                        and PongConsumer.ball_pos[self.room_name][0] > 100 and PongConsumer.ball_pos[self.room_name][0] < 220
+                        and PongConsumer.ball_direction[self.room_name][1] < 0):
+                        PongConsumer.ball_pos[self.room_name][0] += 500
+                        PongConsumer.ball_direction[self.room_name][0] *= -1
+
+                    elif (PongConsumer.ball_pos[self.room_name][1] + PongConsumer.ball_direction[self.room_name][1] < 10
+                        and PongConsumer.ball_pos[self.room_name][0] > 600 and PongConsumer.ball_pos[self.room_name][0] < 720
+                        and PongConsumer.ball_direction[self.room_name][1] < 0):
+                        PongConsumer.ball_pos[self.room_name][0] -= 500
+                        PongConsumer.ball_direction[self.room_name][0] *= -1
+
+
                 PongConsumer.ball_direction[self.room_name][1] *= -1
                 await self.send(text_data=json.dumps({
                     'type':'hit',
@@ -841,10 +876,11 @@ class PongConsumer(AsyncWebsocketConsumer):
                 }))
 
             # right side
-            if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] > 750):
+            if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] > 740):
                 # check if paddle hit ball
                 if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] + PongConsumer.paddle_size[self.room_name] 
-                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]):
+                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]
+                    and PongConsumer.ball_pos[self.room_name][0] < PongConsumer.right_paddle_pos[self.room_name][0] + 20):
                     
                     impact_pos = PongConsumer.right_paddle_pos[self.room_name][1] - PongConsumer.ball_pos[self.room_name][1] # between -60 and 60
                     impact_pos *= -1
@@ -856,7 +892,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                     PongConsumer.ball_speed[self.room_name] += 1
                     PongConsumer.current_exchange[self.room_name] += 1
 
-                else:
+                if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] > 800):
                     PongConsumer.score[self.room_name][0] += 1
                     if (PongConsumer.current_exchange[self.room_name] > PongConsumer.longest_exchange[self.room_name]):
                         PongConsumer.longest_exchange[self.room_name] = PongConsumer.current_exchange[self.room_name]
@@ -881,17 +917,18 @@ class PongConsumer(AsyncWebsocketConsumer):
                         'winner': "LEFT"
                     }))
 
-                    PongConsumer.ball_pos[self.room_name] = [400, 250]
-                    PongConsumer.ball_speed[self.room_name] = 5
+                    PongConsumer.ball_pos[self.room_name] = [450, 250]
+                    PongConsumer.ball_speed[self.room_name] = 7
                     PongConsumer.ball_direction[self.room_name][0] = random.uniform(0.5, 1) if random.random() > 0.5 else random.uniform(-0.5, -1)
                     PongConsumer.ball_direction[self.room_name][1] = random.uniform(-0.5, 0.5)
                     if PongConsumer.ball_direction[self.room_name][0] < 0 :
                         PongConsumer.ball_direction[self.room_name][0] *= -1
 
             # left side
-            if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] < 50):
+            if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] < 60):
                 if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.left_paddle_pos[self.room_name][1] + PongConsumer.paddle_size[self.room_name] 
-                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.left_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]):
+                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.left_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]
+                    and PongConsumer.ball_pos[self.room_name][0] > PongConsumer.left_paddle_pos[self.room_name][0] - 20):
                     
                     impact_pos = PongConsumer.left_paddle_pos[self.room_name][1] - PongConsumer.ball_pos[self.room_name][1] # between -60 and 60
                     impact_pos *= -1
@@ -903,7 +940,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                     PongConsumer.ball_speed[self.room_name] += 1
                     PongConsumer.current_exchange[self.room_name] += 1
 
-                else:
+                if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] < 0):
                     PongConsumer.score[self.room_name][1] += 1
                     if (PongConsumer.current_exchange[self.room_name] > PongConsumer.longest_exchange[self.room_name]):
                         PongConsumer.longest_exchange[self.room_name] = PongConsumer.current_exchange[self.room_name]
@@ -930,8 +967,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                     }))
 
                     # re-init ball
-                    PongConsumer.ball_pos[self.room_name] = [400, 250]
-                    PongConsumer.ball_speed[self.room_name] = 5
+                    PongConsumer.ball_pos[self.room_name] = [350, 250]
+                    PongConsumer.ball_speed[self.room_name] = 7
                     PongConsumer.ball_direction[self.room_name][0] = random.uniform(0.5, 1) if random.random() > 0.5 else random.uniform(-0.5, -1)
                     PongConsumer.ball_direction[self.room_name][1] = random.uniform(-0.5, 0.5)
                     if PongConsumer.ball_direction[self.room_name][0] > 0 :
@@ -946,6 +983,35 @@ class PongConsumer(AsyncWebsocketConsumer):
                 'x': PongConsumer.ball_pos[self.room_name][0],
                 'y': PongConsumer.ball_pos[self.room_name][1]
             }))
+
+            if (PongConsumer.map[self.room_name] == 2):
+                # inverse direction
+                if (PongConsumer.middle_paddle_dir[self.room_name] == 1 and PongConsumer.middle_paddle_pos[self.room_name][1] >= 440):
+                    PongConsumer.middle_paddle_dir[self.room_name] = -1
+                if (PongConsumer.middle_paddle_dir[self.room_name] == -1 and PongConsumer.middle_paddle_pos[self.room_name][1] <= 60):
+                    PongConsumer.middle_paddle_dir[self.room_name] = 1
+
+                PongConsumer.middle_paddle_pos[self.room_name][1] += PongConsumer.middle_paddle_dir[self.room_name]
+                await self.send(text_data=json.dumps({
+                    'type':'middle_paddle_pos',
+                    'message': PongConsumer.middle_paddle_pos[self.room_name][1]
+                }))
+
+                # check if paddle hit ball
+                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.middle_paddle_pos[self.room_name][1] + PongConsumer.paddle_size[self.room_name] 
+                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.middle_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]
+                    and PongConsumer.ball_pos[self.room_name][0] < PongConsumer.middle_paddle_pos[self.room_name][0]
+                    and PongConsumer.ball_pos[self.room_name][0] > PongConsumer.middle_paddle_pos[self.room_name][0] - 20
+                    and PongConsumer.ball_direction[self.room_name][0] > 0):
+                    PongConsumer.ball_direction[self.room_name][0] = -1
+                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.middle_paddle_pos[self.room_name][1] + PongConsumer.paddle_size[self.room_name] 
+                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.middle_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]
+                    and PongConsumer.ball_pos[self.room_name][0] > PongConsumer.middle_paddle_pos[self.room_name][0]
+                    and PongConsumer.ball_pos[self.room_name][0] < PongConsumer.middle_paddle_pos[self.room_name][0] + 20
+                    and PongConsumer.ball_direction[self.room_name][0] < 0):
+                    PongConsumer.ball_direction[self.room_name][0] = 1
+
+
             await asyncio.sleep(1 / 30)
 
     async def wait_until_power_up(self, wait_time):
