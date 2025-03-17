@@ -802,8 +802,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if (message == "begin_game"):
             PongConsumer.game_task[self.room_name] = asyncio.create_task(self.main_loop())
-            if (PongConsumer.power_up[self.room_name] == 1):
-                self.wait_until_power_up(2)
+            #if (PongConsumer.power_up[self.room_name] == 1):
+            #    self.wait_until_power_up(2)
 
     async def disconnect(self, close_code):
         logger.info("salut mon pote")

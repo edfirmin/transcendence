@@ -90,10 +90,10 @@ function Pong() {
 				'message':'points',
 				'value': points
 			}));
-			ws.send(JSON.stringify({
+	/*		ws.send(JSON.stringify({
 				'message':'power_up',
 				'value':power_up
-			}));
+			}));*/
 			ws.send(JSON.stringify({
 				'message':'map',
 				'value':map_index

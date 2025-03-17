@@ -52,7 +52,7 @@ function PongSelection() {
 
     function handleLocalPong() {
       const roomId = uuidv4();
-      navigate(`/pong/${roomId}`, {state : { isAI : false, map : index_map_design, design : index_design, points : points, power_up_on : power_up_index}});
+      navigate(`/pong/${roomId}`, {state : { isAI : false, map : index_map_design, design : index_design, points : points}});
     }
 
     function handleAIPong() {
@@ -92,7 +92,6 @@ function PongSelection() {
               <Selector name={"Points"} designs={point_design} index={points} setIndex={set_points} userToken={userToken} />
               <Selector name={"Difficulté IA"} designs={difficulty_designs} index={difficulty_index} setIndex={set_difficulty_index} />
               <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} userToken={userToken} />
-              <Selector name={'Power Up'} designs={power_up_design} index={power_up_index} setIndex={set_power_up_index} />
               <div></div>
             </div>
             <div className='container'>
