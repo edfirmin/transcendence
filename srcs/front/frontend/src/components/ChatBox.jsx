@@ -192,7 +192,7 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
     <div className={`chat-box ${isMinimized ? 'minimized' : ''} ${privateChat ? 'private-chat' : ''}`} style={{ height: isMinimized ? 'auto' : undefined }}>
       <div className="chat-header" onClick={toggleMinimize}>
         <div className="chat-header-content">
-          <span>{privateChat ? `Chat with ${privateChat.username}` : 'Global Chat'}</span>
+          <span>{privateChat ? `Chat with ${privateChat.username}` : 'Chat Global'}</span>
     
         </div>
         <div className="chat-controls">
@@ -220,16 +220,6 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
                 🚫
               </button>
               <button 
-                className="profile-button" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/profil/${privateChat.username}`);
-                }}
-                title="View profile"
-              >
-                👤
-              </button>
-              <button 
                 className="close-button" 
                 onClick={(e) => {
                   e.stopPropagation();
@@ -254,14 +244,12 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
                   src={msg.profil_pic} 
                   alt={msg.username} 
                   className="user-avatar"
-                  onClick={() => navigate(`/profil/${msg.username}`)}
                   style={{ cursor: 'pointer' }}
                 />
                 <div className="message-content">
                   <div className="message-header">
                     <span 
                       className="username"
-                      onClick={() => navigate(`/profil/${msg.username}`)}
                       style={{ cursor: 'pointer' }}
                     >
                       {msg.username}
@@ -294,9 +282,9 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
+              placeholder="Ecrire un message ..."
             />
-            <button type="submit">Send</button>
+            <button type="submit">Envoyer</button>
           </form>
         </>
       )}

@@ -23,7 +23,7 @@ function Pong() {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
-	var ws = useMemo(() => {return new WebSocket(`wss://c4r1p1:9443/ws/pong/${roomid}`)}, [ws]);
+	var ws = useMemo(() => {return new WebSocket(`wss://c4r1p6:9443/ws/pong/${roomid}`)}, [ws]);
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});

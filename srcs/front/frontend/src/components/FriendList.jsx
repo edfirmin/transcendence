@@ -98,17 +98,17 @@ const FriendList = ({ onStartPrivateChat }) => {
 
     return (
         <div className="friend-list-container">
-            <h2>Friends</h2>
+            <h2>Amis</h2>
             
             <form onSubmit={handleAddFriend} className="add-friend-form">
                 <input
                     type="text"
                     value={newFriendUsername}
                     onChange={(e) => setNewFriendUsername(e.target.value)}
-                    placeholder="Enter username"
+                    placeholder="Entrer un nom d'utilisateur"
                     className="friend-input"
                 />
-                <button type="submit" className="add-friend-btn">Add Friend</button>
+                <button type="submit" className="add-friend-btn">Ajouter un ami</button>
             </form>
 
             {error && <div className="error-message">{error}</div>}
