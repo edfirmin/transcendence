@@ -55,7 +55,7 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
       console.log('ChatBox: Attempting to connect to WebSocket');
       const token = localStorage.getItem(ACCESS_TOKEN);
       if (!token) {
-        console.error('ChatBox: No authentication token found');
+        console.log('ChatBox: No authentication token found');
         setConnectionError(true);
         return;
       }
