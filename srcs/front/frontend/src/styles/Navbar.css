@@ -18,6 +18,15 @@
     color: white;
 } */
 
+.logout-b {
+    position: absolute;
+	/* background-color: red; */
+    max-width: 25px;
+    max-height: 25px;
+    border-radius: 100px;
+	margin: -12px 1500px;
+}
+
 .pp_nav {
     position: absolute;
     margin: -25.5px 82.8%;

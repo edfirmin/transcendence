@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import lock from "../assets/le.png"
 import "../styles/Config2FA.css"
 import Snowfall from 'react-snowfall'
+import logo2fa from "../assets/conf2fa.png"
 
 function Config2FA () {
     const [qr, setQR] = useState([])
@@ -70,7 +71,7 @@ function Config2FA () {
             <Snowfall snowflakeCount={500}></Snowfall>
             {!user.is2FA ?
             <div className="active-2fa">
-                <h1>Configuration de la 2FA</h1>
+                <img src={logo2fa} />
                 <p>Pour activer l'autentification a double facteur (aka 2FA) il faut telecharger une application de double autentification, style "Google Authenticator",
                     ensuite il vous faudra scanner le qrCode ci dessous (vous n'avez pas la posiblilitee de scanner le qrCode , entree la cle de configuration : {kay2fa})
                 </p>
