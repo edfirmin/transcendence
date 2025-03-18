@@ -12,6 +12,7 @@ import star_icon from '../assets/img/star_icon.webp'
 import classic_map_design from '../assets/img/classic_map_design.png'
 import tennis_map_design from '../assets/img/tennis_map_design.png'
 import table_tennis_map_design from '../assets/img/table_tennis_map_design.png'
+import fog_map_design from '../assets/img/fog_map_design.png'
 
 function Profil() {
     const [user, setUser] = useState([])
@@ -21,7 +22,7 @@ function Profil() {
     const [preferAIDifficulty, setPreferAIDifficulty] = useState("none")
     const [preferMap, setPreferMap] = useState(-1)
     const [averageTime, setAverageTime] = useState(null)
-    const map_design = [classic_map_design, tennis_map_design, table_tennis_map_design];
+    const map_design = [classic_map_design, table_tennis_map_design, fog_map_design, tennis_map_design];
     const [selectedPong, setSelectedPong] = useState(true);
 
     const data = useLocation();
@@ -124,6 +125,7 @@ function Profil() {
         let first = 0;
         let second = 0;
         let third = 0;
+        let fourth = 0;
 
         for (let i = 0; i < matches.length; i++) {
             if (matches[i].map_index == 0)
@@ -132,24 +134,30 @@ function Profil() {
                 second++;
             if (matches[i].map_index == 2)
                 third++;
+            if (matches[i].map_index == 3)
+                fourth++;
         }
         
         // EASY
-        if (first > second && first > third) {
+        if (first > second && first > third && first > fourth) {
             setPreferMap(0);
             return;
         }
         // MEDIUM
-        if (second > first && second > third) {
+        if (second > first && second > third && fourth > third) {
             setPreferMap(1);
             return;
         }
         // HARD
-        if (third > second && third > first) {
+        if (third > second && third > first && third > fourth) {
             setPreferMap(2);
             return;
         }
-        
+    
+        if (fourth > second && fourth > first && fourth > third) {
+            setPreferMap(3);
+            return;
+        }
     }
 
     function AverageTime()
@@ -267,7 +275,7 @@ function WinrateBar({loses, wins}) {
 
 function MatchResult({result, date, score_left, score_right, time, type, longest_exchange, shortest_exchange, map_index, is_tourney, opponent}) {
     const [isClicked, setIsClicked] = useState(false)
-    const map_design = [classic_map_design, tennis_map_design, table_tennis_map_design];
+    const map_design = [classic_map_design, table_tennis_map_design, fog_map_design, tennis_map_design];
 
     return (
         <div onClick={() => {if (isClicked) {setIsClicked(false);} else {setIsClicked(true);} console.log(isClicked)}} className="matchResult" style={{backgroundColor: result == "VICTOIRE" ? "#0f9acc" : "#cc0f38"}}>

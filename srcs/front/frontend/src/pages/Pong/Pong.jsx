@@ -14,10 +14,11 @@ import sick_ball_design from '../../assets/img/sick_ball_design.png'
 import swag_paddle_design from '../../assets/img/swag_paddle_design.png'
 import swag_ball_design from '../../assets/img/swag_ball_design.png'
 import classic_map from '../../assets/img/classic_map.png'
-import tennis_map from '../../assets/img/space_background.png'
+import tennis_map from '../../assets/img/portal_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
-import space_fog from '../../assets/img/space_fog.png'
-import space_fog_corner from '../../assets/img/space_fog_corner.png'
+import fog_map from '../../assets/img/fog_map_background.png'
+import fog from '../../assets/img/fog_map_fog.png'
+import fog_corner from '../../assets/img/fog_map_fog_corner.png'
 import portal_red from '../../assets/img/portal_red.png'
 import portal_green from '../../assets/img/portal_green.png'
 import { ACCESS_TOKEN } from "../../constants";
@@ -56,7 +57,7 @@ function Pong() {
 	const AIBallPos = useRef({ x: 400, y: 250})
 	//const [score_history, set_score_history] = useState([])
 
-	const map_design = [classic_map, tennis_map, table_tennis_map, table_tennis_map];
+	const map_design = [classic_map, table_tennis_map, fog_map, tennis_map ];
 	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
 	const paddle_design = [classic_paddle_design, tennis_paddle_design, cool_paddle_design, sick_paddle_design, swag_paddle_design];
 
@@ -446,12 +447,12 @@ function Pong() {
 	const drawFog = (ctx) => {
 		ctx.beginPath();
 		var img = new Image();
-		img.src = space_fog;
+		img.src = fog;
 		ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
 		ctx.fill();
 		ctx.beginPath();
 		var img = new Image();
-		img.src = space_fog_corner;
+		img.src = fog_corner;
 		ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
 		ctx.fill();
 	}
@@ -487,9 +488,9 @@ function Pong() {
 			drawBall(ctx, ball.x, ball.y, ball_img);
 			drawHits(ctx);
 			if (map_index == 1)
-				drawFog(ctx);
-			if (map_index == 2)
 				drawPaddle(ctx, middlePaddle.current.x, middlePaddle.current.y, paddle_img);
+			if (map_index == 2)
+				drawFog(ctx);
 			if (map_index == 3) {
 				drawPortal(ctx, 100, 0, portal_red);
 				drawPortal(ctx, 600, 495, portal_green);

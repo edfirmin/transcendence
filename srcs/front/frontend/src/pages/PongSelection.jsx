@@ -8,8 +8,9 @@ import cool_design from '../assets/img/cool_design.png'
 import sick_design from '../assets/img/sick_design.png'
 import swag_design from '../assets/img/swag_design.png'
 import classic_map_design from '../assets/img/classic_map_design.png'
-import tennis_map_design from '../assets/img/tennis_map_design.png'
+import portal_map_design from '../assets/img/tennis_map_design.png'
 import table_tennis_map_design from '../assets/img/table_tennis_map_design.png'
+import fog_map_design from '../assets/img/fog_map_design.png'
 import design_2 from '../assets/img/2.png'; import design_3 from '../assets/img/3.png'; import design_4 from '../assets/img/4.png';
 import design_5 from '../assets/img/5.png'; import design_6 from '../assets/img/6.png'; import design_7 from '../assets/img/7.png';
 import design_8 from '../assets/img/8.png'; import design_9 from '../assets/img/9.png'; 
@@ -27,7 +28,7 @@ function PongSelection() {
     const [user, setUser] = useState([])
     const paddle_designs = [classic_design, tennis_design, cool_design, sick_design, swag_design];
     const difficulty_designs = [easy_design, medium_design, hard_design];
-    const map_designs = [classic_map_design, tennis_map_design, table_tennis_map_design, table_tennis_map_design];
+    const map_designs = [classic_map_design, table_tennis_map_design, fog_map_design, portal_map_design];
     const point_design = [design_2, design_3, design_4, design_5, design_6, design_7, design_8, design_9];
     const power_up_design = [no_design, yes_design];
     const [index_design, set_index_design] = useState(0);
