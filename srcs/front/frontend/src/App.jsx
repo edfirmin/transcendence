@@ -19,7 +19,7 @@ import React, {useMemo} from 'react';
 
 
 function App() {
-  var ws = useMemo(() => {return new WebSocket("ws://localhost:8000/ws/global")}, [ws]);
+  // var ws = useMemo(() => {return new WebSocket("ws://c4r1p1:9443/ws/global")}, [ws]);
 	return (
     <BrowserRouter>
       <Routes>
