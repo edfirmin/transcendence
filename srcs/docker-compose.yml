@@ -59,8 +59,7 @@ services:
     build:
       context: ./nginx
     container_name: nginx
-    depends_on: 
-      - react
+    depends_on:
       - django
     ports:
       - 9443:443
