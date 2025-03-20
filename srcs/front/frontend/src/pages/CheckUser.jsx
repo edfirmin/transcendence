@@ -12,7 +12,7 @@ function CheckUser() {
     const sendCodeToBack = async () => {
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
-        const response = await axios.get(`http://localhost:8000/api/auth/login/?${code}`);
+        const response = await axios.get(`api/auth/login/?${code}`);
         const username = response.data.username
         const res = await axios.post("/api/user/token/", {username, password :"don't care", code2fa})
         if (res.data.jwt)

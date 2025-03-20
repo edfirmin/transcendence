@@ -31,6 +31,12 @@ export const getMatches = async () => {
     return (response.data)
 }
 
+export const getHangmanGames = async () => {
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    const response = await axios.get("/api/user/getHangmanGames/?" + userToken);
+    return (response.data)
+}
+
 export const getTourney = async (tourney_id) => {
     const response = await axios.get("/api/user/getTourney/?" + tourney_id);
     return (response.data)
@@ -45,6 +51,46 @@ export const getQR = async () => {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const oui = await axios.get("/api/user/qrcode/?" + userToken);
     return (oui.data)
+}
+
+export const getFriends = async () => {
+    try {
+        const userToken = localStorage.getItem(ACCESS_TOKEN);
+        const response = await axios.get(`/api/user/friends/?token=${userToken}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching friends:', error);
+        throw error;
+    }
+}
+
+export const addFriend = async (username) => {
+    try {
+        const userToken = localStorage.getItem(ACCESS_TOKEN);
+        const response = await axios({
+            method: 'post',
+            url: `/api/user/friends/?token=${userToken}`,
+            data: { username },
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error adding friend:', error);
+        throw error;
+    }
+}
+
+export const removeFriend = async (username) => {
+    try {
+        const userToken = localStorage.getItem(ACCESS_TOKEN);
+        const response = await axios.delete(`/api/user/friends/${username}/?token=${userToken}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error removing friend:', error);
+        throw error;
+    }
 }
 
 // export const changeUser = async () => {

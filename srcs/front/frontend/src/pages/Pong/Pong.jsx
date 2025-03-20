@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, Prompt } from 'react';
 import { Shake } from 'reshake';
 import styles from './Pong.module.css';
 import axios from 'axios';
@@ -23,7 +23,7 @@ function Pong() {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
-	var ws = useMemo(() => {return new WebSocket(`wss://c4r1p1:9443/ws/pong/${roomid}`)}, [ws]);
+	var ws = useMemo(() => {return new WebSocket(`wss://c3r2p2:9443/ws/pong/${roomid}`)}, [ws]);
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
@@ -37,6 +37,7 @@ function Pong() {
     const dir = useRef(1);
     const vec = useRef(0.005);
     const speed = useRef(2);
+	const paddle_size = useRef(60);
     const lastUpdateTimeRef = useRef(0);
     const [count, setCount]  = useState(0);
 	const [winner, setWinner] = useState("");
@@ -107,6 +108,9 @@ function Pong() {
         if (data.type == "right_paddle_down" || data.type == "right_paddle_up") {
             RPaddle.current.y = data.message
         }
+		if (data.type == "paddle_size") {
+            paddle_size.current = data.message
+        }
         if (data.type == "ball_pos") {
             ball.x = data.x;
             ball.y = data.y;
@@ -175,8 +179,6 @@ function Pong() {
 		if (timeoutAI.current != null)
 			clearTimeout(timeoutAI.current);
 
-		console.log("paddle " + RPaddle.current.y);
-		console.log("ball " + AIBallPos.current.y);
 		if (RPaddle.current.y > AIBallPos.current.y) {
 			if (proba < 0.95)
 				AIGoUp.current = true;
@@ -268,7 +270,6 @@ function Pong() {
 		const a = + d.getHours() + ':' + d.getMinutes() + '  ' + year + '-' + month + '-' + day;
 
 		const time = d.getTime() - time_start.getTime();
-		console.log(time);
 		
 		if (isAI)
 			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
@@ -289,6 +290,10 @@ function Pong() {
 			}
 			else
 				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
+	}
+
+	function getDate() {
+		
 	}
 
 	useEffect(() => {
@@ -388,7 +393,7 @@ function Pong() {
 	const drawPaddle = (ctx, x, y, img) => {
 		// Drawing a paddle centered at the given position
 		ctx.beginPath();
-		ctx.drawImage(img, x, y - 60, 18, 120);
+		ctx.drawImage(img, x, y - paddle_size.current, 18, paddle_size.current * 2);
 		ctx.fill();
 	}
 

@@ -6,9 +6,234 @@ import asyncio
 import logging
 import random
 import math
+from user.models import User, BlockedUser
+from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
+from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 logging.basicConfig(level=logging.DEBUG)  # Définir le niveau des logs
 logger = logging.getLogger(__name__)     # Créer un logger avec un nom unique
+
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        self.room_group_name = 'chat_global'
+        
+        # Join global chat room
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        
+        # Join personal room for direct messages
+        self.personal_room = f'user_{self.user.id}'
+        await self.channel_layer.group_add(
+            self.personal_room,
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.channel_layer.group_discard(
+            self.personal_room,
+            self.channel_name
+        )
+
+    @database_sync_to_async
+    def is_blocked(self, sender_id, recipient_id):
+        return BlockedUser.objects.filter(
+            user_id=recipient_id,
+            blocked_user_id=sender_id
+        ).exists()
+
+    @database_sync_to_async
+    def get_user_by_id(self, user_id):
+        try:
+            return User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return None
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+            message_type = data.get('type', 'chat_message')
+            
+            if message_type == 'chat_message':
+                message = data.get('message', '')
+                recipient_id = data.get('recipient')
+                
+                # Check if this is a direct message
+                if recipient_id:
+                    recipient = await self.get_user_by_id(recipient_id)
+                    if not recipient:
+                        return
+                    
+                    # Check if recipient has blocked the sender
+                    if await self.is_blocked(self.user.id, recipient_id):
+                        return
+                    
+                    # Send to recipient's personal room
+                    await self.channel_layer.group_send(
+                        f'user_{recipient_id}',
+                        {
+                            'type': 'chat_message',
+                            'message': {
+                                'text': message,
+                                'username': self.user.username,
+                                'profil_pic': self.user.profil_pic,
+                                'isSelf': False,
+                                'isDirect': True
+                            }
+                        }
+                    )
+                    
+                    # Send confirmation to sender
+                    await self.channel_layer.group_send(
+                        self.personal_room,
+                        {
+                            'type': 'chat_message',
+                            'message': {
+                                'text': message,
+                                'username': self.user.username,
+                                'profil_pic': self.user.profil_pic,
+                                'isSelf': True,
+                                'isDirect': True,
+                                'recipient': recipient.username
+                            }
+                        }
+                    )
+                else:
+                    # Global chat message
+                    # First send to all other users
+                    await self.channel_layer.group_send(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_message',
+                            'message': {
+                                'text': message,
+                                'username': self.user.username,
+                                'profil_pic': self.user.profil_pic,
+                                'userId': self.user.id,
+                                'isSelf': False
+                            }
+                        }
+                    )
+                    
+                    # Then send a copy to the sender with isSelf: true
+                    await self.send(text_data=json.dumps({
+                        'type': 'chat_message',
+                        'message': {
+                            'text': message,
+                            'username': self.user.username,
+                            'profil_pic': self.user.profil_pic,
+                            'userId': self.user.id,
+                            'isSelf': True
+                        }
+                    }))
+            
+            elif message_type == 'block_user':
+                blocked_user_id = data.get('user_id')
+                if blocked_user_id:
+                    await database_sync_to_async(BlockedUser.objects.create)(
+                        user=self.user,
+                        blocked_user_id=blocked_user_id
+                    )
+            
+            elif message_type == 'game_invite':
+                recipient_id = data.get('recipient')
+                room_id = data.get('room_id')
+                if recipient_id:
+                    recipient = await self.get_user_by_id(recipient_id)
+                    if recipient and not await self.is_blocked(self.user.id, recipient_id):
+                        await self.channel_layer.group_send(
+                            f'user_{recipient_id}',
+                            {
+                                'type': 'game_invite',
+                                'invite': {
+                                    'from_user': self.user.username,
+                                    'from_user_id': self.user.id,
+                                    'game_type': 'pong',
+                                    'room_id': room_id
+                                }
+                            }
+                        )
+
+        except json.JSONDecodeError:
+            pass
+        except Exception as e:
+            logger.error(f"Error in chat consumer: {str(e)}")
+
+    async def chat_message(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'type': 'chat_message',
+            'message': message
+        }))
+
+    async def game_invite(self, event):
+        invite = event['invite']
+        await self.send(text_data=json.dumps({
+            'type': 'game_invite',
+            'invite': invite
+        }))
+
+class OnlineUsersConsumer(AsyncWebsocketConsumer):
+    connected_users = {}  # Class variable to track connected users
+
+    @classmethod
+    def is_user_online(cls, user_id):
+        return user_id in cls.connected_users
+
+    async def connect(self):
+        self.user = self.scope["user"]
+        OnlineUsersConsumer.connected_users[self.user.id] = self.channel_name
+
+        # Join online users group
+        await self.channel_layer.group_add(
+            'online_users',
+            self.channel_name
+        )
+
+        await self.accept()
+        await self.update_online_users()
+
+    async def disconnect(self, close_code):
+        if self.user.id in OnlineUsersConsumer.connected_users:
+            del OnlineUsersConsumer.connected_users[self.user.id]
+
+        await self.channel_layer.group_discard(
+            'online_users',
+            self.channel_name
+        )
+        await self.update_online_users()
+
+    @database_sync_to_async
+    def get_online_users(self):
+        from user.serializers import UserSerializer
+        users = User.objects.filter(id__in=OnlineUsersConsumer.connected_users.keys())
+        return UserSerializer(users, many=True).data
+
+    async def update_online_users(self):
+        online_users = await self.get_online_users()
+        await self.channel_layer.group_send(
+            'online_users',
+            {
+                'type': 'online_users_update',
+                'users': online_users
+            }
+        )
+
+    async def online_users_update(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'online_users',
+            'users': event['users']
+        }))
 
 class GlobalConsumer(AsyncWebsocketConsumer):
     
@@ -422,6 +647,7 @@ class PongConsumer(AsyncWebsocketConsumer):
     right_paddle_pos = {}
     score = {}
     game_task = {}
+    power_up_task = {}
     up_limit = 60
     down_limit = 440
     score_to_win = {}
@@ -432,6 +658,9 @@ class PongConsumer(AsyncWebsocketConsumer):
     longest_exchange = {}
     shortest_exchange = {}
     current_exchange = {}
+    
+    power_up_list = ["long_paddle"]
+    paddle_size = {}
 
     async def change_ai_direction_easy(self, time): 
         await asyncio.sleep(time)
@@ -502,13 +731,12 @@ class PongConsumer(AsyncWebsocketConsumer):
         PongConsumer.longest_exchange[self.room_name] = 0
         PongConsumer.shortest_exchange[self.room_name] = 10000
         PongConsumer.current_exchange[self.room_name] = 0
+        PongConsumer.paddle_size[self.room_name] = 60
         
 
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message = data_json['message']
-
-        logger.info(self.ball_pos)
 
         #if (message == "isAi"):
         #    PongConsumer.is_ai[self.room_name] = data_json['value']
@@ -566,7 +794,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if (message == "begin_game"):
             PongConsumer.game_task[self.room_name] = asyncio.create_task(self.main_loop())
-
+            if (PongConsumer.power_up[self.room_name] == 1):
+                self.wait_until_power_up(2)
 
     async def disconnect(self, close_code):
         logger.info("salut mon pote")
@@ -614,7 +843,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             # right side
             if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] > 750):
                 # check if paddle hit ball
-                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] + 60 and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] - 60):
+                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] + PongConsumer.paddle_size[self.room_name] 
+                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.right_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]):
                     
                     impact_pos = PongConsumer.right_paddle_pos[self.room_name][1] - PongConsumer.ball_pos[self.room_name][1] # between -60 and 60
                     impact_pos *= -1
@@ -660,7 +890,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 
             # left side
             if (PongConsumer.ball_pos[self.room_name][0] + PongConsumer.ball_direction[self.room_name][0] < 50):
-                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.left_paddle_pos[self.room_name][1] + 60 and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.left_paddle_pos[self.room_name][1] - 60):
+                if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.left_paddle_pos[self.room_name][1] + PongConsumer.paddle_size[self.room_name] 
+                    and PongConsumer.ball_pos[self.room_name][1] > PongConsumer.left_paddle_pos[self.room_name][1] - PongConsumer.paddle_size[self.room_name]):
                     
                     impact_pos = PongConsumer.left_paddle_pos[self.room_name][1] - PongConsumer.ball_pos[self.room_name][1] # between -60 and 60
                     impact_pos *= -1
@@ -716,4 +947,39 @@ class PongConsumer(AsyncWebsocketConsumer):
                 'y': PongConsumer.ball_pos[self.room_name][1]
             }))
             await asyncio.sleep(1 / 30)
-        
+
+    async def wait_until_power_up(self, wait_time):
+        await asyncio.sleep(wait_time)
+
+        PongConsumer.paddle_size[self.room_name] = 60
+        await self.send(text_data=json.dumps({
+            'type':'paddle_size',
+            'message': PongConsumer.paddle_size[self.room_name]
+        }))
+
+        self.spawn_power_up()
+
+    async def spawn_power_up(self):
+        logger.info("POWER_UP")
+
+        choosed_power_up = random.choice(self.power_up_list)
+
+        #await self.send(text_data=json.dumps({
+        #    'type':'power_up',
+        #    'message':choosed_power_up 
+        #}))
+
+
+        if (choosed_power_up == 'long_paddle'):
+            PongConsumer.paddle_size[self.room_name] = 80
+            await self.send(text_data=json.dumps({
+                'type':'paddle_size',
+                'message': PongConsumer.paddle_size[self.room_name]
+            }))
+        logger.info(PongConsumer.paddle_size[self.room_name])
+
+        self.wait_until_power_up(6)
+
+
+
+            

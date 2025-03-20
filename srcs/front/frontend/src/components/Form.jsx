@@ -6,6 +6,8 @@ import LoadingIndicator from "./LoadingIndicator";
 import axios from "axios";
 import logo42 from "../assets/42logo.png"
 import Snowfall from 'react-snowfall'
+import connec from "../assets/login.png"
+import cree from "../assets/register.png"
 
 function From({route, method}) {
     const [username, setUsername] = useState("")//"username" = la variable, "setUsename" = la methode pour pouvoir la modifier, "useState" = defini son type en gros
@@ -17,7 +19,7 @@ function From({route, method}) {
     const [code2fa, set2fa] = useState("")
     const navigate = useNavigate()
     const name = method === "login" ? "Se connecter" : "S'enregistrer";
-    var logo = method === "login" ? "src/assets/login.png" : "src/assets/register.png" ;
+    var logo = method === "login" ? connec : cree ;
     const button_text = method === "login" ? "Créer un compte" : "Vous avez déjà un compte ?";
     const [goodlogin, setGoodlogin] = useState(null)
     const [goodregister, setGoodregister] = useState(null)
