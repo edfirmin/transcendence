@@ -20,7 +20,7 @@ const FriendList = ({ onStartPrivateChat }) => {
         const token = localStorage.getItem(ACCESS_TOKEN);
         if (token) {
             const cleanToken = token.replace('Bearer ', '');
-            ws.current = new WebSocket(`ws://localhost:8000/ws/online/?token=${cleanToken}`);
+            ws.current = new WebSocket(`wss://c3r2p2:9443/ws/online/?token=${cleanToken}`);
             
             ws.current.onmessage = (event) => {
                 const data = JSON.parse(event.data);
@@ -99,7 +99,6 @@ const FriendList = ({ onStartPrivateChat }) => {
     return (
         <div className="friend-list-container">
             <h2>Amis</h2>
-            
             <form onSubmit={handleAddFriend} className="add-friend-form">
                 <input
                     type="text"

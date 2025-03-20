@@ -754,7 +754,6 @@ class PongConsumer(AsyncWebsocketConsumer):
     map = {}
     middle_paddle_pos = {}
     middle_paddle_dir = {}
-
     power_up_list = ["long_paddle"]
     paddle_size = {}
 

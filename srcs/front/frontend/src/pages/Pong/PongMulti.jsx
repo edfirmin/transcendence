@@ -28,7 +28,7 @@ function PongMulti() {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
-	const ws = useMemo(() => {return new WebSocket(`wss://c4r1p6:9443/ws/multipong/${roomid}`)}, []); 
+	const ws = useMemo(() => {return new WebSocket(`wss://c3r2p2:9443/ws/multipong/${roomid}`)}, []);
 	const id = useMemo(() => {return uuidv4()}, []);
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);
