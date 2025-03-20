@@ -404,7 +404,7 @@ function Hangman() {
       </button>
         
       <button 
-        onClick={() => score >= 100 ? () => {setSelectedWordGroup(midWords); setSelectedWordGroupName('Gaming');} : null} 
+        onClick={() => score >= 100 ? (setSelectedWordGroup(midWords), setSelectedWordGroupName('Gaming')) : null}
         className={`word-button ${score < 100 ? 'locked' : ''}`}
         disabled={score < 100}
         style={{backgroundColor: selectedWordGroupName == 'Gaming' ? "gray" : "white" }}
@@ -415,7 +415,7 @@ function Hangman() {
       </button>
         
       <button 
-        onClick={() => score >= 300 ?  () => {setSelectedWordGroup(hardWords); setSelectedWordGroupName('Orthographe');} : null} 
+        onClick={() => score >= 300 ? (setSelectedWordGroup(hardWords), setSelectedWordGroupName('Orthographe')) : null}
         className={`word-button ${score < 300 ? 'locked' : ''}`}
         disabled={score < 300}
         style={{backgroundColor: selectedWordGroupName == 'Orthographe' ? "gray" : "white" }}

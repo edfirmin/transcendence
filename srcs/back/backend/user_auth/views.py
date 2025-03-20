@@ -2,18 +2,11 @@
 
 import requests
 import logging
+import os
 from django.http import JsonResponse
 from user.serializers import CreatUserSerializer, UserSerializer
 from user.models import User
-
 logger = logging.getLogger(__name__)
-
-
-CLIENT_ID = 'u-s4t2ud-efb8810a6794b0509ab1b30b4baeb56fff909df009eb5c29cde1d675f5309a75'
-CLIENT_SECRET = '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'
-
-REDIRECT_URI = 'https://localhost:5173/check42user'
-
 
 # {} ==> dictionnaire --> .get("element" acceder a l'element) 
 # [] ==> tableaux --> .append(ajouter un element)
@@ -23,9 +16,9 @@ def login42(request):
     myCode = fullPath.split("/auth/login/?")[1]
 
     url42 = "https://api.intra.42.fr/oauth/token"
-    myClientId = CLIENT_ID
-    mySecret = CLIENT_SECRET
-    myRedirect = REDIRECT_URI
+    myClientId = os.environ.get('42_ID')
+    mySecret = os.environ.get('42_SECRET')
+    myRedirect = os.environ.get('42_REDIRECT_URI')
 
     myData = {
         "grant_type": "authorization_code",
@@ -55,26 +48,29 @@ def login42(request):
     # JE RECUP TOUS MES ELEMENTS UTILS A MON USER
     logger.info("MON LOGIN --> %s", myLogin)
     logger.info("MA PP FDP --> %s", link)
-    # JE REMPLIE TOUS CES ELEMENTS DANS UN JSON
-    my42UserInfo = {
-        "username" : myLogin+"_42",
-        "profil_pic" : link,
-        "is42stud" : True,
-        "password": "password_default"
-    }
-    # AVEC CE JSON JE CREE UN OBJET USER GRACE A USERSERIALIZER
-    # Log pour la réponse brute
-    #logger.info("Réponse brute de 42 API: %s", my42Response)
 
-    user_serializer = CreatUserSerializer(data=my42UserInfo)
-
-# 4. VALIDATION DES DONNEES ET ENREGISTREMENT EN DB SI TOUT EST OK
-    if user_serializer.is_valid():
-        user = user_serializer.save()  # JE SAVE CE USER EN DB
-        logger.info("Utilisateur créé avec succès : %s", user)
-        return JsonResponse(user_serializer.data, safe=False)
-    else:
-        logger.error("Erreur de validation du serializer : %s", user_serializer.errors)
+    # Check if user already exists
+    username_42 = myLogin + "_42"
+    try:
+        existing_user = User.objects.get(username=username_42)
+        # Update profile picture in case it changed
+        existing_user.profil_pic = link
+        existing_user.save()
+        return JsonResponse({"username": username_42}, safe=False)
+    except User.DoesNotExist:
+        # Create new user if they don't exist
+        my42UserInfo = {
+            "username": username_42,
+            "profil_pic": link,
+            "is42stud": True,
+            "password": "password_default"
+        }
+        user_serializer = CreatUserSerializer(data=my42UserInfo)
+        if user_serializer.is_valid():
+            user = user_serializer.save()
+            logger.info("Utilisateur créé avec succès : %s", user)
+            return JsonResponse(user_serializer.data, safe=False)
+        else:
+            logger.error("Erreur de validation du serializer : %s", user_serializer.errors)
+            return JsonResponse({"error": "Failed to create user"}, status=400)
     
-    return JsonResponse({"username" : myLogin}, safe=False)
-

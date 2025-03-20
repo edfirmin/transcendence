@@ -26,7 +26,7 @@ function CheckUser() {
 
     return (
         <div>
-           OUI JE SUIS ARRIVE ICI
+           Chargement .....
         </div>
     );
 }

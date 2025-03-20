@@ -493,11 +493,7 @@ function NextMatch({show, left_name, right_name, left_icone, right_icone, map_in
 
 function Button({name, callback}) {
 	return (
-	  <tr>
-		<td>
 		  <button className='button' onClick={() => callback()}>{name} </button>
-		</td>
-	  </tr>
 	)
 }
 
