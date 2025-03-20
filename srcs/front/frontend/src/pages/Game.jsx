@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 
 export default function Game() {
-    var ws = useMemo(() => {return new WebSocket("wss://c3r2p2:9443/ws/pong/")}, [ws]);
+    var ws = useMemo(() => {return new WebSocket("wss://c1r5p1:9443/ws/pong/")}, [ws]);
     const [topLeftPaddle, setTopLeftPaddle] = useState(550);
     const [topRightPaddle, setTopRightPaddle] = useState(550);
     const [ballPos, setBallPos] = useState([500, 500]);

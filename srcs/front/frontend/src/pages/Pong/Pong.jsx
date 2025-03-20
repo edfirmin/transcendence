@@ -22,13 +22,14 @@ import fog_corner from '../../assets/img/fog_map_fog_corner.png'
 import portal_red from '../../assets/img/portal_red.png'
 import portal_green from '../../assets/img/portal_green.png'
 import { ACCESS_TOKEN } from "../../constants";
+import Navbarr from "../../components/Navbar";
+import Snowfall from 'react-snowfall'
 
 
 function Pong() {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
-	var ws = useMemo(() => {return new WebSocket(`wss://c3r2p2:9443/ws/pong/${roomid}`)}, [ws]);
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
@@ -56,31 +57,32 @@ function Pong() {
 	const timeoutAI = useRef(null);
 	const AIBallPos = useRef({ x: 400, y: 250})
 	//const [score_history, set_score_history] = useState([])
-
+	
 	const map_design = [classic_map, table_tennis_map, fog_map, tennis_map ];
 	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
 	const paddle_design = [classic_paddle_design, tennis_paddle_design, cool_paddle_design, sick_paddle_design, swag_paddle_design];
-
+	
 	const data = useLocation();
 	const isAI = data.state == null ? false : data.state.isAI;
 	const difficulty = data.state == null ? "easy" : data.state.difficulty;
-	const map_index = data.state.map;
-	const design_index = data.state.design;
-	const points = data.state.points + 2;
-	const players = data.state.players;
-	const leftPlayerName = data.state.leftPlayerName;
-	const rightPlayerName = data.state.rightPlayerName;
-	const tourney_id = data.state.tourney_id;
-    const currentBattleIndex = data.state.currentBattleIndex;
-	const returnPage = data.state.returnPage == null ? '/selection' : data.state.returnPage;
-	const leftPlayerIsUser = data.state.leftPlayerIsUser;
-	const rightPlayerIsUser = data.state.rightPlayerIsUser;
-	const power_up = data.state.power_up_on;
-
+	const map_index = data.state == null ? 0 : data.state.map;
+	const design_index = data.state == null ? 0 : data.state.design;
+	const points = data.state == null ? 2 : data.state.points + 2;
+	const players = data.state == null ? 0 : data.state.players;
+	const leftPlayerName = data.state == null ? 0 : data.state.leftPlayerName;
+	const rightPlayerName = data.state == null ? 0 : data.state.rightPlayerName;
+	const tourney_id = data.state == null ? 0 : data.state.tourney_id;
+    const currentBattleIndex = data.state == null ? 0 : data.state.currentBattleIndex;
+	const returnPage = data.state == null ? 0 : (data.state.returnPage == null ? '/selection' : data.state.returnPage);
+	const leftPlayerIsUser = data.state == null ? 0 : data.state.leftPlayerIsUser;
+	const rightPlayerIsUser = data.state == null ? 0 : data.state.rightPlayerIsUser;
+	const power_up = data.state == null ? 0 : data.state.power_up_on;
+	
+	var ws = useMemo(() => {return data.state == null ? new WebSocket("") : new WebSocket(`wss://c1r5p1:9443/ws/pong/${roomid}`)}, [ws]);
 	const [countdown, setCountdown] = useState(-1);
-
+	
     const navigate = useNavigate();
-
+	
     // When receiving a message from the back
     ws.onmessage = function(event) {
         let data = JSON.parse(event.data);
@@ -290,15 +292,15 @@ function Pong() {
 			if (tourney_id != null) {
 				if (leftPlayerIsUser) {
 					if (winner == 'LEFT WIN !') 
-						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true})
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true, opponent: rightPlayerName})
 					else
-						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true})
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: leftPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true, opponent: rightPlayerName})
 				}
 				if (rightPlayerIsUser) {
 					if (winner == 'LEFT WIN !')
-						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true})
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "DEFAITE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true, opponent: leftPlayerName})
 					else
-						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true})
+						await axios.post('api/user/addMatchStatsWithUsername/', {username: rightPlayerName, result: "VICTOIRE", date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: true, opponent: leftPlayerName})
 				}
 			}
 			else
@@ -600,10 +602,20 @@ function Pong() {
 
 	return (
 		<>
+		<Navbarr></Navbarr>
+		<Snowfall></Snowfall>
+		{data.state == null ? 
+		<div>
+			<h1 style={{ textAlign: "center", color:"white", top: "40%", left: "40%", position: "absolute"}}>La Partie est invalide !!</h1>
+			<canvas ref={canvasRef2} width={0} height={0} style={{ border: '5px solid white', borderRadius: '5px', marginBottom: '5px' }}></canvas>
+			<canvas ref={canvasRef} width={0} height={0} style={{ border: '5px solid white' }}></canvas>
+		</div>	
+		:
         <div className={styles.MovingBall}>
 			<canvas ref={canvasRef2} width={800} height={50} style={{ border: '5px solid white', borderRadius: '5px', marginBottom: '5px' }}></canvas>
 			<canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white' }}></canvas>
 		</div>
+		}
 		</>
 	);
 
