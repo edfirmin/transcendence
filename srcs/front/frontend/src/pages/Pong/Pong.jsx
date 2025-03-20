@@ -14,8 +14,13 @@ import sick_ball_design from '../../assets/img/sick_ball_design.png'
 import swag_paddle_design from '../../assets/img/swag_paddle_design.png'
 import swag_ball_design from '../../assets/img/swag_ball_design.png'
 import classic_map from '../../assets/img/classic_map.png'
-import tennis_map from '../../assets/img/tennis_map.png'
+import tennis_map from '../../assets/img/portal_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
+import fog_map from '../../assets/img/fog_map_background.png'
+import fog from '../../assets/img/fog_map_fog.png'
+import fog_corner from '../../assets/img/fog_map_fog_corner.png'
+import portal_red from '../../assets/img/portal_red.png'
+import portal_green from '../../assets/img/portal_green.png'
 import { ACCESS_TOKEN } from "../../constants";
 
 
@@ -29,6 +34,7 @@ function Pong() {
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
 	const LPaddle = useRef({ x: 50, y: 250});
 	const RPaddle = useRef({ x: 750, y: 250});
+	const middlePaddle = useRef({ x: 391, y: 250});
 	const [score, setScore] = useState({left: 0, right: 0});
 	const ball_history = useRef([]);
 	const ball_history_max_size = 10;
@@ -51,7 +57,7 @@ function Pong() {
 	const AIBallPos = useRef({ x: 400, y: 250})
 	//const [score_history, set_score_history] = useState([])
 
-	const map_design = [classic_map, tennis_map, table_tennis_map];
+	const map_design = [classic_map, table_tennis_map, fog_map, tennis_map ];
 	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
 	const paddle_design = [classic_paddle_design, tennis_paddle_design, cool_paddle_design, sick_paddle_design, swag_paddle_design];
 
@@ -85,9 +91,13 @@ function Pong() {
 				'message':'points',
 				'value': points
 			}));
-			ws.send(JSON.stringify({
+	/*		ws.send(JSON.stringify({
 				'message':'power_up',
 				'value':power_up
+			}));*/
+			ws.send(JSON.stringify({
+				'message':'map',
+				'value':map_index
 			}));
 			/*ws.send(JSON.stringify({
 				'message':'isAi',
@@ -107,6 +117,9 @@ function Pong() {
         }
         if (data.type == "right_paddle_down" || data.type == "right_paddle_up") {
             RPaddle.current.y = data.message
+        }
+        if (data.type == "middle_paddle_pos") {
+            middlePaddle.current.y = data.message
         }
 		if (data.type == "paddle_size") {
             paddle_size.current = data.message
@@ -292,9 +305,6 @@ function Pong() {
 				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Local", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
 	}
 
-	function getDate() {
-		
-	}
 
 	useEffect(() => {
 		postMatchStats();
@@ -434,6 +444,28 @@ function Pong() {
 		}
 	}
 
+	const drawFog = (ctx) => {
+		ctx.beginPath();
+		var img = new Image();
+		img.src = fog;
+		ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+		ctx.fill();
+		ctx.beginPath();
+		var img = new Image();
+		img.src = fog_corner;
+		ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+		ctx.fill();
+	}
+
+	const drawPortal = (ctx, x, y, image) => {
+		// Drawing a paddle centered at the given position
+		ctx.beginPath();
+		var img = new Image();
+		img.src = image;
+		ctx.drawImage(img, x, y, 119, 5);
+		ctx.fill();
+	}
+
 	const drawGame = (ctx, background, paddle_img, ball_img) =>
 	{
 		// Fill background in black
@@ -455,6 +487,16 @@ function Pong() {
 			drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y, paddle_img);
 			drawBall(ctx, ball.x, ball.y, ball_img);
 			drawHits(ctx);
+			if (map_index == 1)
+				drawPaddle(ctx, middlePaddle.current.x, middlePaddle.current.y, paddle_img);
+			if (map_index == 2)
+				drawFog(ctx);
+			if (map_index == 3) {
+				drawPortal(ctx, 100, 0, portal_red);
+				drawPortal(ctx, 600, 495, portal_green);
+				drawPortal(ctx, 100, 495, portal_green);
+				drawPortal(ctx, 600, 0, portal_red);
+			}
 		}
 	}
 

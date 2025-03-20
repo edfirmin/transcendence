@@ -14,10 +14,15 @@ import sick_ball_design from '../../assets/img/sick_ball_design.png'
 import swag_paddle_design from '../../assets/img/swag_paddle_design.png'
 import swag_ball_design from '../../assets/img/swag_ball_design.png'
 import classic_map from '../../assets/img/classic_map.png'
-import tennis_map from '../../assets/img/tennis_map.png'
+import tennis_map from '../../assets/img/portal_map.png'
 import table_tennis_map from '../../assets/img/table_tennis_map.png'
+import fog_map from '../../assets/img/fog_map_background.png'
+import fog from '../../assets/img/fog_map_fog.png'
+import fog_corner from '../../assets/img/fog_map_fog_corner.png'
 import { ACCESS_TOKEN } from "../../constants";
 import { getUser } from '../../api';
+import portal_red from '../../assets/img/portal_red.png'
+import portal_green from '../../assets/img/portal_green.png'
 
 function PongMulti() {
 
@@ -30,6 +35,7 @@ function PongMulti() {
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
 	const LPaddle = useRef({ x: 50, y: 250});
 	const RPaddle = useRef({ x: 750, y: 250});
+	const middlePaddle = useRef({ x: 391, y: 250});
 	const [score, setScore] = useState({left: 0, right: 0});
 	const gameStarted = useRef(false);
     const ball = useRef({ x: 400, y: 250 });
@@ -46,9 +52,10 @@ function PongMulti() {
 	const [shortest_exchange, set_shortest_exchange] = useState(0);
 	const hit_history = useRef([]);
 	const [time_start, set_time_start] = useState(0)
+	const paddle_size = useRef(60);
+	const [id_winner, set_id_winner] = useState(0);
 
-
-	const map_design = [classic_map, tennis_map, table_tennis_map];
+	const map_design = [classic_map, table_tennis_map, fog_map, tennis_map ];
 	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
 	const paddle_design = [classic_paddle_design, tennis_paddle_design, cool_paddle_design, sick_paddle_design, swag_paddle_design];
 
@@ -73,15 +80,27 @@ function PongMulti() {
 	    	}))
 			
 			if (data.state != null) {
-				ws.send(JSON.stringify({
-					'id':id,
-					'message':'game_custom_options',
-					'map':map_index,
-					'design':design_index,
-					'points':points,
-					'left_user':left_user,
-					'right_user':right_user
-				}))
+				if (left_user == undefined) {
+					ws.send(JSON.stringify({
+						'id':id,
+						'message':'game_custom_options',
+						'map':map_index,
+						'design':design_index,
+						'points':points,
+						'left_user':null,
+						'right_user':null
+					}))
+				}
+				else
+					ws.send(JSON.stringify({
+						'id':id,
+						'message':'game_custom_options',
+						'map':map_index,
+						'design':design_index,
+						'points':points,
+						'left_user':left_user,
+						'right_user':right_user
+					}))
 			}
 		}
 
@@ -95,6 +114,9 @@ function PongMulti() {
 			}
 			if (data.type == "right_paddle_down" || data.type == "right_paddle_up") {
 				RPaddle.current.y = data.message
+			}
+			if (data.type == "middle_paddle_pos") {
+				middlePaddle.current.y = data.message
 			}
 			if (data.type == "ball_pos") {
 				ball.x = data.x;
@@ -115,6 +137,7 @@ function PongMulti() {
 			if (data.type == "winner") {
 				set_longest_exchange(data.longest_exchange);
 				set_shortest_exchange(data.shortest_exchange);
+				set_id_winner(data.id);
 				setWinner(data.winner + " WIN !");
 				setTimeout(() => { navigate('/selection', {state : {map : map_index, design : design_index, points : points - 2, winner : data.winner
 				}}) }, 3000);
@@ -159,8 +182,9 @@ function PongMulti() {
 		const time = d.getTime() - time_start.getTime();
 		console.log(time);
 
-		if (left_user == null)
-			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
+		if (left_user == null || left_user == undefined || left_user == -1)
+			if (id == id_winner)
+				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
 		else {
 			const user = await getUser();
 			if (winner == "LEFT WIN !" && user.username == left_user.username)
@@ -265,10 +289,9 @@ function PongMulti() {
 	const drawPaddle = (ctx, x, y, img) => {
 		// Drawing a paddle centered at the given position
 		ctx.beginPath();
-		ctx.drawImage(img, x, y - 60, 10, 120);
+		ctx.drawImage(img, x, y - paddle_size.current, 18, paddle_size.current * 2);
 		ctx.fill();
 	}
-
 
 	const drawWinner = (ctx) => {
 		if (winner != "") {
@@ -307,6 +330,28 @@ function PongMulti() {
 		}
 	}
 
+	const drawFog = (ctx) => {
+		ctx.beginPath();
+		var img = new Image();
+		img.src = fog;
+		ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+		ctx.fill();
+		ctx.beginPath();
+		var img = new Image();
+		img.src = fog_corner;
+		ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+		ctx.fill();
+	}
+
+	const drawPortal = (ctx, x, y, image) => {
+		// Drawing a paddle centered at the given position
+		ctx.beginPath();
+		var img = new Image();
+		img.src = image;
+		ctx.drawImage(img, x, y, 119, 5);
+		ctx.fill();
+	}
+
 	const drawGame = (ctx, background, paddle_img, ball_img) =>
 	{
 		// Fill background in black
@@ -326,6 +371,16 @@ function PongMulti() {
 			drawPaddle(ctx, RPaddle.current.x, RPaddle.current.y, paddle_img);
 			drawBall(ctx, ball.x, ball.y, ball_img);
 			drawHits(ctx);
+			if (map_index == 1)
+				drawPaddle(ctx, middlePaddle.current.x, middlePaddle.current.y, paddle_img);
+			if (map_index == 2)
+				drawFog(ctx);
+			if (map_index == 3) {
+				drawPortal(ctx, 100, 0, portal_red);
+				drawPortal(ctx, 600, 495, portal_green);
+				drawPortal(ctx, 100, 495, portal_green);
+				drawPortal(ctx, 600, 0, portal_red);
+			}
 		}
 	}
 
@@ -413,8 +468,8 @@ function PongMulti() {
 
     return (
 		<>
-		{ left_user != null && <PlayerUser name={left_user.username} image={left_user.profil_pic} left={560} top={70} /> }
-		{ right_user != null && <PlayerUser name={right_user.username} image={right_user.profil_pic} left={1120} top={70} />}
+		{ (left_user != undefined && left_user != null && left_user != -1) && <PlayerUser name={left_user.username} image={left_user.profil_pic} left={560} top={70} /> }
+		{ (right_user != undefined && right_user != null && right_user != -1) && <PlayerUser name={right_user.username} image={right_user.profil_pic} left={1120} top={70} />}
         <div className={styles.MovingBall}>
 			<canvas ref={canvasRef2} width={800} height={50} style={{ border: '5px solid white', borderRadius: '5px', marginBottom: '5px' }}></canvas>
             <canvas ref={canvasRef} width={800} height={500} style={{ border: '5px solid white' }}></canvas>
