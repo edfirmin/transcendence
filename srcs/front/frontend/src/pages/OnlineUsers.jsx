@@ -20,7 +20,7 @@ function OnlineUsers({ onStartPrivateChat }) {
 
       // Remove 'Bearer ' prefix and include token in the WebSocket URL
       const cleanToken = token.replace('Bearer ', '');
-      ws.current = new WebSocket(`wss://c1r5p1:9443/ws/online/?token=${cleanToken}`);
+      ws.current = new WebSocket(`wss://c1r1p1:9443/ws/online/?token=${cleanToken}`);
 
       ws.current.onopen = () => {
         console.log('OnlineUsers: Successfully connected to WebSocket');

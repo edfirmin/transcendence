@@ -1,0 +1,22 @@
+.bg-rounohome {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    box-shadow: inset 0 0 0 200000px rgba(0, 0, 0, 0);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.poti {
+    width: 215.5vh;
+    height: 100vh;
+}
+
+.poti-nez {
+    position: absolute;
+    background :none;
+    margin: -500px 850px;
+    border-radius: 1000px;
+    height: 110px;
+    width: 220px;
+}

@@ -21,15 +21,39 @@
 .logout-b {
     position: absolute;
 	/* background-color: red; */
-    max-width: 25px;
-    max-height: 25px;
+    max-width: 35px;
+    max-height: 35px;
     border-radius: 100px;
-	margin: -12px 1500px;
+	margin: -17px 83%;
+}
+
+.nav-pong {
+    position: absolute;
+    margin: -30px 25.5%;
+    width: 100px;
+}
+
+.nav-hangman {
+    position: absolute;
+    margin: -17px 40%;
+    width: 100px;
+}
+
+.nav-cl {
+    position: absolute;
+    margin: 0px 46.8%;
+    width: 45px;
+}
+
+.nav-cr {
+    position: absolute;
+    margin: -100px 50%;
+    width: 45px;
 }
 
 .pp_nav {
     position: absolute;
-    margin: -25.5px 82.8%;
+    margin: -25.5px 34%;
     border-radius: 10000000px;
     object-fit: cover;
     width: 50px;
@@ -43,16 +67,16 @@
     transition: 0.2s;
 }
 
-.logo :hover {
+/* .logo :hover {
     transform: scale(1.2);
     background-color: rgb(38, 0, 252);
-}
+} */
 
-.language {
+/* .language {
     all: unset;
     position: absolute;
     margin: 0px 91%;
-}
+} */
 
 /* .language .language-item{
     display: block;

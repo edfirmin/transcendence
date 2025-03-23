@@ -6,7 +6,7 @@ function NotFound() {
 
     const navigate = useNavigate()
     const handleButton = () => {
-            navigate("/rounohome")
+            navigate("/oui")
     }
 
     return (
