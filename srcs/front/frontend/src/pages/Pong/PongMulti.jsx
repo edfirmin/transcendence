@@ -23,6 +23,8 @@ import { ACCESS_TOKEN } from "../../constants";
 import { getUser } from '../../api';
 import portal_red from '../../assets/img/portal_red.png'
 import portal_green from '../../assets/img/portal_green.png'
+import Navbarr from "../../components/Navbar";
+import Snowfall from 'react-snowfall'
 
 function PongMulti() {
 
@@ -468,6 +470,8 @@ function PongMulti() {
 
     return (
 		<>
+		<Navbarr></Navbarr>
+		<Snowfall></Snowfall>
 		{ (left_user != undefined && left_user != null && left_user != -1) && <PlayerUser name={left_user.username} image={left_user.profil_pic} left={560} top={70} /> }
 		{ (right_user != undefined && right_user != null && right_user != -1) && <PlayerUser name={right_user.username} image={right_user.profil_pic} left={1120} top={70} />}
         <div className={styles.MovingBall}>
