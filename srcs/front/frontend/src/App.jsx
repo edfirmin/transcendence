@@ -11,7 +11,7 @@ import RedirectHome from './pages/RedirectHome';
 import CheckUser from './pages/CheckUser';
 import PongMulti from "./pages/Pong/PongMulti"
 import PongSelection from "./pages/PongSelection"
-import RounoHome from "./pages/RounoHome"
+import Oui from "./pages/Oui"
 import Config2FA from "./components/Config2FA"
 import Tourney from "./pages/PongTourney"
 import TourneyPresentation from "./pages/PongTourneyPresentation"
@@ -39,7 +39,7 @@ function App() {
           <Route path="/pong/:roomid" element={<ProtectedRoute> <ChatWrapper /> <Pong/> </ProtectedRoute>}/>
           <Route path="/multipong/:roomid" element={<ProtectedRoute> <ChatWrapper /> <PongMulti/> </ProtectedRoute>}/>
           <Route path="/selection" element={<ProtectedRoute> <ChatWrapper /> <PongSelection/> </ProtectedRoute>}/>
-          <Route path="/rounohome" element={<ProtectedRoute> <ChatWrapper /> <RounoHome/> </ProtectedRoute>}></Route>
+          <Route path="/oui" element={<ProtectedRoute> <Oui/> </ProtectedRoute>}></Route>
           <Route path="/tourney" element={<ProtectedRoute> <ChatWrapper /> <Tourney/> </ProtectedRoute>}></Route>
           <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <ChatWrapper /> <TourneyPresentation/> </ProtectedRoute>}></Route>
           <Route path="/friends" element={<ProtectedRoute> <ChatWrapper /> <FriendList /> </ProtectedRoute>}></Route>

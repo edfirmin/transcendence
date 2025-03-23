@@ -108,8 +108,8 @@ function From({route, method}) {
             {goodpass == true && (<p className="pass-false">Mot de passe pas identique/Champ vide</p>)}
             <button className="go-to-register-button" onClick={() => handleGoToRegisterOrLoginButton()}>{button_text}</button>
                 {!ffa && method === "login" && (<div className="div-login42">
-                    <h2>━━━━━━━━ Étudiant 42 ? ━━━━━━━━</h2>
-                    <button className="login-with-42-button" onClick={handleLoginWith42}><img className="logo42" src={logo42} alt="42 Authentication"/></button>
+                    {/* <h2>━━━━━━━━ Étudiant 42 ? ━━━━━━━━</h2>
+                    <button className="login-with-42-button" onClick={handleLoginWith42}><img className="logo42" src={logo42} alt="42 Authentication"/></button> */}
                 </div>)}
         </div>
     )
