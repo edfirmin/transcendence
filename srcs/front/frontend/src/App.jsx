@@ -17,12 +17,39 @@ import Tourney from "./pages/PongTourney"
 import TourneyPresentation from "./pages/PongTourneyPresentation"
 import ChatWrapper from "./components/ChatWrapper"
 import FriendList from './components/FriendList';
-import React, {useMemo} from 'react';
-
+import React, {useEffect, useMemo, useState} from 'react';
+import {v4 as uuidv4} from 'uuid';
+import { getUser, getAllUserExceptLoggedOne } from "./api"
 
 
 function App() {
-  // var ws = useMemo(() => {return new WebSocket("ws://c4r1p1:9443/ws/global")}, [ws]);
+  const [user, setUser] = useState(null)  
+  var global_id = useMemo(() => { return uuidv4()}, [global_id]);
+  var ws = useMemo(() => {return new WebSocket("wss://c4r1p1:9443/ws/global")}, [ws]);
+  
+  useEffect(() => {
+    ws.onopen = function(event) {
+      ws.send(JSON.stringify({
+        'id':global_id,
+        'message':'on_connect'
+        }))
+    }
+    
+    ws.onmessage = function(event) {
+      let data = JSON.parse(event.data);
+
+      if (data.type == "ping_tourney") {
+        console.log("ping")
+        if (data.left_opponent == user.username || data.right_opponent == user.username)
+          window.confirm(`Tu es attendu pour un match de tournoi organisé par ${data.host} !`);
+      }
+    }
+  });
+
+  useEffect(() => {
+    console.log(user)
+  }, [user])
+
 	return (
     <BrowserRouter>
       <Routes>
@@ -30,7 +57,7 @@ function App() {
         <Route path="/login" element={<Login/>}></Route>
         <Route path="/register" element={<Register/>}></Route>
           <Route path="/" element={<ProtectedRoute> <ChatWrapper /> <RedirectHome/> </ProtectedRoute>}/>
-          <Route path="/home" element={<ProtectedRoute> <ChatWrapper /> <Home/> </ProtectedRoute>}/>
+          <Route path="/home" element={<ProtectedRoute> <ChatWrapper /> <Home setUser={setUser}/> </ProtectedRoute>}/>
           <Route path="/profil" element={<ProtectedRoute> <ChatWrapper /> <Profil/> </ProtectedRoute>}/>
           <Route path="/pong" element={<ProtectedRoute> <ChatWrapper /> <Pong/> </ProtectedRoute>}/>
           <Route path="/hangman" element={<ProtectedRoute> <ChatWrapper /> <Hangman/> </ProtectedRoute>}/>
@@ -41,7 +68,7 @@ function App() {
           <Route path="/selection" element={<ProtectedRoute> <ChatWrapper /> <PongSelection/> </ProtectedRoute>}/>
           <Route path="/rounohome" element={<ProtectedRoute> <ChatWrapper /> <RounoHome/> </ProtectedRoute>}></Route>
           <Route path="/tourney" element={<ProtectedRoute> <ChatWrapper /> <Tourney/> </ProtectedRoute>}></Route>
-          <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <ChatWrapper /> <TourneyPresentation/> </ProtectedRoute>}></Route>
+          <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <ChatWrapper /> <TourneyPresentation ws={ws}/> </ProtectedRoute>}></Route>
           <Route path="/friends" element={<ProtectedRoute> <ChatWrapper /> <FriendList /> </ProtectedRoute>}></Route>
       </Routes>
     </BrowserRouter>

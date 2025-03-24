@@ -2,10 +2,13 @@
 import React from 'react'
 import "../styles/Home.css"
 import {useNavigate} from "react-router-dom"
+import { getUser } from "../api"
 import Navbarr from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.css';
+import { useState, useEffect } from "react";
 
-function Home() {
+
+function Home({setUser}) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -19,6 +22,15 @@ function Home() {
 
   const handleHangman = () => {
     navigate("/hangman")
+  }
+
+  useEffect(() => {
+      inituser()
+  }, []);
+
+  const inituser = async () => {
+      const TMPuser = await getUser()
+      setUser(TMPuser);
   }
 
 	return (
