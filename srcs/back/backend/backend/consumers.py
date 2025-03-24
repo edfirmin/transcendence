@@ -454,14 +454,25 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
 
         if (self.id == MultiPongConsumer.players[self.room_name][0] or self.id == MultiPongConsumer.players[self.room_name][1]):
         
-            await self.channel_layer.group_send(
-                self.room_group_name,{
-                    'type':'winner_type',
-                    'winner': 'YOU',
-                    'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
-                    'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
-                    'id': MultiPongConsumer.players[self.room_name][0]
-                })
+            if (self.id == MultiPongConsumer.players[self.room_name][0]):
+                await self.channel_layer.group_send(
+                    self.room_group_name,{
+                        'type':'winner_type',
+                        'winner': 'RIGHT',
+                        'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
+                        'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
+                        'id': MultiPongConsumer.players[self.room_name][1]
+                    })
+            if (self.id == MultiPongConsumer.players[self.room_name][1]):
+                await self.channel_layer.group_send(
+                    self.room_group_name,{
+                        'type':'winner_type',
+                        'winner': 'LEFT',
+                        'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
+                        'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
+                        'id': MultiPongConsumer.players[self.room_name][0]
+                    })
+
 
             if MultiPongConsumer.game_task[self.room_name]:
                 MultiPongConsumer.game_task[self.room_name].cancel()

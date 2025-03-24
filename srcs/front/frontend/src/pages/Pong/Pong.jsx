@@ -78,7 +78,7 @@ function Pong() {
 	const rightPlayerIsUser = data.state == null ? 0 : data.state.rightPlayerIsUser;
 	const power_up = data.state == null ? 0 : data.state.power_up_on;
 	
-	var ws = useMemo(() => {return data.state == null ? new WebSocket("") : new WebSocket(`wss://c1r5p1:9443/ws/pong/${roomid}`)}, [ws]);
+	var ws = useMemo(() => {return data.state == null ? new WebSocket("") : new WebSocket(`wss://c4r1p1:9443/ws/pong/${roomid}`)}, [ws]);
 	const [countdown, setCountdown] = useState(-1);
 	
     const navigate = useNavigate();
@@ -282,9 +282,14 @@ function Pong() {
 		if (month.toString().length == 1)
 			month = '0' + month;
 		const year = d.getFullYear();
-		const a = + d.getHours() + ':' + d.getMinutes() + '  ' + year + '-' + month + '-' + day;
+		const min = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+		const a = + d.getHours() + ':' + min + '  ' + year + '-' + month + '-' + day;
 
-		const time = d.getTime() - time_start.getTime();
+		var time;
+		if (time_start == null || time_start <= 0)
+			time = 0;
+		else
+			time = d.getTime() - time_start.getTime();
 		
 		if (isAI)
 			await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "AI " + difficulty, longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})

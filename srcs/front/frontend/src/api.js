@@ -31,6 +31,12 @@ export const getMatches = async () => {
     return (response.data)
 }
 
+export const getMatchesWithUsername = async (username) => {
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    const response = await axios.get("/api/user/getMatchesWithUsername/?" + username);
+    return (response.data)
+}
+
 export const getHangmanGames = async () => {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const response = await axios.get("/api/user/getHangmanGames/?" + userToken);
