@@ -1,7 +1,7 @@
 import "../styles/Profil.css"
 import EditProfil from "../components/EditProfil";
 import { useState, useEffect } from "react";
-import { getUser, getUserWithUsername, getMatches, getHangmanGames } from "../api"
+import { getUser, getUserWithUsername, getMatches, getMatchesWithUsername, getHangmanGames } from "../api"
 import Navbarr from "../components/Navbar";
 import tas from "../assets/tas-de-neige.png"
 import profile_logo from "../assets/profile_logo.png"
@@ -50,7 +50,11 @@ function Profil() {
     }
 
     const initmatches = async () => {
-        const TMPmatches = await getMatches()
+        var TMPmatches;
+        if (username != null)
+            TMPmatches = await getMatchesWithUsername(username);
+        else
+            TMPmatches = await getMatches();
         setMatches(TMPmatches);
     }
 
@@ -169,6 +173,7 @@ function Profil() {
         }
     
         setAverageTime(time / matches.length);
+        console.log(averageTime)
     }
 
     return (
@@ -223,7 +228,7 @@ function Profil() {
                             <div className="small_space"></div>
 
                             <h4 className="center">Durée moyenne match</h4>
-                            {averageTime != null ? <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p> : <p className="center">No Match Play</p>}
+                            {!(averageTime != null && averageTime != 0 && isNaN(averageTime)) ? <p className="center">{String(Number.parseFloat(averageTime).toFixed(0)).substring(0, String(Number.parseFloat(averageTime).toFixed(0)).length - 3)} s</p> : <p className="center">Aucun Match Joué</p>}
                             <div className="small_space"></div>
                             <h4 className="center">Historique de Match</h4>
                             <MatchArray matches={matches} />
@@ -246,7 +251,7 @@ function Profil() {
                             </div>
                             <div className="small_space"></div>
                             <h4 className="center">Précision</h4>
-                            <p className="center">{Number.parseInt((user.hangman_find_letter / (user.hangman_miss_letter + user.hangman_find_letter)) * 100)} % lettres justes !</p>                       
+                            { hangman_games.length != 0 ? <p className="center">{Number.parseInt((user.hangman_find_letter / (user.hangman_miss_letter + user.hangman_find_letter)) * 100)} % lettres justes !</p> : <p className="center">Aucune Partie Jouée</p>}                   
                             <div className="small_space"></div>
                             <h4 className="center">Historique des Parties</h4>
                             <HangmanArray hangman_games={hangman_games} />
@@ -301,10 +306,10 @@ function MatchResult({result, date, score_left, score_right, time, type, longest
                 <div>
                     {is_tourney ? <p>oui</p> : <p>non</p>} 
                     {opponent != 'null' && <p>{opponent}</p> }
-                    <p>{time} s</p>
+                    {(!isNaN(time) && time != 0 && time != null) ? <p>{time} s</p> : <p>trop courte</p>}
                     <p>{type}</p>
                     <p>{longest_exchange}</p>
-                    <p>{shortest_exchange}</p>
+                    {shortest_exchange > longest_exchange ? <p>{longest_exchange}</p> : <p>{shortest_exchange}</p>}
                     <img style={{width: "50px", height: "50px"}} src={map_design[map_index]} alt="" />
                 </div>
             </div>

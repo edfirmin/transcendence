@@ -20,7 +20,7 @@ const FriendList = ({ onStartPrivateChat }) => {
         const token = localStorage.getItem(ACCESS_TOKEN);
         if (token) {
             const cleanToken = token.replace('Bearer ', '');
-            ws.current = new WebSocket(`wss://c1r1p1:9443/ws/online/?token=${cleanToken}`);
+            ws.current = new WebSocket(`wss://c4r1p1:9443/ws/online/?token=${cleanToken}`);
             
             ws.current.onmessage = (event) => {
                 const data = JSON.parse(event.data);
@@ -31,7 +31,7 @@ const FriendList = ({ onStartPrivateChat }) => {
             };
 
             ws.current.onerror = (error) => {
-                console.error('WebSocket error:', error);
+                console.log('WebSocket error:', error);
             };
         }
 
@@ -50,7 +50,7 @@ const FriendList = ({ onStartPrivateChat }) => {
             setError('');
         } catch (err) {
             setError('Failed to load friends');
-            console.error(err);
+            console.log(err);
         }
     };
 
@@ -68,7 +68,7 @@ const FriendList = ({ onStartPrivateChat }) => {
         } catch (err) {
             const errorMessage = err.response?.data?.error || 'Failed to add friend';
             setError(errorMessage);
-            console.error('Error adding friend:', err);
+            console.log('Error adding friend:', err);
         }
     };
 

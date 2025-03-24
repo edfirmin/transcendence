@@ -235,10 +235,18 @@ class OnlineUsersConsumer(AsyncWebsocketConsumer):
             'users': event['users']
         }))
 
-class GlobalConsumer(AsyncWebsocketConsumer):
+class GlobalConsumer(AsyncJsonWebsocketConsumer):
     
+    username_ids = {}
 
     async def connect(self):
+        self.room_name = 'oui'
+        self.room_group_name = 'ouioui'
+        
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
         await self.accept()
 
         await self.send(text_data=json.dumps({
@@ -246,26 +254,38 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             'message':'You are now connected!'
         }))
 
+        if self.room_name not in GlobalConsumer.username_ids:
+            GlobalConsumer.username_ids[self.room_name] = dict()
+        
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message = data_json['message']
+        
+        if (message == "on_connect"):
+            self.id = data_json['id']
 
-        if (message == "left_paddle_down"):
-            if self.left_paddle_pos[1] > self.down_limit:
-                return
-
-            self.left_paddle_pos[1] += 1
-            await self.send(text_data=json.dumps({
-                'type':'left_paddle_down',
-                'message': self.left_paddle_pos[1]
-        }))
-
-        if self.game_task == None:
-            self.game_task = asyncio.create_task(self.main_loop())
-
+        if (message == "ping_tourney"):
+            await self.channel_layer.group_send(
+                self.room_group_name,{
+                    'type':'ping_tourney_type',
+                    'host': data_json['host'],
+                    'left_opponent': data_json['left_opponent'],
+                    'right_opponent': data_json['right_opponent']
+            })
 
     async def disconnect(self, close_code):
-        logger.info("salut mon pote")
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    async def ping_tourney_type(self, event):
+        await self.send_json({
+                'type': "ping_tourney",
+                'host': event['host'],
+                'left_opponent': event['left_opponent'],
+                'right_opponent': event['right_opponent']
+            })
 
 class MultiPongConsumer(AsyncJsonWebsocketConsumer):
     
@@ -454,14 +474,25 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
 
         if (self.id == MultiPongConsumer.players[self.room_name][0] or self.id == MultiPongConsumer.players[self.room_name][1]):
         
-            await self.channel_layer.group_send(
-                self.room_group_name,{
-                    'type':'winner_type',
-                    'winner': 'YOU',
-                    'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
-                    'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
-                    'id': MultiPongConsumer.players[self.room_name][0]
-                })
+            if (self.id == MultiPongConsumer.players[self.room_name][0]):
+                await self.channel_layer.group_send(
+                    self.room_group_name,{
+                        'type':'winner_type',
+                        'winner': 'RIGHT',
+                        'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
+                        'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
+                        'id': MultiPongConsumer.players[self.room_name][1]
+                    })
+            if (self.id == MultiPongConsumer.players[self.room_name][1]):
+                await self.channel_layer.group_send(
+                    self.room_group_name,{
+                        'type':'winner_type',
+                        'winner': 'LEFT',
+                        'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
+                        'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
+                        'id': MultiPongConsumer.players[self.room_name][0]
+                    })
+
 
             if MultiPongConsumer.game_task[self.room_name]:
                 MultiPongConsumer.game_task[self.room_name].cancel()
