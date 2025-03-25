@@ -30,6 +30,9 @@ function Pong() {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
+
+	const host = import.meta.env.VITE_HOST;
+
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);
 	const keys = useRef({ left_up: false, left_down: false, right_up: false, right_down: false});
@@ -78,7 +81,7 @@ function Pong() {
 	const rightPlayerIsUser = data.state == null ? 0 : data.state.rightPlayerIsUser;
 	const power_up = data.state == null ? 0 : data.state.power_up_on;
 	
-	var ws = useMemo(() => {return data.state == null ? new WebSocket("") : new WebSocket(`wss://c2r8p1:9443/ws/pong/${roomid}`)}, [ws]);
+	var ws = useMemo(() => {return data.state == null ? new WebSocket("") : new WebSocket(`wss://${host}:9443/ws/pong/${roomid}`)}, [ws]);
 	const [countdown, setCountdown] = useState(-1);
 	
     const navigate = useNavigate();

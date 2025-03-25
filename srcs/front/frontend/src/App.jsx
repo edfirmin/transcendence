@@ -25,7 +25,8 @@ import { getUser, getAllUserExceptLoggedOne } from "./api"
 function App() {
   const [user, setUser] = useState(null)  
   var global_id = useMemo(() => { return uuidv4()}, [global_id]);
-  var ws = useMemo(() => {return new WebSocket("wss://c2r8p1:9443/ws/global")}, [ws]);
+  const host = import.meta.env.VITE_HOST;
+  var ws = useMemo(() => {return new WebSocket(`wss://${host}:9443/ws/global`)}, [ws]);
   
   useEffect(() => {
     ws.onopen = function(event) {
