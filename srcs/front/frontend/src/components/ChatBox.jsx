@@ -65,7 +65,7 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
       }
 
       const cleanToken = token.replace('Bearer ', '');
-      ws.current = new WebSocket(`wss://c4r1p1:9443/ws/chat/?token=${cleanToken}`);
+      ws.current = new WebSocket(`wss://c2r8p1:9443/ws/chat/?token=${cleanToken}`);
 
       ws.current.onopen = () => {
         console.log('ChatBox: Successfully connected to WebSocket');

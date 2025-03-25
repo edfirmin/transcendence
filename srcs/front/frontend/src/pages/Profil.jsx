@@ -193,8 +193,8 @@ function Profil() {
                         <h2>Prénom: {user.first_name}</h2>
                         <h2>Nom: {user.last_name}</h2>
                         <h2>E-mail: {user.email}</h2>
-                        <button onClick={formEdit} className="lb">Modifier ton profile</button>
-                        <button onClick={handleButton} className="rb">Activer la 2FA</button>
+                        {username == null ? <button onClick={formEdit} className="lb">Modifier ton profile</button> : <></>}
+                        {username == null ? <button onClick={handleButton} className="rb">Activer la 2FA</button> : <></>}
                     </div>
                     <div className="rigth">
                         <div id="choose_game">
