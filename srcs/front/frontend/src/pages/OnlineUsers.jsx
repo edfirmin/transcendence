@@ -7,6 +7,7 @@ function OnlineUsers({ onStartPrivateChat }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const ws = useRef(null);
   const [connectionError, setConnectionError] = useState(false);
+  const host = import.meta.env.VITE_HOST;
 
   useEffect(() => {
     const connectWebSocket = () => {
@@ -20,7 +21,7 @@ function OnlineUsers({ onStartPrivateChat }) {
 
       // Remove 'Bearer ' prefix and include token in the WebSocket URL
       const cleanToken = token.replace('Bearer ', '');
-      ws.current = new WebSocket(`wss://c4r1p1:9443/ws/online/?token=${cleanToken}`);
+      ws.current = new WebSocket(`wss://${host}:9443/ws/online/?token=${cleanToken}`);
 
       ws.current.onopen = () => {
         console.log('OnlineUsers: Successfully connected to WebSocket');
