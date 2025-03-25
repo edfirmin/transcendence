@@ -16,7 +16,7 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
   const [from_user, setFrom_user] = useState(null);
   const [room_id, setRoom_id] = useState(null);
   const navigate = useNavigate();
-  const [isWaitingToAPongGame, setIsWaitingToAPongGame] = useState(0)
+  const [isWaitingToAPongGame, setIsWaitingToAPongGame] = useState(false)
   const host = import.meta.env.VITE_HOST;
 
   const navigateRemotePong = async (roomId, opponent_id) => {
@@ -108,7 +108,7 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
             
             setFrom_user(data.invite.from_user);
             setRoom_id(data.invite.room_id);
-            setIsWaitingToAPongGame(isWaitingToAPongGame + 1);
+            setIsWaitingToAPongGame(true);
           }
         } catch (error) {
           console.error('ChatBox: Error parsing message:', error);
@@ -191,15 +191,15 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
   }
 
   useEffect(() => {
-    if (isWaitingToAPongGame <= 0 )
+    if (!isWaitingToAPongGame )
       return;
 
     console.log("isWaiting : " + isWaitingToAPongGame);
-    const accept = window.confirm(`${from_user} t'invite à une partie de Pong ! Acceptez ?`);
-    if (accept) {
+   // const accept = window.confirm(`${from_user} t'invite à une partie de Pong ! Acceptez ?`);
+   // if (accept) {
       // Navigate to game page or start game
-      navigateRemotePong(room_id, null)
-    }
+   //   navigateRemotePong(room_id, null)
+   // }
   }, [isWaitingToAPongGame])
 
   return (
@@ -301,8 +301,36 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
           </form>
         </>
       )}
+      {isWaitingToAPongGame && <AcceptPong roomId={room_id} opponent_id={null} setIsWaitingToAPongGame={setIsWaitingToAPongGame} from_user={from_user}/>}
     </div>
   );
+}
+
+function AcceptPong({roomId, opponent_id, from_user, setIsWaitingToAPongGame}) {
+  const navigate = useNavigate();
+  
+  const navigateRemotePong = async () => {
+    setIsWaitingToAPongGame(false)
+    
+    const left_user = await getUser();
+    if (opponent_id != null) {
+      const right_user = await getUserWithId(opponent_id);
+      navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index, left_user: left_user, right_user: right_user}});
+    } else 
+      navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index}});
+  }
+
+  const close = async () => {
+    setIsWaitingToAPongGame(false)
+  }
+  
+  return (
+    <div className='accept_match_button'>
+      <p>{from_user} t'invite à une partie de Pong</p>
+      <button onClick={close}>Refusez</button>
+      <button onClick={navigateRemotePong}>Acceptez</button>
+    </div>
+  )
 }
 
 export default ChatBox;

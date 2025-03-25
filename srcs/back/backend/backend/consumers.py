@@ -782,7 +782,7 @@ class PongConsumer(AsyncWebsocketConsumer):
     power_up = {}
     is_ai = {}
     difficulty = {}
-    ai_direction_go_up = {}
+    ai_direction = {}
     longest_exchange = {}
     shortest_exchange = {}
     current_exchange = {}
@@ -792,17 +792,44 @@ class PongConsumer(AsyncWebsocketConsumer):
     power_up_list = ["long_paddle"]
     paddle_size = {}
     ai_ball_pos = {}
+    ai_ball_pos_destination = {}
 
     async def refresh_ai_view(self):
         while True:
-            PongConsumer.ai_ball_pos[self.room_name] = PongConsumer.ball_pos[self.room_name]
+            PongConsumer.ai_ball_pos[self.room_name][0] = PongConsumer.ball_pos[self.room_name][0]
+            PongConsumer.ai_ball_pos[self.room_name][1] = PongConsumer.ball_pos[self.room_name][1]
+            PongConsumer.ai_ball_pos_destination[self.room_name][0] = PongConsumer.ball_pos[self.room_name][0]
+            PongConsumer.ai_ball_pos_destination[self.room_name][1] = PongConsumer.ball_pos[self.room_name][1]
+            
+            velocity = [0, 0]
+            velocity[0] = PongConsumer.ball_direction[self.room_name][0] * PongConsumer.ball_speed[self.room_name]
+            velocity[1] = PongConsumer.ball_direction[self.room_name][1] * PongConsumer.ball_speed[self.room_name]
+
+            if (PongConsumer.ball_direction[self.room_name][0] > 0):    
+                nb_pas = (750 - PongConsumer.ball_pos[self.room_name][0]) / velocity[0] 
+                PongConsumer.ai_ball_pos_destination[self.room_name][0] += velocity[0] * nb_pas
+                PongConsumer.ai_ball_pos_destination[self.room_name][1] += velocity[1] * nb_pas
+
+            if (PongConsumer.ai_ball_pos_destination[self.room_name][1] > 500):
+                difference = PongConsumer.ai_ball_pos_destination[self.room_name][1] - 500
+                PongConsumer.ai_ball_pos_destination[self.room_name][1] -= difference * 2
+
+            if (PongConsumer.ai_ball_pos_destination[self.room_name][1] < 0):
+                PongConsumer.ai_ball_pos_destination[self.room_name][1] = abs(PongConsumer.ai_ball_pos_destination[self.room_name][1])
+
+            logger.info(PongConsumer.ai_ball_pos_destination[self.room_name])
             await asyncio.sleep(1)
 
     async def change_ai_direction_easy(self, time): 
         await asyncio.sleep(time)
-        PongConsumer.ai_direction_go_up[self.room_name] = bool(random.getrandbits(1))
+        r = random.random()
+        if (r < 0.50):
+            PongConsumer.ai_direction[self.room_name] = 1            
+        else:
+            PongConsumer.ai_direction[self.room_name] = -1  
 
-        new_time = random.uniform(1, 2)
+
+        new_time = random.uniform(0.8, 1.5)
         asyncio.create_task(self.change_ai_direction_easy(new_time))
 
     async def change_ai_direction_medium(self, time):
@@ -811,35 +838,47 @@ class PongConsumer(AsyncWebsocketConsumer):
         if (PongConsumer.ai_ball_pos[self.room_name][1] <= PongConsumer.right_paddle_pos[self.room_name][1]):
             ran = random.random()
             if (ran <= 0.90):
-                PongConsumer.ai_direction_go_up[self.room_name] = True
+                PongConsumer.ai_direction[self.room_name] = -1
             else:
-                PongConsumer.ai_direction_go_up[self.room_name] = False
+                PongConsumer.ai_direction[self.room_name] = 1
         else :
             ran = random.random()
             if (ran <= 0.90):
-                PongConsumer.ai_direction_go_up[self.room_name] = False
+                PongConsumer.ai_direction[self.room_name] = 1
             else:
-                PongConsumer.ai_direction_go_up[self.room_name] = True
+                PongConsumer.ai_direction[self.room_name] = -1
         new_time = random.uniform(0.3, 0.5)
         asyncio.create_task(self.change_ai_direction_medium(new_time))
 
+
+
+    async def calculate_destination_ball(self):
+        logger.info("asasasaaaaaaaaaaaaaaaaaaaaaaaa")
+
+        velocity = PongConsumer.ball_direction[self.room_name] * PongConsumer.ball_speed[self.room_name]
+        PongConsumer.ai_ball_pos_destination[self.room_name] = PongConsumer.ball_pos[self.room_name] + velocity
+
+        if (PongConsumer.ai_ball_pos_destination[self.room_name][1] > 500):
+            difference = PongConsumer.ai_ball_pos_destination[self.room_name][1] - 500
+            PongConsumer.ai_ball_pos_destination[self.room_name][1] -= difference 
+
+        if (PongConsumer.ai_ball_pos_destination[self.room_name][1] < 0):
+            PongConsumer.ai_ball_pos_destination[self.room_name][1] = abs(PongConsumer.ai_ball_pos_destination[self.room_name][1])
+
+
     async def change_ai_direction_hard(self, time): 
+
         await asyncio.sleep(time)
 
-        if (PongConsumer.ai_ball_pos[self.room_name][1] <= PongConsumer.right_paddle_pos[self.room_name][1]):
-            ran = random.random()
-            if (ran <= 0.96):
-                PongConsumer.ai_direction_go_up[self.room_name] = True
-            else:
-                PongConsumer.ai_direction_go_up[self.room_name] = False
-        else :
-            ran = random.random()
-            if (ran <= 0.96):
-                PongConsumer.ai_direction_go_up[self.room_name] = False
-            else:
-                PongConsumer.ai_direction_go_up[self.room_name] = True
-        new_time = random.uniform(0.2, 0.3)
-        asyncio.create_task(self.change_ai_direction_medium(new_time))
+        if (PongConsumer.ai_ball_pos_destination[self.room_name][1] <= PongConsumer.right_paddle_pos[self.room_name][1] - 60):
+            PongConsumer.ai_direction[self.room_name] = -1
+        elif (PongConsumer.ai_ball_pos_destination[self.room_name][1] >= PongConsumer.right_paddle_pos[self.room_name][1] + 60):
+            PongConsumer.ai_direction[self.room_name] = 1
+        else:
+            PongConsumer.ai_direction[self.room_name] = 0
+
+        new_time = random.uniform(0.01, 0.02)
+        asyncio.create_task(self.change_ai_direction_hard(new_time))
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['roomid']
@@ -858,9 +897,11 @@ class PongConsumer(AsyncWebsocketConsumer):
             'message':'You are now connected!'
         }))
 
-        PongConsumer.ball_pos[self.room_name] = [450, 250]
+        PongConsumer.ball_pos[self.room_name] = [350, 250]
+        PongConsumer.ai_ball_pos[self.room_name] = [350, 250]
+        PongConsumer.ai_ball_pos_destination[self.room_name] = [350, 250]
         PongConsumer.ball_speed[self.room_name] = 7
-        PongConsumer.ball_direction[self.room_name] = [1, 1]
+        PongConsumer.ball_direction[self.room_name] = [-1, 1]
         PongConsumer.left_paddle_pos[self.room_name] = [50, 250]
         PongConsumer.right_paddle_pos[self.room_name] = [750, 250]
         PongConsumer.score[self.room_name] = [0, 0]
@@ -875,7 +916,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if (message == "isAi"):
             PongConsumer.is_ai[self.room_name] = data_json['value']
-            PongConsumer.ai_refresh_view_task[self.room_name] = asyncio.create_task(self.refresh_ai_view())
         if (message == "difficulty"):
             PongConsumer.difficulty[self.room_name] = data_json['value']
             if (PongConsumer.difficulty[self.room_name] == 'easy'):
@@ -883,7 +923,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             elif (PongConsumer.difficulty[self.room_name] == 'medium'):
                 PongConsumer.ai_change_direction_task[self.room_name] = asyncio.create_task(self.change_ai_direction_medium(0.3))
             else:
-                PongConsumer.ai_change_direction_task[self.room_name] = asyncio.create_task(self.change_ai_direction_hard(1))
+                PongConsumer.ai_change_direction_task[self.room_name] = asyncio.create_task(self.change_ai_direction_hard(0.1))
 
         if (message == "points"):
             PongConsumer.score_to_win[self.room_name] = data_json['value']
@@ -936,7 +976,9 @@ class PongConsumer(AsyncWebsocketConsumer):
         if (message == "begin_game"):
             PongConsumer.game_task[self.room_name] = asyncio.create_task(self.main_loop())
             if (PongConsumer.is_ai[self.room_name]):
+                PongConsumer.ai_refresh_view_task[self.room_name] = asyncio.create_task(self.refresh_ai_view())
                 PongConsumer.ai_loop_task[self.room_name] = asyncio.create_task(self.ai_loop())
+
             
             #if (PongConsumer.power_up[self.room_name] == 1):
             #    self.wait_until_power_up(2)
@@ -964,14 +1006,14 @@ class PongConsumer(AsyncWebsocketConsumer):
         while True:
             # Bot
             if (PongConsumer.is_ai[self.room_name]):
-                if (not PongConsumer.ai_direction_go_up[self.room_name]):
+                if (PongConsumer.ai_direction[self.room_name] == 1):
                     if (PongConsumer.right_paddle_pos[self.room_name][1] < self.down_limit):
                         PongConsumer.right_paddle_pos[self.room_name][1] += 2
                         await self.send(text_data=json.dumps({
                             'type':'right_paddle_down',
                             'message': PongConsumer.right_paddle_pos[self.room_name][1]
                         }))
-                else:
+                elif (PongConsumer.ai_direction[self.room_name] == -1):
                     if (PongConsumer.ball_pos[self.room_name][1] < PongConsumer.right_paddle_pos[self.room_name][1] and PongConsumer.right_paddle_pos[self.room_name][1] > self.up_limit):
                         PongConsumer.right_paddle_pos[self.room_name][1] -= 2
                         await self.send(text_data=json.dumps({
