@@ -13,7 +13,10 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
   const [blockedUsers, setBlockedUsers] = useState(new Set());
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
+  const [from_user, setFrom_user] = useState(null);
+  const [room_id, setRoom_id] = useState(null);
   const navigate = useNavigate();
+  const [isWaitingToAPongGame, setIsWaitingToAPongGame] = useState(0)
 
   const navigateRemotePong = async (roomId, opponent_id) => {
     
@@ -50,6 +53,7 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
     }
   };
 
+
   useEffect(() => {
     const connectWebSocket = () => {
       console.log('ChatBox: Attempting to connect to WebSocket');
@@ -61,7 +65,7 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
       }
 
       const cleanToken = token.replace('Bearer ', '');
-      ws.current = new WebSocket(`wss://c1r1p1:9443/ws/chat/?token=${cleanToken}`);
+      ws.current = new WebSocket(`wss://c4r1p1:9443/ws/chat/?token=${cleanToken}`);
 
       ws.current.onopen = () => {
         console.log('ChatBox: Successfully connected to WebSocket');
@@ -97,16 +101,12 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
           }
           
           else if (data.type === 'game_invite') {
-            const { from_user, from_user_id } = data.invite;
             // Don't show invites from blocked users
-            if (blockedUsers.has(from_user)) return;
+            if (blockedUsers.has(data.invite.from_user)) return;
             
-            const accept = window.confirm(`${from_user} has invited you to play Pong! Accept?`);
-            if (accept) {
-              // Navigate to game page or start game
-              console.log(data.invite.room_id)
-              navigateRemotePong(data.invite.room_id, null)
-            }
+            setFrom_user(data.invite.from_user);
+            setRoom_id(data.invite.room_id);
+            setIsWaitingToAPongGame(isWaitingToAPongGame + 1);
           }
         } catch (error) {
           console.error('ChatBox: Error parsing message:', error);
@@ -187,6 +187,18 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
   if (connectionError) {
     return null;
   }
+
+  useEffect(() => {
+    if (isWaitingToAPongGame <= 0 )
+      return;
+
+    console.log("isWaiting : " + isWaitingToAPongGame);
+    const accept = window.confirm(`${from_user} t'invite à une partie de Pong ! Acceptez ?`);
+    if (accept) {
+      // Navigate to game page or start game
+      navigateRemotePong(room_id, null)
+    }
+  }, [isWaitingToAPongGame])
 
   return (
     <div className={`chat-box ${isMinimized ? 'minimized' : ''} ${privateChat ? 'private-chat' : ''}`} style={{ height: isMinimized ? 'auto' : undefined }}>

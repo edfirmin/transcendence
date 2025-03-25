@@ -15,7 +15,7 @@ import axios from 'axios';
 import { ACCESS_TOKEN } from "../constants";
 
 
-function TourneyPresentation() {
+function TourneyPresentation({ws}) {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     
     const data = useLocation();
@@ -168,6 +168,12 @@ function TourneyPresentation() {
         set_left_opponent(name_first);
         set_right_opponent(name_second);
         set_next_match(true);
+        ws.send(JSON.stringify({
+            'message':'ping_tourney',
+            'host':user.username,
+            'left_opponent':name_first,
+            'right_opponent':name_second
+        }));
     }
 
     // Determiner prochain match
@@ -468,6 +474,8 @@ function Victory({show, winner_name, winner_icone}) {
 function NextMatch({show, left_name, right_name, left_icone, right_icone, map_index, design_index, p, players, currentBattleIndex, tourney_id, isLeftPlayerAUser, isRightPlayerAUser}) {
     const navigate = useNavigate();    
     
+
+
     function beginNextMatch() {
         const roomId = uuidv4();
         navigate(`/pong/${roomId}`, {state : { isAI : false, map : map_index, design : design_index, points : p, players : players, leftPlayerName : left_name, rightPlayerName : right_name, returnPage : '/tourney/tourneyPresentation', tourney_id : tourney_id, currentBattleIndex : currentBattleIndex,

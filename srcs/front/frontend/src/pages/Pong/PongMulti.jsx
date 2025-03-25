@@ -30,7 +30,7 @@ function PongMulti() {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
-	const ws = useMemo(() => {return new WebSocket(`wss://c1r1p1:9443/ws/multipong/${roomid}`)}, []);
+	const ws = useMemo(() => {return new WebSocket(`wss://c4r1p1:9443/ws/multipong/${roomid}`)}, []);
 	const id = useMemo(() => {return uuidv4()}, []);
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);
@@ -179,14 +179,24 @@ function PongMulti() {
 		if (month.toString().length == 1)
 			month = '0' + month;
 		const year = d.getFullYear();
-		const a = + d.getHours() + ':' + d.getMinutes() + '  ' + year + '-' + month + '-' + day;
+		const min = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+		const a = + d.getHours() + ':' + min + '  ' + year + '-' + month + '-' + day;
 
-		const time = d.getTime() - time_start.getTime();
-		console.log(time);
+		
+		var time;
+		if (time_start == null || time_start <= 0)
+			time = 0;
+		else
+			time = d.getTime() - time_start.getTime();
 
-		if (left_user == null || left_user == undefined || left_user == -1)
+		console.log("id : " + id)
+		console.log("id_winner : " + id_winner)
+		console.log("left_user : " + left_user)
+
+		if (left_user == null || left_user == undefined || left_user == -1) {
 			if (id == id_winner)
 				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
+		}
 		else {
 			const user = await getUser();
 			if (winner == "LEFT WIN !" && user.username == left_user.username)

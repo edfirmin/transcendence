@@ -242,6 +242,15 @@ def getMatches(request):
     matchesSer = MatchSerializer(matches, many=True)
     return JsonResponse(matchesSer.data, safe=False)
 
+def getMatchesWithUsername(request):
+    myPath = request.build_absolute_uri()
+    token_string = myPath.split("?")[1]
+    user = User.objects.get(username=token_string)
+    matches = Match.objects.filter(user=user)
+
+    matchesSer = MatchSerializer(matches, many=True)
+    return JsonResponse(matchesSer.data, safe=False)
+
 def getHangmanGames(request):
     myPath = request.build_absolute_uri()
     token_string = myPath.split("?")[1]

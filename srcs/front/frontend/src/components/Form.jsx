@@ -9,7 +9,7 @@ import Snowfall from 'react-snowfall'
 import connec from "../assets/login.png"
 import cree from "../assets/register.png"
 
-function From({route, method}) {
+function From({route, method, setUser}) {
     const [username, setUsername] = useState("")//"username" = la variable, "setUsename" = la methode pour pouvoir la modifier, "useState" = defini son type en gros
     const [password, setPassword] = useState("")
     const [password2, setPassword2] = useState("")
@@ -79,9 +79,8 @@ function From({route, method}) {
         else
             navigate("/register")
     }
-
     const handleLoginWith42 = () => {
-        window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-efb8810a6794b0509ab1b30b4baeb56fff909df009eb5c29cde1d675f5309a75&redirect_uri=https%3A%2F%2Flocalhost%3A5173%2Fcheck42user&response_type=code";
+        window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8e4e752e3f4080de153ffd9f8198fdf7923515177cab5956100a7ab501f2ea8a&redirect_uri=https%3A%2F%2Fc4r1p1%3A5173%2Fcheck42user&response_type=code";
     };
 
 

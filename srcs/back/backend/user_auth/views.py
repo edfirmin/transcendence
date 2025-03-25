@@ -41,7 +41,7 @@ def login42(request):
     try:
         myLogin = my42Response.get("login")
     except AttributeError as e:
-        logger.error("Erreur lors de l'accès à l'attribut 'get': %s", e)
+        logger.info("Erreur lors de l'accès à l'attribut 'get': %s", e)
 
     my42Picture = my42Response.get("image")
     link = my42Picture.get("link") if my42Picture else None  
@@ -71,6 +71,6 @@ def login42(request):
             logger.info("Utilisateur créé avec succès : %s", user)
             return JsonResponse(user_serializer.data, safe=False)
         else:
-            logger.error("Erreur de validation du serializer : %s", user_serializer.errors)
+            logger.info("Erreur de validation du serializer : %s", user_serializer.errors)
             return JsonResponse({"error": "Failed to create user"}, status=400)
     

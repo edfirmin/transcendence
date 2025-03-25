@@ -31,6 +31,12 @@ export const getMatches = async () => {
     return (response.data)
 }
 
+export const getMatchesWithUsername = async (username) => {
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    const response = await axios.get("/api/user/getMatchesWithUsername/?" + username);
+    return (response.data)
+}
+
 export const getHangmanGames = async () => {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const response = await axios.get("/api/user/getHangmanGames/?" + userToken);
@@ -59,7 +65,7 @@ export const getFriends = async () => {
         const response = await axios.get(`/api/user/friends/?token=${userToken}`);
         return response.data;
     } catch (error) {
-        console.error('Error fetching friends:', error);
+        console.log('Error fetching friends:', error);
         throw error;
     }
 }
@@ -77,7 +83,7 @@ export const addFriend = async (username) => {
         });
         return response.data;
     } catch (error) {
-        console.error('Error adding friend:', error);
+        console.log('Error adding friend:', error);
         throw error;
     }
 }
@@ -88,7 +94,7 @@ export const removeFriend = async (username) => {
         const response = await axios.delete(`/api/user/friends/${username}/?token=${userToken}`);
         return response.data;
     } catch (error) {
-        console.error('Error removing friend:', error);
+        console.log('Error removing friend:', error);
         throw error;
     }
 }
