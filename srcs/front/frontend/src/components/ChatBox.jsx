@@ -66,6 +66,7 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
       }
 
       const cleanToken = token.replace('Bearer ', '');
+
       ws.current = new WebSocket(`wss://${host}:9443/ws/chat/?token=${cleanToken}`);
 
       ws.current.onopen = () => {

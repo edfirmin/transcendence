@@ -30,8 +30,10 @@ function PongMulti() {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
+
 	const host = import.meta.env.VITE_HOST;
 	const ws = useMemo(() => {return new WebSocket(`wss://${host}:9443/ws/multipong/${roomid}`)}, []);
+
 	const id = useMemo(() => {return uuidv4()}, []);
     const canvasRef = useRef(null);
     const canvasRef2 = useRef(null);

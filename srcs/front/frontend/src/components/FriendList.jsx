@@ -21,6 +21,7 @@ const FriendList = ({ onStartPrivateChat }) => {
         const token = localStorage.getItem(ACCESS_TOKEN);
         if (token) {
             const cleanToken = token.replace('Bearer ', '');
+
             ws.current = new WebSocket(`wss://${host}:9443/ws/online/?token=${cleanToken}`);
             
             ws.current.onmessage = (event) => {
