@@ -142,6 +142,8 @@ div {
 	width: 350px;
 	top: 37%;
 	left: 58%;
+	border: 2mm double rgb(255, 255, 255);
+
 }
 
 .home-top {

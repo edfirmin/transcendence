@@ -158,6 +158,11 @@ function PongMulti() {
 				set_right_user(data.right_user);
 			}
 		}
+
+		ws.onclose = (event) => {
+			console.log("The connection has been closed successfully.");
+			setWinner('LEFT WIN !');
+		}
 	}, [])
 
 	async function postMatchStats() {
@@ -211,6 +216,9 @@ function PongMulti() {
 			if (winner != "LEFT WIN !" && user.username == right_user.username)
 				await axios.post('api/user/addMatchStatsWithUsername/', {username: right_user.username, result: "VICTOIRE", date: a, score_left: score.right, score_right: score.left, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false, opponent: left_user.username});
 		}
+
+		ws.close();
+
 	}
 
 	useEffect(() => {
@@ -262,11 +270,13 @@ function PongMulti() {
 				};
                     window.addEventListener('keydown', handleKeyDown);
                     window.addEventListener('keyup', handleKeyUp);
+					window.onbeforeunload = function () {return false;}
 
                     return () => {
                         window.removeEventListener('keydown', handleKeyDown);
-			window.addEventListener('keyup', handleKeyUp);
-		};
+						window.addEventListener('keyup', handleKeyUp);
+					ws.close();
+					};
 	}, []);
 
 	const handlePaddlesMovement = () =>

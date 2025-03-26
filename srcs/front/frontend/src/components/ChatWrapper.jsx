@@ -4,7 +4,7 @@ import ChatBox from "./ChatBox"
 import FriendList from './FriendList';
 import '../styles/ChatWrapper.css'
 
-function ChatWrapper() {
+function ChatWrapper({isInAGame}) {
     const location = useLocation();
     const hideChat = ['/login', '/register', '/check42user'].includes(location.pathname);
     const [privateChats, setPrivateChats] = useState(new Map());
@@ -31,12 +31,13 @@ function ChatWrapper() {
           <FriendList onStartPrivateChat={handleStartPrivateChat} />
         </div>
         <div className="chat-container">
-          <ChatBox /> {/* Global chat */}
+          <ChatBox/> {/* Global chat */}
           {Array.from(privateChats.entries()).map(([userId, user]) => (
             <ChatBox
               key={userId}
               privateChat={user}
               onClosePrivateChat={() => handleClosePrivateChat(userId)}
+              isInAGame={isInAGame}
             />
           ))}
         </div>
