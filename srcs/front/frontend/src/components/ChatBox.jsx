@@ -5,7 +5,7 @@ import '../styles/ChatBox.css';
 import {v4 as uuidv4} from 'uuid';
 import { getUser, getUserWithUsername, getUserWithId } from "../api"
 
-function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
+function ChatBox({ privateChat, onClosePrivateChat, isInAGame, areOthersInAGame}) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
@@ -18,6 +18,12 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
   const navigate = useNavigate();
   const [isWaitingToAPongGame, setIsWaitingToAPongGame] = useState(false)
   const host = import.meta.env.VITE_HOST;
+  const [privateUserIsInAGame, setPrivateUserIsInAGame] = useState(false)
+
+  useEffect(() => {
+    if (privateUserIsInAGame)
+      setTimeout(() => {setPrivateUserIsInAGame(false)}, 500)
+  }, [privateUserIsInAGame])
 
   const navigateRemotePong = async (roomId, opponent_id) => {
     
@@ -25,7 +31,16 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
 
     if (opponent_id != null) {
       const right_user = await getUserWithId(opponent_id);
-      navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index, left_user: left_user, right_user: right_user}});
+
+      if (!right_user.is_in_a_game) {
+        ws.current.send(JSON.stringify({
+          type: 'game_invite',
+          recipient: opponent_id,
+          room_id: roomId
+        }));
+        navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index, left_user: left_user, right_user: right_user}});
+      } else
+        setPrivateUserIsInAGame(true)
     } else 
       navigate(`/multipong/${roomId}`,  {state : {map : left_user.default_map_index, design : left_user.default_paddle_index, points : left_user.default_points_index}});
   }
@@ -172,12 +187,6 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       const roomId = uuidv4();
 
-      ws.current.send(JSON.stringify({
-        type: 'game_invite',
-        recipient: userId,
-        room_id: roomId
-      }));
-
       navigateRemotePong(roomId, userId);
     }
   };
@@ -223,6 +232,7 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
                 🎮
               </button>
               }
+              {privateUserIsInAGame && <p id='error_play_button'>Deja dans une partie</p>}
               <button 
                 className="block-button" 
                 onClick={(e) => {
@@ -303,7 +313,7 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
           </form>
         </>
       )}
-      {isWaitingToAPongGame && <AcceptPong roomId={room_id} opponent_id={null} setIsWaitingToAPongGame={setIsWaitingToAPongGame} from_user={from_user}/>}
+      {isWaitingToAPongGame && privateChat == undefined && <AcceptPong roomId={room_id} opponent_id={null} setIsWaitingToAPongGame={setIsWaitingToAPongGame} from_user={from_user}/>}
     </div>
   );
 }

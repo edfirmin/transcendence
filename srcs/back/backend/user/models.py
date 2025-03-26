@@ -23,6 +23,7 @@ class User(AbstractUser):
     default_map_index = models.IntegerField(default=0)
     default_paddle_index = models.IntegerField(default=0)
     default_points_index = models.IntegerField(default=0)
+    is_in_a_game = models.BooleanField(default=False)
 
 class Hangman(models.Model):
     user = models.ForeignKey(User, default=None, on_delete=models.CASCADE)

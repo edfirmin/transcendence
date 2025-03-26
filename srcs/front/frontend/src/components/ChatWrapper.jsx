@@ -4,7 +4,7 @@ import ChatBox from "./ChatBox"
 import FriendList from './FriendList';
 import '../styles/ChatWrapper.css'
 
-function ChatWrapper({isInAGame}) {
+function ChatWrapper({isInAGame, areOthersInAGame}) {
     const location = useLocation();
     const hideChat = ['/login', '/register', '/check42user'].includes(location.pathname);
     const [privateChats, setPrivateChats] = useState(new Map());
@@ -38,6 +38,7 @@ function ChatWrapper({isInAGame}) {
               privateChat={user}
               onClosePrivateChat={() => handleClosePrivateChat(userId)}
               isInAGame={isInAGame}
+              areOthersInAGame={areOthersInAGame}
             />
           ))}
         </div>

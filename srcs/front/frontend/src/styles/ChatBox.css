@@ -246,3 +246,10 @@
   padding: 10px;
   border-radius: 20px;
 }
+
+#error_play_button {
+	color: red;
+  position: absolute;
+  left: 20%;
+  top: -7%
+}
