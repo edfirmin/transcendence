@@ -391,40 +391,40 @@ function Hangman() {
       </button>
     </div>
 
-      <div className="word-selection-container">
-    <h2>Choisissez le thème</h2>
-    <div className="word-selection">
-      <button 
-        onClick={() => {setSelectedWordGroup(defaultWords); setSelectedWordGroupName('Informatique');}} 
-        className="word-button"
-        style={{backgroundColor: selectedWordGroupName == 'Informatique' ? "gray" : "white" }}
-      >
-        <div className="theme-icon">📝</div>
-        <span>Easy Informatique</span>
-      </button>
-        
-      <button 
-        onClick={() => score >= 100 ? (setSelectedWordGroup(midWords), setSelectedWordGroupName('Gaming')) : null}
-        className={`word-button ${score < 100 ? 'locked' : ''}`}
-        disabled={score < 100}
-        style={{backgroundColor: selectedWordGroupName == 'Gaming' ? "gray" : "white" }}
-      >
-        <div className="theme-icon">🎮</div>
-        <span>Mid Gaming</span>
-        {score < 100 && <div className="lock-overlay">Débloqué à 100 points</div>}
-      </button>
-        
-      <button 
-        onClick={() => score >= 300 ? (setSelectedWordGroup(hardWords), setSelectedWordGroupName('Orthographe')) : null}
-        className={`word-button ${score < 300 ? 'locked' : ''}`}
-        disabled={score < 300}
-        style={{backgroundColor: selectedWordGroupName == 'Orthographe' ? "gray" : "white" }}
-      >
-        <div className="theme-icon">📚</div>
-        <span>Hard Orthographe</span>
-        {score < 300 && <div className="lock-overlay">Débloqué à 300 points</div>}
-      </button>
-    </div>
+    <div className="word-selection-container">
+      <h2>Choisissez le thème</h2>
+      <div className="word-selection">
+        <button 
+          onClick={() => {setSelectedWordGroup(defaultWords); setSelectedWordGroupName('Informatique');}} 
+          className="word-button"
+          style={{backgroundColor: selectedWordGroupName == 'Informatique' ? "gray" : "white" }}
+        >
+          <div className="theme-icon">📝</div>
+          <span>Easy Informatique</span>
+        </button>
+          
+        <button 
+          onClick={() => score >= 100 ? (setSelectedWordGroup(midWords), setSelectedWordGroupName('Gaming')) : null}
+          className={`word-button ${score < 100 ? 'locked' : ''}`}
+          disabled={score < 100}
+          style={{backgroundColor: selectedWordGroupName == 'Gaming' ? "gray" : "white" }}
+        >
+          <div className="theme-icon">🎮</div>
+          <span>Mid Gaming</span>
+          {score < 100 && <div className="lock-overlay">Débloqué à 100 points</div>}
+        </button>
+          
+        <button 
+          onClick={() => score >= 300 ? (setSelectedWordGroup(hardWords), setSelectedWordGroupName('Orthographe')) : null}
+          className={`word-button ${score < 300 ? 'locked' : ''}`}
+          disabled={score < 300}
+          style={{backgroundColor: selectedWordGroupName == 'Orthographe' ? "gray" : "white" }}
+        >
+          <div className="theme-icon">📚</div>
+          <span>Hard Orthographe</span>
+          {score < 300 && <div className="lock-overlay">Débloqué à 300 points</div>}
+        </button>
+      </div>
   </div>
     
     {selectedAvatar && selectedWordGroup && (

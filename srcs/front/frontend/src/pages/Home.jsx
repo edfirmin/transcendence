@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import select from "../assets/select.png"
 import ou from "../assets/ou.png"
 import pongg from "../assets/pongg.gif"
+import hang from "../assets/kermit-hangman.gif"
 
 
 function Home({setUser}) {
@@ -43,7 +44,7 @@ function Home({setUser}) {
         <div className='home-top'><img src={select} /></div>
         <button  onClick={() => handlePong()}><img className='home-buttonP' src={pongg} /></button>
         <img className='home-ou' src={ou} />
-        <button className='home-buttonH' onClick={() => handleHangman()}>Hangman</button>
+        <button onClick={() => handleHangman()}><img className='home-buttonH' src={hang} /></button>
       </div>
 		</div>
   );
