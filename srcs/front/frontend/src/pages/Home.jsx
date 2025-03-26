@@ -6,6 +6,9 @@ import { getUser } from "../api"
 import Navbarr from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.css';
 import { useState, useEffect } from "react";
+import select from "../assets/select.png"
+import ou from "../assets/ou.png"
+import pongg from "../assets/pongg.gif"
 
 
 function Home({setUser}) {
@@ -36,16 +39,14 @@ function Home({setUser}) {
 	return (
 		<div>
       <Navbarr></Navbarr>
-      <button style={{height: "150px", width:"300px", position: "absolute", left:"500px", top:"400px"}} className='button' onClick={() => handlePong()}>Pong</button>
-      <button style={{height: "150px", width:"350px", position: "absolute", left:"1000px", top:"400px"}} className='button' onClick={() => handleHangman()}>Hangman</button>
+      <div className='home-div'>
+        <div className='home-top'><img src={select} /></div>
+        <button  onClick={() => handlePong()}><img className='home-buttonP' src={pongg} /></button>
+        <img className='home-ou' src={ou} />
+        <button className='home-buttonH' onClick={() => handleHangman()}>Hangman</button>
+      </div>
 		</div>
   );
-}
-
-function Button({name, callback}) {
-	return (
-		  <button className='button' onClick={() => callback()}>{name} </button>
-	)
 }
 
 export default Home
