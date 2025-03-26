@@ -49,8 +49,8 @@ function App() {
     ws.onmessage = async function(event) {
       let data = JSON.parse(event.data);
 
-      const TMPuser = await getUser()
-
+      //const TMPuser = await getUser()
+/*
       if (data.type == "ping_tourney") {
         if (data.left_opponent == TMPuser.username || data.right_opponent == TMPuser.username) {
           set_host_tourney(data.host);
@@ -60,11 +60,12 @@ function App() {
       if (data.type == "is_in_a_game") {
         
       }
-    }
+  */
+      }
   }, []);
-
+/*
   useEffect(() => {
-    /*
+
     const sendIsInAGame = async () => {
       const TMPuser = await getUser()
 
@@ -77,7 +78,7 @@ function App() {
       }
     }
 
-    sendIsInAGame()*/
+    sendIsInAGame()
     const sendIsInAGame = async () => {
 		  await axios.post('api/user/setIsInAGame/', {userToken, is_in_a_game: isInAGame})
 
@@ -93,7 +94,7 @@ function App() {
     }
 
     sendIsInAGame()
-  }, [isInAGame]);
+  }, [isInAGame]);*/
 
 	return (
     <>

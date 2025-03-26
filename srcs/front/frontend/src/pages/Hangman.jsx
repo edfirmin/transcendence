@@ -106,24 +106,18 @@ function Hangman() {
     
     setLoading(true);
     
-    // Simuler un délai pour une meilleure expérience utilisateur
     setTimeout(async () => {
-      // Copier l'objet du jeu actuel
       const updatedGame = { ...currentGame };
       
-      // Ajouter la lettre aux lettres devinées
       updatedGame.guessedLetters += lowerLetter;
       
-      // Mettre à jour le mot masqué
       updatedGame.maskedWord = getMaskedWord(updatedGame.word, updatedGame.guessedLetters);
       
-      // Calculer les points si la lettre est correcte
       let pointsEarned = 0;
       
       if (updatedGame.word.includes(lowerLetter)) {
-        // Compter combien de fois la lettre apparaît dans le mot
         const letterCount = updatedGame.word.split('').filter(char => char === lowerLetter).length;
-        // Attribuer 10 points par occurrence de la lettre
+
         pointsEarned = letterCount * 10;
         set_find_letter(find_letter + 1);
       } else {
@@ -131,26 +125,21 @@ function Hangman() {
         set_miss_letter(miss_letter + 1);
       }
       
-      // Vérifier si la partie est gagnée
       const isWordGuessed = !updatedGame.maskedWord.includes("_");
       
       if (isWordGuessed) {
         updatedGame.status = "won";
-        // Bonus pour avoir complété le mot
         pointsEarned += 10;
       } else if (updatedGame.attemptsLeft <= 0) {
         updatedGame.status = "lost";
       }
       
-      // Mettre à jour le state avec le jeu modifié
       setCurrentGame(updatedGame);
       
-      // Ajouter les points au score
       if (pointsEarned > 0) {
         setScore(prevScore => prevScore + pointsEarned);
       }
       
-      // Définir le message en fonction du résultat
       if (updatedGame.status === "won") {
         setMessage(`Félicitations ! Vous avez trouvé le mot : ${updatedGame.word}`);
         await axios.post('api/user/addScoreHangman/', {userToken, score, result: "VICTOIRE", find_letter, miss_letter});
@@ -172,25 +161,19 @@ function Hangman() {
     }, 300);
   };
 
-  // Fonction pour dessiner le pendu en fonction des tentatives restantes
   const drawHangman = (attemptsLeft) => {
     return (
       <div className="hangman-drawing">
         <svg width="200" height="250" viewBox="0 0 200 250">
-          {/* Base */}
           <line x1="20" y1="230" x2="100" y2="230" stroke="black" strokeWidth="3" />
           
-          {/* Poteau vertical */}
           <line x1="60" y1="20" x2="60" y2="230" stroke="black" strokeWidth="3" />
           
-          {/* Poutre horizontale */}
           <line x1="58" y1="20" x2="140" y2="20" stroke="black" strokeWidth="3" />
           
-          {/* Corde */}
           <line x1="140" y1="20" x2="140" y2="50" stroke="black" strokeWidth="3" 
                 opacity={attemptsLeft < 6 ? "1" : "0"} />
           
-          {/* Tête (conditionnelle selon si un avatar est sélectionné) */}
           {selectedAvatar && attemptsLeft < 5 ? (
             <image 
               href={selectedAvatar} 
@@ -206,23 +189,18 @@ function Hangman() {
                     opacity={attemptsLeft < 5 ? "1" : "0"} />
           )}
           
-          {/* Corps */}
           <line x1="140" y1="90" x2="140" y2="150" stroke="black" strokeWidth="3" 
                 opacity={attemptsLeft < 4 ? "1" : "0"} />
           
-          {/* Bras gauche */}
           <line x1="140" y1="110" x2="110" y2="100" stroke="black" strokeWidth="3" 
                 opacity={attemptsLeft < 3 ? "1" : "0"} />
           
-          {/* Bras droit */}
           <line x1="140" y1="110" x2="170" y2="100" stroke="black" strokeWidth="3" 
                 opacity={attemptsLeft < 2 ? "1" : "0"} />
           
-          {/* Jambe gauche */}
           <line x1="140" y1="150" x2="120" y2="180" stroke="black" strokeWidth="3" 
                 opacity={attemptsLeft < 1 ? "1" : "0"} />
           
-          {/* Jambe droite */}
           <line x1="140" y1="150" x2="160" y2="180" stroke="black" strokeWidth="3" 
                 opacity={attemptsLeft === 0 ? "1" : "0"} />
         </svg>
@@ -230,7 +208,6 @@ function Hangman() {
     );
   };
 
-  // Fonction pour rendre le clavier virtuel
   const renderKeyboard = () => {
     const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
     
@@ -278,10 +255,8 @@ function Hangman() {
       
       {currentGame && (
         <div className="game-area">
-          {/* Zone de dessin du pendu */}
           {drawHangman(currentGame.attemptsLeft)}
           
-          {/* Affichage du mot masqué */}
           <div className="word-display">
             {currentGame.maskedWord.split('').map((char, index) => (
               <span key={index} className="letter-box">
@@ -290,14 +265,12 @@ function Hangman() {
             ))}
           </div>
           
-          {/* Affichage des informations de jeu */}
           <div className="game-info">
             <p>Tentatives restantes: <strong>{currentGame.attemptsLeft}</strong></p>
             <p>Lettres déjà essayées: <strong>{currentGame.guessedLetters.split('').join(', ')}</strong></p>
             <p className="game-message">{message}</p>
           </div>
           
-          {/* Formulaire pour deviner une lettre */}
           <form id="letter-form" onSubmit={guessLetter} className="guess-form">
             <input
               type="text"

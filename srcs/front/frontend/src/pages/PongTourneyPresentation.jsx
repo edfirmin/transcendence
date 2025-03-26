@@ -119,8 +119,6 @@ function TourneyPresentation({ws}) {
         for (let i = 0; i < tourneyPlayers.length; i++) {
             if (tourneyPlayers[i].name == name) {
                 if (tourneyPlayers[i].isUser) {
-                    console.log("name : " + tourneyPlayers[i].name)
-                    console.log("users length : " + users.length)
                         for (let j = 0; j < users.length; j++) {
                             if (tourneyPlayers[i].name == users[j].username) {
                                 return users[j].profil_pic                   
@@ -278,7 +276,7 @@ function TourneyPresentation({ws}) {
 
     if (!tourney || !tourneyPlayers || !users || !isReady)
         return (
-            <div class="spinner">
+            <div className="spinner">
             <div></div>   
             <div></div>    
             <div></div>    

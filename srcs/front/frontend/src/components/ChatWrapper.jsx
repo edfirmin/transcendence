@@ -31,7 +31,6 @@ function ChatWrapper({isInAGame, areOthersInAGame}) {
           <FriendList onStartPrivateChat={handleStartPrivateChat} />
         </div>
         <div className="chat-container">
-          <ChatBox/> {/* Global chat */}
           {Array.from(privateChats.entries()).map(([userId, user]) => (
             <ChatBox
               key={userId}
