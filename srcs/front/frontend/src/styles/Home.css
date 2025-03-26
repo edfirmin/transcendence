@@ -113,3 +113,49 @@ div {
 .center {
 	display: flex;
 }
+
+.home-div {
+	display: block;
+    color: white;
+    border: 4mm ridge rgb(255, 255, 255);
+    border-radius: 20px;
+    background-color: rgba(10, 88, 190, 0.473);
+    box-shadow: inset 0 0 50px rgb(255, 255, 255);
+    backdrop-filter: blur(10px);
+    height: 65vh;
+    width: 60%;
+    margin: 5% 20%;
+}
+
+.home-buttonP {
+	position: absolute;
+	max-height: 250px;
+	max-width: 350px;
+	top: 37%;
+	left: 10%;
+	border: 2mm double rgb(255, 255, 255);
+}
+
+.home-buttonH {
+	position: absolute;
+	height: 250px;
+	width: 350px;
+	top: 37%;
+	left: 58%;
+}
+
+.home-top {
+    display: flex;
+    justify-content: center;
+	border-width: 7px;
+	border-style: none none inset none;
+	background-color: rgba(255, 255, 255, 0.384);
+    box-shadow: inset 0 0 50px rgb(255, 255, 255);
+    backdrop-filter: blur(10px);
+}
+
+.home-ou {
+	position: absolute;
+	top: 50%;
+	left: 44%;
+}

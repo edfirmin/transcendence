@@ -9,7 +9,7 @@
     src: url("../assets/fonts/fr-bold.ttf");
   }
 
-.button {
+/* .button {
     padding: 5rem;
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -34,7 +34,7 @@
     width: 100%;
   
     font-family: 'Futurama';
-}
+} */
 
 .container {
     display: flex;
