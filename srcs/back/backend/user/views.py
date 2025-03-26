@@ -507,6 +507,18 @@ class SetDefaultPointsIndex(APIView):
 
         myUser.save()
         return Response(True)  
+    
+class SetIsInAGame(APIView):
+    def post(self, request):
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        myUser = User.objects.get(id=user_id)
+
+        myUser.is_in_a_game = request.data['is_in_a_game']
+
+        myUser.save()
+        return Response(True)  
 
 class BlockedUsersView(APIView):
     permission_classes = [IsAuthenticated]

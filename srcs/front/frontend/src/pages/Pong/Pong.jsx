@@ -97,7 +97,7 @@ function Pong({setIsInAGame}) {
     // When receiving a message from the back
     ws.onmessage = function(event) {
         let data = JSON.parse(event.data);
-        console.log('Data:', data);
+      //  console.log('Data:', data);
     
 		if (data.type == "connection_established") {
 			ws.send(JSON.stringify({

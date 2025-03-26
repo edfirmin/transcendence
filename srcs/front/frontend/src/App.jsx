@@ -21,8 +21,13 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import { getUser, getAllUserExceptLoggedOne } from "./api"
 import "./styles/App.css"
+import axios from 'axios';
+import { ACCESS_TOKEN } from "./constants";
+
 
 function App() {
+  const userToken = localStorage.getItem(ACCESS_TOKEN);
+  
   const [user, setUser] = useState(null);
   const [ping_tourney, set_ping_tourney] = useState(false)
   const [isInAGame, setIsInAGame] = useState(false);
@@ -30,6 +35,8 @@ function App() {
   const host = import.meta.env.VITE_HOST;
   var ws = useMemo(() => {return new WebSocket(`wss://${host}:9443/ws/global`)}, [ws]);
   const [host_tourney, set_host_tourney] = useState(null)
+
+  const [areOthersInAGame, setAreOthersInAGame] = useState(0)
 
   useEffect(() => {
     ws.onopen = function(event) {
@@ -42,17 +49,52 @@ function App() {
     ws.onmessage = async function(event) {
       let data = JSON.parse(event.data);
 
-      const TMPuser = await getUser()
-
+      //const TMPuser = await getUser()
+/*
       if (data.type == "ping_tourney") {
         if (data.left_opponent == TMPuser.username || data.right_opponent == TMPuser.username) {
           set_host_tourney(data.host);
           set_ping_tourney(true);
         }
       }
-    }
+      if (data.type == "is_in_a_game") {
+        
+      }
+  */
+      }
   }, []);
+/*
+  useEffect(() => {
 
+    const sendIsInAGame = async () => {
+      const TMPuser = await getUser()
+
+      if (ws.readyState === ws.OPEN) {
+        ws.send(JSON.stringify({
+          'message':'is_in_a_game',
+          'username':TMPuser.username,
+          'value': isInAGame
+        }))
+      }
+    }
+
+    sendIsInAGame()
+    const sendIsInAGame = async () => {
+		  await axios.post('api/user/setIsInAGame/', {userToken, is_in_a_game: isInAGame})
+
+      const TMPuser = await getUser()
+
+      if (ws.readyState === ws.OPEN) {
+        ws.send(JSON.stringify({
+          'message':'is_in_a_game',
+          'username':TMPuser.username,
+          'value': isInAGame
+        }))
+      }
+    }
+
+    sendIsInAGame()
+  }, [isInAGame]);*/
 
 	return (
     <>
@@ -61,19 +103,19 @@ function App() {
         <Route path="*" element={<NotFound/>}></Route>
         <Route path="/login" element={<Login/>}></Route>
         <Route path="/register" element={<Register/>}></Route>
-          <Route path="/" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <RedirectHome/> </ProtectedRoute>}/>
-          <Route path="/home" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Home setUser={setUser}/> </ProtectedRoute>}/>
-          <Route path="/profil" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Profil/> </ProtectedRoute>}/>
-          <Route path="/hangman" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Hangman/> </ProtectedRoute>}/>
-          <Route path="/Config2FA" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Config2FA/> </ProtectedRoute>}/>
+          <Route path="/" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <RedirectHome/> </ProtectedRoute>}/>
+          <Route path="/home" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Home setUser={setUser}/> </ProtectedRoute>}/>
+          <Route path="/profil" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Profil/> </ProtectedRoute>}/>
+          <Route path="/hangman" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Hangman/> </ProtectedRoute>}/>
+          <Route path="/Config2FA" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Config2FA/> </ProtectedRoute>}/>
           <Route path="/check42user" element={<CheckUser/>}></Route>
-          <Route path="/pong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Pong setIsInAGame={setIsInAGame}/> </ProtectedRoute>}/>
-          <Route path="/multipong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <PongMulti setIsInAGame={setIsInAGame}/> </ProtectedRoute>}/>
-          <Route path="/selection" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <PongSelection/> </ProtectedRoute>}/>
+          <Route path="/pong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Pong setIsInAGame={setIsInAGame}/> </ProtectedRoute>}/>
+          <Route path="/multipong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <PongMulti setIsInAGame={setIsInAGame}/> </ProtectedRoute>}/>
+          <Route path="/selection" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <PongSelection/> </ProtectedRoute>}/>
           <Route path="/oui" element={<ProtectedRoute> <Oui/> </ProtectedRoute>}></Route>
-          <Route path="/tourney" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Tourney/> </ProtectedRoute>}></Route>
-          <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <TourneyPresentation ws={ws}/> </ProtectedRoute>}></Route>
-          <Route path="/friends" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <FriendList /> </ProtectedRoute>}></Route>
+          <Route path="/tourney" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Tourney/> </ProtectedRoute>}></Route>
+          <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <TourneyPresentation ws={ws}/> </ProtectedRoute>}></Route>
+          <Route path="/friends" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <FriendList /> </ProtectedRoute>}></Route>
       </Routes>
     </BrowserRouter>
     {ping_tourney && <PopUpTourney host={host_tourney} set_ping_tourney={set_ping_tourney}/>}

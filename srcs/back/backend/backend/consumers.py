@@ -238,6 +238,7 @@ class OnlineUsersConsumer(AsyncWebsocketConsumer):
 class GlobalConsumer(AsyncJsonWebsocketConsumer):
     
     username_ids = {}
+    is_in_a_game = {}
 
     async def connect(self):
         self.room_name = 'oui'
@@ -256,6 +257,8 @@ class GlobalConsumer(AsyncJsonWebsocketConsumer):
 
         if self.room_name not in GlobalConsumer.username_ids:
             GlobalConsumer.username_ids[self.room_name] = dict()
+        if self.room_name not in GlobalConsumer.is_in_a_game:
+            GlobalConsumer.is_in_a_game[self.room_name] = dict()
         
     async def receive(self, text_data):
         data_json = json.loads(text_data)
@@ -263,6 +266,13 @@ class GlobalConsumer(AsyncJsonWebsocketConsumer):
         
         if (message == "on_connect"):
             self.id = data_json['id']
+
+        if (message == "is_in_a_game"):
+            GlobalConsumer.is_in_a_game[self.room_name][data_json['username']] = data_json['value']
+            await self.channel_layer.group_send(
+                self.room_group_name,{
+                    'type':'is_in_a_game',
+            })
 
 
         if (message == "ping_tourney"):

@@ -29,6 +29,7 @@ urlpatterns = [
     path('setDefaultMapIndex/', SetDefaultMapIndex.as_view() ,name="setDefaultMapIndex"),
     path('setDefaultPointsIndex/', SetDefaultPointsIndex.as_view() ,name="setDefaultPointsIndex"),
     path('setDefaultPaddleIndex/', SetDefaultPaddleIndex.as_view() ,name="setDefaultPaddleIndex"),
+    path('setIsInAGame/', SetIsInAGame.as_view() ,name="setIsInAGame"),
     path('blocked/', BlockedUsersView.as_view(), name="blocked_users"),
     path('blocked/<int:user_id>/', BlockedUsersView.as_view(), name="unblock_user"),
     path('friends/', FriendView.as_view(), name='friends'),
