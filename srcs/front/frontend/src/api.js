@@ -76,22 +76,25 @@ export const getFriends = async () => {
     }
 }
 
+export const checkUserExist = async (username) => {
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    const response = await axios.post("api/user/checkuserexist/", {username, userToken})
+    return (response.data)
+}
+
 export const addFriend = async (username) => {
-    try {
-        const userToken = localStorage.getItem(ACCESS_TOKEN);
-        const response = await axios({
-            method: 'post',
-            url: `/api/user/friends/?token=${userToken}`,
-            data: { username },
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.log('Error adding friend:', error);
-        throw error;
-    }
+    const userToken = localStorage.getItem(ACCESS_TOKEN);
+    const response = await axios({
+        method: 'post',
+        url: `/api/user/friends/?token=${userToken}`,
+        data: { username },
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    if (response == false)
+        console.log("pas de user")
+    return response.data;
 }
 
 export const removeFriend = async (username) => {

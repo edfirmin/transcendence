@@ -597,22 +597,37 @@ class BlockedUsersView(APIView):
             logger.error(f"Error unblocking user: {str(e)}", exc_info=True)
             return Response({'error': 'Failed to unblock user'}, status=500)
 
+class CheckUserExist(APIView):
+    def post(self, request):
+        username = request.data['username']
+        token_string = request.data['userToken']
+        token = jwt.decode(token_string, 'secret', algorithms=['HS256'])
+        user_id = token.get('id')
+        me = User.objects.get(id=user_id)
+        myName = me.username
+        user = User.objects.filter(username=username).first()
+
+        if username == myName :
+            Response(False)
+        elif user :
+            return Response(True)
+        return Response(False)
+
 class FriendView(APIView):
     def get(self, request):
-        try:
-            token = request.GET.get('token')
-            if not token:
-                return JsonResponse({'error': 'Token required'}, status=401)
+        token = request.GET.get('token')
+        if not token:
+            return JsonResponse({'error': 'Token required'}, status=401)
 
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-            user = User.objects.get(id=payload['id'])
-            
+        payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        user = User.objects.get(id=payload['id'])
+        if user :
             friends = Friend.objects.filter(user=user)
             serializer = FriendSerializer(friends, many=True)
             return JsonResponse(serializer.data, safe=False)
-        except Exception as e:
-            logger.error(f"Error in FriendView.get: {str(e)}")
-            return JsonResponse({'error': str(e)}, status=500)
+        else:
+            pass
+        return Response(False)
 
     def post(self, request):
         try:

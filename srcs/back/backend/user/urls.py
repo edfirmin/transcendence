@@ -32,5 +32,6 @@ urlpatterns = [
     path('blocked/', BlockedUsersView.as_view(), name="blocked_users"),
     path('blocked/<int:user_id>/', BlockedUsersView.as_view(), name="unblock_user"),
     path('friends/', FriendView.as_view(), name='friends'),
-    path('friends/<str:username>/', FriendView.as_view(), name='remove_friend')
+    path('friends/<str:username>/', FriendView.as_view(), name='remove_friend'),
+    path('checkuserexist/', CheckUserExist.as_view(), name="checkuserexist")
 ]

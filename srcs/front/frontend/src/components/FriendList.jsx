@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getFriends, addFriend, removeFriend } from '../api';
+import { getFriends, addFriend, removeFriend , checkUserExist} from '../api';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../constants';
 import '../styles/FriendList.css';
@@ -60,6 +60,11 @@ const FriendList = ({ onStartPrivateChat }) => {
         e.preventDefault();
         if (!newFriendUsername.trim()) {
             setError('Please enter a username');
+            return;
+        }
+        const resp = await checkUserExist(newFriendUsername.trim());
+        if (resp == false) {
+            setError("L'utilisateur n'existe pas !!!");
             return;
         }
         try {
