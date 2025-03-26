@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 
 export default function Game() {
+
     const host = import.meta.env.VITE_HOST;
     var ws = useMemo(() => {return new WebSocket(`wss://${host}:9443/ws/pong/`)}, [ws]);
     const [topLeftPaddle, setTopLeftPaddle] = useState(550);

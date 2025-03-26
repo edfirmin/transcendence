@@ -1,7 +1,7 @@
 import "../styles/Profil.css"
 import EditProfil from "../components/EditProfil";
 import { useState, useEffect } from "react";
-import { getUser, getUserWithUsername, getMatches, getMatchesWithUsername, getHangmanGames } from "../api"
+import { getUser, getUserWithUsername, getMatches, getMatchesWithUsername, getHangmanGames, getHangmanGamesWithUsername } from "../api"
 import Navbarr from "../components/Navbar";
 import tas from "../assets/tas-de-neige.png"
 import profile_logo from "../assets/profile_logo.png"
@@ -59,8 +59,12 @@ function Profil() {
     }
 
     const inithangmangames = async () => {
-        const TMPgames = await getHangmanGames()
-        setHangmanGames(TMPgames);
+        var TMPmatches;
+        if (username != null)
+            TMPmatches = await getHangmanGamesWithUsername(username);
+        else
+            TMPmatches = await getHangmanGames();
+        setHangmanGames(TMPmatches);
     }
 
     const formEdit = () => {
@@ -193,8 +197,8 @@ function Profil() {
                         <h2>Prénom: {user.first_name}</h2>
                         <h2>Nom: {user.last_name}</h2>
                         <h2>E-mail: {user.email}</h2>
-                        <button onClick={formEdit} className="lb">Modifier ton profile</button>
-                        <button onClick={handleButton} className="rb">Activer la 2FA</button>
+                        {username == null ? <button onClick={formEdit} className="lb">Modifier ton profile</button> : <></>}
+                        {username == null ? <button onClick={handleButton} className="rb">Activer la 2FA</button> : <></>}
                     </div>
                     <div className="rigth">
                         <div id="choose_game">

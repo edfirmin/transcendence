@@ -9,6 +9,7 @@ urlpatterns = [
     path('getMatches/', getMatches, name="getMatches"),
     path('getMatchesWithUsername/', getMatchesWithUsername, name="getMatchesWithUsername"),
     path('getHangmanGames/', getHangmanGames, name="getHangmanGames"),
+    path('getHangmanGamesWithUsername/', getHangmanGamesWithUsername, name="getHangmanGamesWithUsername"),
     path('getTourney/', getTourney, name="getTourney"),
     path('getTourneyPlayers/', getTourneyPlayers, name="getTourneyPlayers"),
     path('register/', CreatUserView.as_view(), name="register"),

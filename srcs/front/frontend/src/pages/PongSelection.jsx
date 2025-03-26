@@ -86,25 +86,27 @@ function PongSelection() {
     return (
         <>
             <Navbarr></Navbarr>
-            <div className='space'></div>
-            <div className='container'>
-              <div></div>
-              <Selector name={"Map"} designs={map_designs} index={index_map_design} setIndex={set_index_map_design} userToken={userToken}/>
-              <Selector name={"Points"} designs={point_design} index={points} setIndex={set_points} userToken={userToken} />
-              <Selector name={"Difficulté IA"} designs={difficulty_designs} index={difficulty_index} setIndex={set_difficulty_index} />
-              <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} userToken={userToken} />
-              <div></div>
-            </div>
-            <div className='container'>
+            <div className='select-div'>
               <div className='space'></div>
-            </div>
-            <div className='container'>
-              <div></div>
-              <Button name={'Local'} callback={handleLocalPong} />
-              <Button name={'IA'} callback={handleAIPong} />
-              <Button name={'En ligne'} callback={handleRemotePong} />
-              <Button name={'Tournoi'} callback={handleTourneyPong} />
-              <div></div>
+              <div className='container'>
+                <div></div>
+                <Selector name={"Map"} designs={map_designs} index={index_map_design} setIndex={set_index_map_design} userToken={userToken}/>
+                <Selector name={"Points"} designs={point_design} index={points} setIndex={set_points} userToken={userToken} />
+                <Selector name={"Difficulté IA"} designs={difficulty_designs} index={difficulty_index} setIndex={set_difficulty_index} />
+                <Selector name={'Design'} designs={paddle_designs} index={index_design} setIndex={set_index_design} userToken={userToken} />
+                <div></div>
+              </div>
+              <div className='container'>
+                <div className='space'></div>
+              </div>
+              <div className='container'>
+                <div></div>
+                <Button name={'Local'} callback={handleLocalPong} icon={'🏓'} />
+                <Button name={'IA'} callback={handleAIPong} icon={'🤖'}/>
+                {/* <Button name={'En ligne'} callback={handleRemotePong} /> */}
+                <Button name={'Tournoi'} callback={handleTourneyPong} icon={'🏆'}/>
+                <div></div>
+              </div>
             </div>
            {/* <button className='button' onClick={() => setDifficulty("easy")}>Easy</button>
             <button className='button' onClick={() => setDifficulty("medium")}>Medium</button>
@@ -113,9 +115,11 @@ function PongSelection() {
     );
 }
 
-function Button({name, callback}) {
+function Button({name, callback, icon}) {
 	return (
-		  <button className='button' onClick={() => callback()}>{name} </button>
+		  <button className='select-button' onClick={() => callback()}>
+        <div className="theme-icon">{icon}</div>
+        <span>{name}</span></button>
 	)
 }
 

@@ -235,3 +235,14 @@
     }
   }
   
+.accept_match_button {
+  position: absolute;
+  left: 40%;
+  top: -40px;
+
+  background-color: #0084ff;
+  color: #ddd;
+
+  padding: 10px;
+  border-radius: 20px;
+}
