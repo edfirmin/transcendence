@@ -22,12 +22,17 @@
     border-radius: 50%;
     object-fit: cover;
   }
-
+/* --------------------------------------------------------------ici---------------------------- */
   .pendu-container {
     max-width: 800px;
-    margin: 0 auto;
+    color: white;
+    border-radius: 25px;
+    margin: 50px auto;
     padding: 2rem;
     text-align: center;
+    background-color: rgba(10, 88, 190, 0.356);
+    box-shadow: inset 5px 5px 100px 40px rgb(15, 73, 139);
+    backdrop-filter: blur(9px);
   }
   
   .user-info {
@@ -319,9 +324,12 @@
   .avatar-selection-container {
     margin-top: 2rem;
     padding: 1rem;
-    background-color: #f8f9fa;
+    color: black;
+    background-color: #ffffffb4;
     border-radius: 8px;
+    backdrop-filter: blur(9px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: inset 5px 5px 100px 40px rgba(15, 73, 139, 0.712);
   }
   
   .avatar-selection {

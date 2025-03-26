@@ -402,7 +402,7 @@ function Hangman() {
         <div className="theme-icon">📝</div>
         <span>Easy Informatique</span>
       </button>
-        
+          
       <button 
         onClick={() => score >= 100 ? (setSelectedWordGroup(midWords), setSelectedWordGroupName('Gaming')) : null}
         className={`word-button ${score < 100 ? 'locked' : ''}`}
