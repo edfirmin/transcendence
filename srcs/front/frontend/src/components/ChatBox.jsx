@@ -56,6 +56,11 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
 
 
   useEffect(() => {
+    const storedMessages = localStorage.getItem('messages');
+    if (storedMessages) {
+      setMessages(JSON.parse(storedMessages));
+    }
+  
     const connectWebSocket = () => {
       console.log('ChatBox: Attempting to connect to WebSocket');
       const token = localStorage.getItem(ACCESS_TOKEN);
@@ -64,25 +69,25 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
         setConnectionError(true);
         return;
       }
-
+  
       const cleanToken = token.replace('Bearer ', '');
-
+  
       ws.current = new WebSocket(`wss://${host}:9443/ws/chat/?token=${cleanToken}`);
-
+  
       ws.current.onopen = () => {
         console.log('ChatBox: Successfully connected to WebSocket');
         setConnectionError(false);
       };
-
+  
       ws.current.onmessage = (event) => {
         console.log('ChatBox: Received message:', event.data);
         try {
           const data = JSON.parse(event.data);
-          
+  
           if (data.type === 'chat_message') {
-            // Don't show messages from blocked users
+            // Ne pas afficher les messages des utilisateurs bloqués
             if (blockedUsers.has(data.message.username)) return;
-            
+  
             setMessages(prev => {
               const lastMessage = prev[prev.length - 1];
               if (lastMessage && 
@@ -90,49 +95,50 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
                   lastMessage.username === data.message.username) {
                 return prev;
               }
-              
+  
               if ((privateChat && data.message.isDirect) || (!privateChat && !data.message.isDirect)) {
                 if (isMinimized) {
                   showNotification(data.message);
                 }
-                return [...prev, data.message];
+                const newMessages = [...prev, data.message];
+                // Sauvegarde des messages dans localStorage
+                localStorage.setItem('messages', JSON.stringify(newMessages));
+                return newMessages;
               }
               return prev;
             });
             scrollToBottom();
           }
-          
           else if (data.type === 'game_invite') {
-            // Don't show invites from blocked users
+            // Ne pas afficher les invitations des utilisateurs bloqués
             if (blockedUsers.has(data.invite.from_user)) return;
-            
+  
             setFrom_user(data.invite.from_user);
             setRoom_id(data.invite.room_id);
-            setIsWaitingToAPongGame(true);
+            setIsWaitingToAPongGame(isWaitingToAPongGame + 1);
           }
         } catch (error) {
           console.error('ChatBox: Error parsing message:', error);
         }
       };
-
+  
       ws.current.onerror = (error) => {
         console.error('ChatBox: WebSocket error:', error);
         setConnectionError(true);
       };
-
+  
       ws.current.onclose = (event) => {
         console.log('ChatBox: WebSocket closed:', event);
         setTimeout(connectWebSocket, 3000);
       };
     };
-
-    setMessages([]);
+  
     connectWebSocket();
-
+  
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
-
+  
     return () => {
       if (ws.current) {
         console.log('ChatBox: Cleaning up WebSocket connection');
