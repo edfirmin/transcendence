@@ -239,3 +239,31 @@ opacity: 1; /* Fully shown on mouse-over */
     flex-direction: column;
 
 }
+
+.button_tourney {
+    padding: 5rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  
+    font-size: 2rem;
+    -webkit-text-stroke: 1px black;
+    color: rgb(255, 255, 255);
+    text-align: center;
+  
+    border: 3px solid white;
+    border-radius: 2rem;
+  
+    flex: 1;
+  
+    background-color: white;
+  
+    box-shadow:
+    0 0 50px #fff,            
+    -10px 0 80px #f0f,        
+    10px 0 80px #0ff;         
+  
+    width: 100%;
+    max-width: 40%;
+  
+    font-family: 'Futurama';
+}

@@ -26,7 +26,7 @@ import portal_green from '../../assets/img/portal_green.png'
 import Navbarr from "../../components/Navbar";
 import Snowfall from 'react-snowfall'
 
-function PongMulti() {
+function PongMulti({setIsInAGame}) {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
@@ -75,6 +75,13 @@ function PongMulti() {
 	
 	const navigate = useNavigate();
 
+	useEffect(() => {
+		setIsInAGame(true)
+
+		return () => {
+			setIsInAGame(false)
+		}
+	})	
 
 	useEffect(() => {
 
@@ -159,10 +166,10 @@ function PongMulti() {
 			}
 		}
 
-		ws.onclose = (event) => {
+		/*ws.onclose = (event) => {
 			console.log("The connection has been closed successfully.");
 			setWinner('LEFT WIN !');
-		}
+		}*/
 	}, [])
 
 	async function postMatchStats() {
@@ -270,12 +277,11 @@ function PongMulti() {
 				};
                     window.addEventListener('keydown', handleKeyDown);
                     window.addEventListener('keyup', handleKeyUp);
-					window.onbeforeunload = function () {return false;}
 
                     return () => {
                         window.removeEventListener('keydown', handleKeyDown);
 						window.addEventListener('keyup', handleKeyUp);
-					ws.close();
+						ws.close();
 					};
 	}, []);
 

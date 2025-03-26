@@ -264,6 +264,7 @@ class GlobalConsumer(AsyncJsonWebsocketConsumer):
         if (message == "on_connect"):
             self.id = data_json['id']
 
+
         if (message == "ping_tourney"):
             await self.channel_layer.group_send(
                 self.room_group_name,{
