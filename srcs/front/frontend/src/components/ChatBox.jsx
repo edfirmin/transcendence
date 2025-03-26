@@ -5,7 +5,7 @@ import '../styles/ChatBox.css';
 import {v4 as uuidv4} from 'uuid';
 import { getUser, getUserWithUsername, getUserWithId } from "../api"
 
-function ChatBox({ privateChat, onClosePrivateChat }) {
+function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
@@ -211,16 +211,17 @@ function ChatBox({ privateChat, onClosePrivateChat }) {
         <div className="chat-controls">
           {privateChat && (
             <>
-              <button 
+              {!isInAGame && <button 
                 className="game-invite-button" 
-                onClick={(e) => {
+                 onClick={(e) => {
                   e.stopPropagation();
                   handleInviteToGame(privateChat.id);
-                }}
+                 }}
                 title="Invite to Pong game"
               >
                 🎮
               </button>
+              }
               <button 
                 className="block-button" 
                 onClick={(e) => {

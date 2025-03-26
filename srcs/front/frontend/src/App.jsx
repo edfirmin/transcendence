@@ -23,7 +23,8 @@ import { getUser, getAllUserExceptLoggedOne } from "./api"
 
 
 function App() {
-  const [user, setUser] = useState(null)  
+  const [user, setUser] = useState(null);
+  const [isInAGame, setIsInAGame] = useState(false);
   var global_id = useMemo(() => { return uuidv4()}, [global_id]);
   const host = import.meta.env.VITE_HOST;
   var ws = useMemo(() => {return new WebSocket(`wss://${host}:9443/ws/global`)}, [ws]);
@@ -47,30 +48,26 @@ function App() {
     }
   });
 
-  useEffect(() => {
-    console.log(user)
-  }, [user])
-
 	return (
     <BrowserRouter>
       <Routes>
         <Route path="*" element={<NotFound/>}></Route>
         <Route path="/login" element={<Login/>}></Route>
         <Route path="/register" element={<Register/>}></Route>
-          <Route path="/" element={<ProtectedRoute> <ChatWrapper /> <RedirectHome/> </ProtectedRoute>}/>
-          <Route path="/home" element={<ProtectedRoute> <ChatWrapper /> <Home setUser={setUser}/> </ProtectedRoute>}/>
-          <Route path="/profil" element={<ProtectedRoute> <ChatWrapper /> <Profil/> </ProtectedRoute>}/>
-          <Route path="/pong" element={<ProtectedRoute> <ChatWrapper /> <Pong/> </ProtectedRoute>}/>
-          <Route path="/hangman" element={<ProtectedRoute> <ChatWrapper /> <Hangman/> </ProtectedRoute>}/>
-          <Route path="/Config2FA" element={<ProtectedRoute> <ChatWrapper /> <Config2FA/> </ProtectedRoute>}/>
+          <Route path="/" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <RedirectHome/> </ProtectedRoute>}/>
+          <Route path="/home" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Home setUser={setUser}/> </ProtectedRoute>}/>
+          <Route path="/profil" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Profil/> </ProtectedRoute>}/>
+          <Route path="/pong" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Pong /> </ProtectedRoute>}/>
+          <Route path="/hangman" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Hangman/> </ProtectedRoute>}/>
+          <Route path="/Config2FA" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Config2FA/> </ProtectedRoute>}/>
           <Route path="/check42user" element={<CheckUser/>}></Route>
-          <Route path="/pong/:roomid" element={<ProtectedRoute> <ChatWrapper /> <Pong/> </ProtectedRoute>}/>
-          <Route path="/multipong/:roomid" element={<ProtectedRoute> <ChatWrapper /> <PongMulti/> </ProtectedRoute>}/>
-          <Route path="/selection" element={<ProtectedRoute> <ChatWrapper /> <PongSelection/> </ProtectedRoute>}/>
+          <Route path="/pong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Pong/> </ProtectedRoute>}/>
+          <Route path="setIsInAGame/multipong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <PongMulti/> </ProtectedRoute>}/>
+          <Route path="/selection" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <PongSelection/> </ProtectedRoute>}/>
           <Route path="/oui" element={<ProtectedRoute> <Oui/> </ProtectedRoute>}></Route>
-          <Route path="/tourney" element={<ProtectedRoute> <ChatWrapper /> <Tourney/> </ProtectedRoute>}></Route>
-          <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <ChatWrapper /> <TourneyPresentation ws={ws}/> </ProtectedRoute>}></Route>
-          <Route path="/friends" element={<ProtectedRoute> <ChatWrapper /> <FriendList /> </ProtectedRoute>}></Route>
+          <Route path="/tourney" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Tourney/> </ProtectedRoute>}></Route>
+          <Route path="/tourney/tourneyPresentation" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <TourneyPresentation ws={ws}/> </ProtectedRoute>}></Route>
+          <Route path="/friends" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <FriendList /> </ProtectedRoute>}></Route>
       </Routes>
     </BrowserRouter>
 	)

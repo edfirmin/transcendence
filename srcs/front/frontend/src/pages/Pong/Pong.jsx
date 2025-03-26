@@ -364,10 +364,12 @@ function Pong() {
 		};
 		window.addEventListener('keydown', handleKeyDown);
 		window.addEventListener('keyup', handleKeyUp);
+		
 
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown);
 			window.addEventListener('keyup', handleKeyUp);
+			ws.close();
 		};
 	}, []);
 
