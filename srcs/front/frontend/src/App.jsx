@@ -20,15 +20,17 @@ import FriendList from './components/FriendList';
 import React, {useEffect, useMemo, useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import { getUser, getAllUserExceptLoggedOne } from "./api"
-
+import "./styles/App.css"
 
 function App() {
   const [user, setUser] = useState(null);
+  const [ping_tourney, set_ping_tourney] = useState(false)
   const [isInAGame, setIsInAGame] = useState(false);
   var global_id = useMemo(() => { return uuidv4()}, [global_id]);
   const host = import.meta.env.VITE_HOST;
   var ws = useMemo(() => {return new WebSocket(`wss://${host}:9443/ws/global`)}, [ws]);
-  
+  const [host_tourney, set_host_tourney] = useState(null)
+
   useEffect(() => {
     ws.onopen = function(event) {
       ws.send(JSON.stringify({
@@ -37,18 +39,23 @@ function App() {
         }))
     }
     
-    ws.onmessage = function(event) {
+    ws.onmessage = async function(event) {
       let data = JSON.parse(event.data);
 
+      const TMPuser = await getUser()
+
       if (data.type == "ping_tourney") {
-        console.log("ping")
-        if (data.left_opponent == user.username || data.right_opponent == user.username)
-          window.confirm(`Tu es attendu pour un match de tournoi organisé par ${data.host} !`);
+        if (data.left_opponent == TMPuser.username || data.right_opponent == TMPuser.username) {
+          set_host_tourney(data.host);
+          set_ping_tourney(true);
+        }
       }
     }
-  });
+  }, []);
+
 
 	return (
+    <>
     <BrowserRouter>
       <Routes>
         <Route path="*" element={<NotFound/>}></Route>
@@ -57,12 +64,11 @@ function App() {
           <Route path="/" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <RedirectHome/> </ProtectedRoute>}/>
           <Route path="/home" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Home setUser={setUser}/> </ProtectedRoute>}/>
           <Route path="/profil" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Profil/> </ProtectedRoute>}/>
-          <Route path="/pong" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Pong /> </ProtectedRoute>}/>
           <Route path="/hangman" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Hangman/> </ProtectedRoute>}/>
           <Route path="/Config2FA" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Config2FA/> </ProtectedRoute>}/>
           <Route path="/check42user" element={<CheckUser/>}></Route>
-          <Route path="/pong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Pong/> </ProtectedRoute>}/>
-          <Route path="setIsInAGame/multipong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <PongMulti/> </ProtectedRoute>}/>
+          <Route path="/pong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Pong setIsInAGame={setIsInAGame}/> </ProtectedRoute>}/>
+          <Route path="/multipong/:roomid" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <PongMulti setIsInAGame={setIsInAGame}/> </ProtectedRoute>}/>
           <Route path="/selection" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <PongSelection/> </ProtectedRoute>}/>
           <Route path="/oui" element={<ProtectedRoute> <Oui/> </ProtectedRoute>}></Route>
           <Route path="/tourney" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <Tourney/> </ProtectedRoute>}></Route>
@@ -70,7 +76,22 @@ function App() {
           <Route path="/friends" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame}/> <FriendList /> </ProtectedRoute>}></Route>
       </Routes>
     </BrowserRouter>
-	)
+    {ping_tourney && <PopUpTourney host={host_tourney} set_ping_tourney={set_ping_tourney}/>}
+    </>
+  )
 }
 
 export default App
+
+function PopUpTourney({host, set_ping_tourney}) {
+  const close = async () => {
+    set_ping_tourney(false)
+  }
+  
+  return (
+    <div id='ping_tourney'>
+      <p>Tu es attendu pour un match de tournoi organisé par {host} !</p>
+      <button onClick={close}>Tres bien</button>
+    </div>
+  )
+}

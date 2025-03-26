@@ -323,11 +323,7 @@ function PlayerUser({name, image, position, points}) {
 
 function Button({name, callback}) {
 	return (
-	  <tr>
-		<td>
-		  <button className='button' onClick={() => callback()}>{name} </button>
-		</td>
-	  </tr>
+		  <button className='button_tourney' onClick={() => callback()}>{name} </button>
 	)
 }
 

@@ -26,7 +26,7 @@ import Navbarr from "../../components/Navbar";
 import Snowfall from 'react-snowfall'
 
 
-function Pong() {
+function Pong({setIsInAGame}) {
 
     const { roomid } = useParams();
 	const userToken = localStorage.getItem(ACCESS_TOKEN);
@@ -86,6 +86,14 @@ function Pong() {
 	
     const navigate = useNavigate();
 	
+	useEffect(() => {
+		setIsInAGame(true)
+
+		return () => {
+			setIsInAGame(false)
+		}
+	})
+
     // When receiving a message from the back
     ws.onmessage = function(event) {
         let data = JSON.parse(event.data);

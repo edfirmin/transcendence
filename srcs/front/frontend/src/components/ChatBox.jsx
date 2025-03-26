@@ -211,12 +211,13 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame }) {
         <div className="chat-controls">
           {privateChat && (
             <>
-              {!isInAGame && <button 
+              { !isInAGame &&
+              <button 
                 className="game-invite-button" 
-                 onClick={(e) => {
+                onClick={(e) => {
                   e.stopPropagation();
                   handleInviteToGame(privateChat.id);
-                 }}
+                }}
                 title="Invite to Pong game"
               >
                 🎮
