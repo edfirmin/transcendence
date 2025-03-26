@@ -9,6 +9,35 @@
     src: url("../assets/fonts/fr-bold.ttf");
   }
 
+.select-button:hover{
+    animation: bounce 3s infinite;
+    animation-timing-function: linear;
+    box-shadow: 1px 5px 5px rgba(255, 255, 255, 0.452);
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(-4px);
+    }
+    50% {
+        transform: translateY(4px);
+    }
+    100% {
+        transform: translateY(-4px);
+    }
+}
+
+.select-button{
+    color: #fff;
+    border-radius: 20px;
+    background-color: rgba(94, 150, 224, 0.473);
+    box-shadow: inset 5px 5px 25px 0px rgba(0, 0, 0, 0.397);
+    box-shadow: 1px 5px 5px rgba(0, 0, 0, 0.596);
+    /* backdrop-filter: blur(0.1px); */
+    width: 10%;
+    margin: -25px 0px;
+}
+
 /* .button {
     padding: 5rem;
     padding-top: 2rem;
@@ -156,6 +185,19 @@ opacity: 1; /* Fully shown on mouse-over */
 
     border-radius: 100px;
 
+}
+
+.select-div {
+    display: block;
+    /* color: white; */
+    /* border: 4mm ridge rgb(255, 255, 255); */
+    border-radius: 20px;
+    background-color: rgba(10, 88, 190, 0.356);
+    box-shadow: inset 5px 5px 100px 40px rgb(15, 73, 139);
+    backdrop-filter: blur(9px);
+    height: 70vh;
+    width: 68%;
+    margin: 5% 15%;
 }
 
 .space {
