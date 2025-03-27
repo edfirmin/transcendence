@@ -59,6 +59,7 @@ function PongMulti({setIsInAGame}) {
 	const [time_start, set_time_start] = useState(0)
 	const paddle_size = useRef(60);
 	const [id_winner, set_id_winner] = useState(0);
+	const [id_loser, set_id_loser] = useState(0);
 
 	const map_design = [classic_map, table_tennis_map, fog_map, tennis_map ];
 	const ball_design = [classic_ball_design, tennis_ball_design, cool_ball_design, sick_ball_design, swag_ball_design];
@@ -149,7 +150,8 @@ function PongMulti({setIsInAGame}) {
 			if (data.type == "winner") {
 				set_longest_exchange(data.longest_exchange);
 				set_shortest_exchange(data.shortest_exchange);
-				set_id_winner(data.id);
+				set_id_winner(data.id_winner);
+				set_id_loser(data.id_loser);
 				setWinner(data.winner + " WIN !");
 				setTimeout(() => { navigate('/selection', {state : {map : map_index, design : design_index, points : points - 2, winner : data.winner
 				}}) }, 3000);
@@ -178,14 +180,19 @@ function PongMulti({setIsInAGame}) {
 
 		var result;
 		if (winner == 'LEFT WIN !') {
-			result = "VICTOIRE"
+			//result = "VICTOIRE"
 			//score.left += 1;	
 		}
 		else {
-			result = "DEFAITE"
+			//result = "DEFAITE"
 			//score.right += 1;	
 		}
 		
+		if (id == id_winner)
+			result = "VICTOIRE"
+		else if (id == id_loser)
+			result = "DEFAITE"
+
 		const d = new Date();
 		var day = d.getDate();
 		if (day.toString().length == 1)
@@ -204,12 +211,12 @@ function PongMulti({setIsInAGame}) {
 		else
 			time = d.getTime() - time_start.getTime();
 
-		console.log("id : " + id)
-		console.log("id_winner : " + id_winner)
-		console.log("left_user : " + left_user)
+		// console.log("id : " + id)
+		// console.log("id_winner : " + id_winner)
+		// console.log("left_user : " + left_user)
 
 		if (left_user == null || left_user == undefined || left_user == -1) {
-			if (id == id_winner)
+			if (id == id_winner || id == id_loser)
 				await axios.post('api/user/addMatchStats/', {userToken, result, date: a, score_left: score.left, score_right: score.right, time: time, type: "Remote", longest_exchange, shortest_exchange, map_index, design_index, is_tourney: false})
 		}
 		else {
@@ -493,7 +500,7 @@ function PongMulti({setIsInAGame}) {
 			}));
 
 			set_time_start(new Date())
-			console.log("begin_game");
+			// console.log("begin_game");
 		}
 	}, [countdown]);
 

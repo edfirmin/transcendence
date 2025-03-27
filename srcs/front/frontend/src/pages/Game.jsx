@@ -17,7 +17,7 @@ export default function Game() {
     // When receiving a message from the back
     ws.onmessage = function(event) {
         let data = JSON.parse(event.data);
-        console.log('Data:', data);
+        // console.log('Data:', data);
     
         if (data.type == "left_paddle_down" || data.type == "left_paddle_up") {
             setTopLeftPaddle(data.message);

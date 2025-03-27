@@ -82,8 +82,8 @@ function Tourney() {
 
         await axios.post('api/user/addTourneyStats/', {userToken, tourney_id : tourney_id.current})
 
-        console.log("name 1 " + names[1])
-        console.log("name 2 " + names[2])
+        // console.log("name 1 " + names[1])
+        // console.log("name 2 " + names[2])
 
         switch (nbPlayers) {
           case 0:
@@ -243,7 +243,7 @@ function Player({name, set_name, index, set_user, image, points, users}) {
     function setName(newName) {
       set_name(newName, index);
       setVisibleName(newName);
-      console.log(name);
+      // console.log(name);
     }
 
     useEffect(() => {

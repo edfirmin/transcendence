@@ -177,7 +177,7 @@ function Profil() {
         }
     
         setAverageTime(time / matches.length);
-        console.log(averageTime)
+        // console.log(averageTime)
     }
 
     return (
@@ -287,7 +287,7 @@ function MatchResult({result, date, score_left, score_right, time, type, longest
     const map_design = [classic_map_design, table_tennis_map_design, fog_map_design, tennis_map_design];
 
     return (
-        <div onClick={() => {if (isClicked) {setIsClicked(false);} else {setIsClicked(true);} console.log(isClicked)}} className="matchResult" style={{backgroundColor: result == "VICTOIRE" ? "#0f9acc" : "#cc0f38"}}>
+        <div onClick={() => {if (isClicked) {setIsClicked(false);} else {setIsClicked(true);} }} className="matchResult" style={{backgroundColor: result == "VICTOIRE" ? "#0f9acc" : "#cc0f38"}}>
             { isClicked ? (
             <div>
             <span className="matchResultFirstRow">    
@@ -348,7 +348,7 @@ function HangmanResult({finded, word, date, word_group, skin}) {
     const [isClicked, setIsClicked] = useState(false)
 
     return (
-        <div onClick={() => {if (isClicked) {setIsClicked(false);} else {setIsClicked(true);} console.log(isClicked)}} className="matchResult" style={{backgroundColor: finded ? "#0f9acc" : "#cc0f38"}}>
+        <div onClick={() => {if (isClicked) {setIsClicked(false);} else {setIsClicked(true);} }} className="matchResult" style={{backgroundColor: finded ? "#0f9acc" : "#cc0f38"}}>
             { isClicked ? (
             <div>
             <span className="matchResultFirstRow">    

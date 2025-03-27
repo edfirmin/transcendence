@@ -8,7 +8,7 @@ import { getUser, getUserWithUsername, getUserWithId } from "../api"
 function ChatBox({ privateChat, onClosePrivateChat, isInAGame, areOthersInAGame}) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
   const [blockedUsers, setBlockedUsers] = useState(new Set());
   const ws = useRef(null);
@@ -51,7 +51,7 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame, areOthersInAGame}
 
   const showNotification = (message) => {
     if (!("Notification" in window)) {
-      console.log("This browser does not support desktop notification");
+      // console.log("This browser does not support desktop notification");
       return;
     }
 
@@ -77,10 +77,10 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame, areOthersInAGame}
     }
   
     const connectWebSocket = () => {
-      console.log('ChatBox: Attempting to connect to WebSocket');
+      // console.log('ChatBox: Attempting to connect to WebSocket');
       const token = localStorage.getItem(ACCESS_TOKEN);
       if (!token) {
-        console.log('ChatBox: No authentication token found');
+        // console.log('ChatBox: No authentication token found');
         setConnectionError(true);
         return;
       }
@@ -90,12 +90,12 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame, areOthersInAGame}
       ws.current = new WebSocket(`wss://${host}:9443/ws/chat/?token=${cleanToken}`);
   
       ws.current.onopen = () => {
-        console.log('ChatBox: Successfully connected to WebSocket');
+        // console.log('ChatBox: Successfully connected to WebSocket');
         setConnectionError(false);
       };
   
       ws.current.onmessage = (event) => {
-        console.log('ChatBox: Received message:', event.data);
+        // console.log('ChatBox: Received message:', event.data);
         try {
           const data = JSON.parse(event.data);
   
@@ -143,7 +143,7 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame, areOthersInAGame}
       };
   
       ws.current.onclose = (event) => {
-        console.log('ChatBox: WebSocket closed:', event);
+        // console.log('ChatBox: WebSocket closed:', event);
         setTimeout(connectWebSocket, 3000);
       };
     };
@@ -156,7 +156,7 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame, areOthersInAGame}
   
     return () => {
       if (ws.current) {
-        console.log('ChatBox: Cleaning up WebSocket connection');
+        // console.log('ChatBox: Cleaning up WebSocket connection');
         ws.current.close();
       }
     };
@@ -209,7 +209,7 @@ function ChatBox({ privateChat, onClosePrivateChat, isInAGame, areOthersInAGame}
     if (!isWaitingToAPongGame )
       return;
 
-    console.log("isWaiting : " + isWaitingToAPongGame);
+    // console.log("isWaiting : " + isWaitingToAPongGame);
    // const accept = window.confirm(`${from_user} t'invite à une partie de Pong ! Acceptez ?`);
    // if (accept) {
       // Navigate to game page or start game

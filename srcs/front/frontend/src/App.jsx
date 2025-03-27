@@ -27,7 +27,6 @@ import { ACCESS_TOKEN } from "./constants";
 
 function App() {
   const userToken = localStorage.getItem(ACCESS_TOKEN);
-  
   const [user, setUser] = useState(null);
   const [ping_tourney, set_ping_tourney] = useState(false)
   const [isInAGame, setIsInAGame] = useState(false);
@@ -35,7 +34,6 @@ function App() {
   const host = import.meta.env.VITE_HOST;
   var ws = useMemo(() => {return new WebSocket(`wss://${host}:9443/ws/global`)}, [ws]);
   const [host_tourney, set_host_tourney] = useState(null)
-
   const [areOthersInAGame, setAreOthersInAGame] = useState(0)
 
   useEffect(() => {
@@ -49,52 +47,18 @@ function App() {
     ws.onmessage = async function(event) {
       let data = JSON.parse(event.data);
 
-      //const TMPuser = await getUser()
-/*
-      if (data.type == "ping_tourney") {
-        if (data.left_opponent == TMPuser.username || data.right_opponent == TMPuser.username) {
-          set_host_tourney(data.host);
-          set_ping_tourney(true);
+      if (userToken != null){
+        const TMPuser = await getUser()
+        
+        if (data.type == "ping_tourney") {
+          if (data.left_opponent == TMPuser.username || data.right_opponent == TMPuser.username) {
+            set_host_tourney(data.host);
+            set_ping_tourney(true);
+          }
         }
       }
-      if (data.type == "is_in_a_game") {
-        
-      }
-  */
-      }
+    }
   }, []);
-/*
-  useEffect(() => {
-
-    const sendIsInAGame = async () => {
-      const TMPuser = await getUser()
-
-      if (ws.readyState === ws.OPEN) {
-        ws.send(JSON.stringify({
-          'message':'is_in_a_game',
-          'username':TMPuser.username,
-          'value': isInAGame
-        }))
-      }
-    }
-
-    sendIsInAGame()
-    const sendIsInAGame = async () => {
-		  await axios.post('api/user/setIsInAGame/', {userToken, is_in_a_game: isInAGame})
-
-      const TMPuser = await getUser()
-
-      if (ws.readyState === ws.OPEN) {
-        ws.send(JSON.stringify({
-          'message':'is_in_a_game',
-          'username':TMPuser.username,
-          'value': isInAGame
-        }))
-      }
-    }
-
-    sendIsInAGame()
-  }, [isInAGame]);*/
 
 	return (
     <>
@@ -103,7 +67,7 @@ function App() {
         <Route path="*" element={<NotFound/>}></Route>
         <Route path="/login" element={<Login/>}></Route>
         <Route path="/register" element={<Register/>}></Route>
-          <Route path="/" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <RedirectHome/> </ProtectedRoute>}/>
+          <Route path="/" element={<ProtectedRoute> <RedirectHome/> </ProtectedRoute>}/>
           <Route path="/home" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Home setUser={setUser}/> </ProtectedRoute>}/>
           <Route path="/profil" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Profil/> </ProtectedRoute>}/>
           <Route path="/hangman" element={<ProtectedRoute> <ChatWrapper isInAGame={isInAGame} areOthersInAGame={areOthersInAGame}/> <Hangman/> </ProtectedRoute>}/>
@@ -133,7 +97,7 @@ function PopUpTourney({host, set_ping_tourney}) {
   return (
     <div id='ping_tourney'>
       <p>Tu es attendu pour un match de tournoi organisé par {host} !</p>
-      <button onClick={close}>Tres bien</button>
+      <button onClick={close}>Très bien</button>
     </div>
   )
 }

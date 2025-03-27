@@ -6,7 +6,7 @@ function RedirectHome() {
   const navigate = useNavigate(); // Moved outside useEffect
 
   useEffect(() => {
-    console.log(location.pathname);
+    // console.log(location.pathname);
 
     if (location.pathname === "/") {
       navigate("/home");

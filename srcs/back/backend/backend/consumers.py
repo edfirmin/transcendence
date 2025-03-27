@@ -492,7 +492,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                         'winner': 'RIGHT',
                         'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
                         'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
-                        'id': MultiPongConsumer.players[self.room_name][1]
+                        'id_winner': MultiPongConsumer.players[self.room_name][1],
+                        'id_loser': MultiPongConsumer.players[self.room_name][0]
                     })
             if (self.id == MultiPongConsumer.players[self.room_name][1]):
                 await self.channel_layer.group_send(
@@ -501,7 +502,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                         'winner': 'LEFT',
                         'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
                         'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
-                        'id': MultiPongConsumer.players[self.room_name][0]
+                        'id_winner': MultiPongConsumer.players[self.room_name][0],
+                        'id_loser': MultiPongConsumer.players[self.room_name][1]
                     })
 
 
@@ -588,7 +590,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                                 'winner': 'LEFT',
                                 'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
                                 'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
-                                'id': MultiPongConsumer.players[self.room_name][0]
+                                'id_winner': MultiPongConsumer.players[self.room_name][0],
+                                'id_loser': MultiPongConsumer.players[self.room_name][1]
                             })
                         MultiPongConsumer.game_task[self.room_name].cancel()
 
@@ -638,7 +641,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                                 'winner': 'RIGHT',
                                 'longest_exchange': MultiPongConsumer.longest_exchange[self.room_name],
                                 'shortest_exchange': MultiPongConsumer.shortest_exchange[self.room_name],
-                                'id': MultiPongConsumer.players[self.room_name][1]
+                                'id_winner': MultiPongConsumer.players[self.room_name][1],
+                                'id_loser': MultiPongConsumer.players[self.room_name][0]
                             })
                         MultiPongConsumer.game_task[self.room_name].cancel()
 
@@ -745,7 +749,8 @@ class MultiPongConsumer(AsyncJsonWebsocketConsumer):
                 'winner': event['winner'],
                 'longest_exchange': event['longest_exchange'],
                 'shortest_exchange': event['shortest_exchange'],
-                'id': event['id']
+                'id_winner': event['id_winner'],
+                'id_loser': event['id_loser']
             })
 
     async def score_type(self, event):
@@ -847,16 +852,16 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if (PongConsumer.ai_ball_pos[self.room_name][1] <= PongConsumer.right_paddle_pos[self.room_name][1] - 60):
             ran = random.random()
-            if (ran <= 0.90):
+            if (ran <= 0.95):
                 PongConsumer.ai_direction[self.room_name] = -1
             else:
-                PongConsumer.ai_direction[self.room_name] = 1
+                PongConsumer.ai_direction[self.room_name] = 0
         elif (PongConsumer.ai_ball_pos_destination[self.room_name][1] >= PongConsumer.right_paddle_pos[self.room_name][1] + 60):
             ran = random.random()
-            if (ran <= 0.90):
+            if (ran <= 0.95):
                 PongConsumer.ai_direction[self.room_name] = 1
             else:
-                PongConsumer.ai_direction[self.room_name] = -1
+                PongConsumer.ai_direction[self.room_name] = 0
         else :
             PongConsumer.ai_direction[self.room_name] = 0
         new_time = random.uniform(0.3, 0.5)

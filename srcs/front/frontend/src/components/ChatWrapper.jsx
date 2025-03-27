@@ -30,17 +30,6 @@ function ChatWrapper({isInAGame, areOthersInAGame}) {
         <div className="chat-sidebar">
           <FriendList onStartPrivateChat={handleStartPrivateChat} />
         </div>
-        <div className="chat-container">
-          {Array.from(privateChats.entries()).map(([userId, user]) => (
-            <ChatBox
-              key={userId}
-              privateChat={user}
-              onClosePrivateChat={() => handleClosePrivateChat(userId)}
-              isInAGame={isInAGame}
-              areOthersInAGame={areOthersInAGame}
-            />
-          ))}
-        </div>
       </div>
     );
   }

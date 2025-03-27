@@ -52,7 +52,7 @@ const FriendList = ({ onStartPrivateChat }) => {
             setError('');
         } catch (err) {
             setError('Failed to load friends');
-            console.log(err);
+            // console.log(err);
         }
     };
 
@@ -75,7 +75,7 @@ const FriendList = ({ onStartPrivateChat }) => {
         } catch (err) {
             const errorMessage = err.response?.data?.error || 'Failed to add friend';
             setError(errorMessage);
-            console.log('Error adding friend:', err);
+            // console.log('Error adding friend:', err);
         }
     };
 
@@ -108,6 +108,7 @@ const FriendList = ({ onStartPrivateChat }) => {
             <h2>Amis</h2>
             <form onSubmit={handleAddFriend} className="add-friend-form">
                 <input
+                    maxLength={11}
                     type="text"
                     value={newFriendUsername}
                     onChange={(e) => setNewFriendUsername(e.target.value)}
@@ -137,12 +138,6 @@ const FriendList = ({ onStartPrivateChat }) => {
                                 {friendship.friend_details.username}
                             </h3>
                             <div className="friend-actions">
-                                <button 
-                                    onClick={() => startChat(friendship)}
-                                    className="chat-btn"
-                                >
-                                    Chat
-                                </button>
                                 <button 
                                     onClick={() => handleRemoveFriend(friendship.friend_details.username)}
                                     className="remove-friend-btn"

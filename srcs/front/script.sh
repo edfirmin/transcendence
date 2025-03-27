@@ -8,4 +8,4 @@ npm i framer-motion
 npm i uuid
 npm i antd
 npm i --save reshake
-npm run dev -- --host
+npm run build

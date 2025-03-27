@@ -120,13 +120,15 @@ class LoginView(APIView):
                 logging.info("PAS BON 2")
                 return Response(False)
         if (is2fa(username)) :
-            if (code2fa == ""):
+            if (user.is42stud == True):
+                pass
+            elif (code2fa == ""):
                 return JsonResponse({"is2fa": "true"}, safe=False)
             else :
                 if (check2fa(user ,code2fa)):
                     pass
                 else :
-                    raise AuthenticationFailed('pas bon code 2FA')
+                    return JsonResponse({"is2fa": "true"}, safe=False)
 
         payload = {
             'id' : user.id,

@@ -71,7 +71,7 @@ export const getFriends = async () => {
         const response = await axios.get(`/api/user/friends/?token=${userToken}`);
         return response.data;
     } catch (error) {
-        console.log('Error fetching friends:', error);
+        // console.log('Error fetching friends:', error);
         throw error;
     }
 }
@@ -92,8 +92,8 @@ export const addFriend = async (username) => {
             'Content-Type': 'application/json'
         }
     });
-    if (response == false)
-        console.log("pas de user")
+    // if (response == false)
+    //     console.log("pas de user")
     return response.data;
 }
 
@@ -103,7 +103,7 @@ export const removeFriend = async (username) => {
         const response = await axios.delete(`/api/user/friends/${username}/?token=${userToken}`);
         return response.data;
     } catch (error) {
-        console.log('Error removing friend:', error);
+        // console.log('Error removing friend:', error);
         throw error;
     }
 }

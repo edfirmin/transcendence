@@ -129,7 +129,7 @@ function Hangman() {
       
       if (isWordGuessed) {
         updatedGame.status = "won";
-        pointsEarned += 10;
+       // pointsEarned += 10;
       } else if (updatedGame.attemptsLeft <= 0) {
         updatedGame.status = "lost";
       }
@@ -251,7 +251,7 @@ function Hangman() {
     <Navbarr></Navbarr>
     <div className="pendu-container">
       <h1>Jeu du Pendu</h1>
-      <div className="score-display">Score: {score}</div>
+      
       
       {currentGame && (
         <div className="game-area">

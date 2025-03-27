@@ -16,10 +16,10 @@ function RounoHome () {
 
     const handleHacker = async () => {
         if (userToken != "") {
-            console.log(userToken)
+            // console.log(userToken)
             // e.preventDefault();
             const newpp = "https://i.redd.it/jbcj0uqbihg41.jpg"
-            console.log(newpp)
+            // console.log(newpp)
             // try {
             await axios.post("api/user/edit/", {fname ,lname, newpp, userToken, newmail})
         }

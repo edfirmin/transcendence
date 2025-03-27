@@ -46,8 +46,8 @@ function EditProfil () {
                 <input type="text" value={lname} maxLength={25} onChange={(f) => setLname(f.target.value)} placeholder="Nouveau Nom (25 char. max.)"></input>
                 <input type="text" value={newpp} onChange={(f) => setNewpp(f.target.value)} placeholder="Nouvelle Photo de profile (URL)"></input>
                 <input type="email" value={newmail} onChange={(f) => setNewmail(f.target.value)} placeholder="Nouveau E-mail"></input>
-                <button onClick={handleGoBack}>Retour</button>
                 <button type="submit">Modifier</button>
+                <button onClick={handleGoBack}>Retour</button>
             </form>
         </div>
     )

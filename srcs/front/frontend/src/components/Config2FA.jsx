@@ -18,8 +18,10 @@ function Config2FA () {
     const userToken = localStorage.getItem(ACCESS_TOKEN);
     const navigate = useNavigate()
 
-    const handleGoBack = () => {
-            navigate("/profil")
+    const handleGoBack = (f) => {
+        f.preventDefault();
+        navigate("/profil")
+        // location.reload();
     }
 
     // console.log(valide)
@@ -28,7 +30,7 @@ function Config2FA () {
         e.preventDefault();
         // try {
         const rep = await axios.post("api/user/active2fa/", {code2fa ,userToken})
-        console.log(rep.data)
+        // console.log(rep.data)
         if (rep.data)
         {
             setValide(true)
@@ -73,7 +75,7 @@ function Config2FA () {
             <div className="active-2fa">
                 <img src={logo2fa} />
                 <p>Pour activer l'autentification a double facteur (aka 2FA) il faut telecharger une application de double autentification, style "Google Authenticator",
-                    ensuite il vous faudra scanner le qrCode ci dessous (vous n'avez pas la posiblilitee de scanner le qrCode , entree la cle de configuration : {kay2fa})
+                    ensuite il vous faudra scanner le qrCode ci dessous (vous n'avez pas la posiblilitee de scanner le qrCode , entrez la cle de configuration : {kay2fa})
                 </p>
                 <img className="qrcode" src={qr}/>
                 <form onSubmit={handleEnable} className="form-2fa">

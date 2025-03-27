@@ -103,7 +103,7 @@ function PongSelection() {
                 <div></div>
                 <Button name={'Local'} callback={handleLocalPong} icon={'🏓'} />
                 <Button name={'IA'} callback={handleAIPong} icon={'🤖'}/>
-                {/* <Button name={'En ligne'} callback={handleRemotePong} /> */}
+                <Button name={'En ligne'} callback={handleRemotePong} icon={'🌐'}/>
                 <Button name={'Tournoi'} callback={handleTourneyPong} icon={'🏆'}/>
                 <div></div>
               </div>

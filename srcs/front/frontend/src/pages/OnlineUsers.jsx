@@ -11,7 +11,7 @@ function OnlineUsers({ onStartPrivateChat }) {
 
   useEffect(() => {
     const connectWebSocket = () => {
-      console.log('OnlineUsers: Attempting to connect to WebSocket');
+      // console.log('OnlineUsers: Attempting to connect to WebSocket');
       const token = localStorage.getItem(ACCESS_TOKEN);
       if (!token) {
         console.error('OnlineUsers: No authentication token found');
@@ -24,7 +24,7 @@ function OnlineUsers({ onStartPrivateChat }) {
       ws.current = new WebSocket(`wss://${host}:9443/ws/online/?token=${cleanToken}`);
 
       ws.current.onopen = () => {
-        console.log('OnlineUsers: Successfully connected to WebSocket');
+        // console.log('OnlineUsers: Successfully connected to WebSocket');
         setConnectionError(false);
       };
 
@@ -45,7 +45,7 @@ function OnlineUsers({ onStartPrivateChat }) {
       };
 
       ws.current.onclose = () => {
-        console.log('OnlineUsers: WebSocket connection closed');
+        // console.log('OnlineUsers: WebSocket connection closed');
         setTimeout(connectWebSocket, 5000); // Try to reconnect after 5 seconds
       };
     };
