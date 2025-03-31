@@ -80,7 +80,7 @@ function From({route, method, setUser}) {
             navigate("/register")
     }
     const handleLoginWith42 = () => {
-        window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f3236dd912ced6cc52240ec908bd1b6358199f25e02e07f3243e077fe426c36e&redirect_uri=https%3A%2F%2Fc1r1p3%3A9443%2Fcheck42user&response_type=code";
+        window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-e9d7e0ce496c8c400728ca5647b5d2345cf50639023aa05cd809988d37719ad3&redirect_uri=https%3A%2F%2Fc3r2p4%3A9443%2Fcheck42user&response_type=code";
     };
 
 
